@@ -51,4 +51,19 @@ public class ArvoreDeJogadas {
             getChild(i).printaArvore();
         }
     }
+    public int getMenorFilho(){
+        int menor;
+        if (this.children.isEmpty()){
+            return this.pontos;
+        }
+        else{
+            menor = this.pontos;
+            for(int i=0; i<getChildren().size(); i++){
+                 if (getChild(i).getMenorFilho() < menor){
+                     menor = getChild(i).getMenorFilho();
+                 }
+            }
+            return menor;
+        }
+    }
 }
