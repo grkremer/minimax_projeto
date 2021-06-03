@@ -5,10 +5,10 @@ import java.util.List;
 public class ArvoreDeJogadas {
     private int[][] tabuleiro;
     private int pontos;
-    private List<ArvoreDeJogadas> children;
+    private List<ArvoreDeJogadas> filhos;
 
     public ArvoreDeJogadas() {
-        this.children = new ArrayList<ArvoreDeJogadas>();
+        this.filhos = new ArrayList<ArvoreDeJogadas>();
     }
     public int[][] getTabuleiro() {
         return tabuleiro;
@@ -22,20 +22,20 @@ public class ArvoreDeJogadas {
     public void setPontos(int pontos) {
         this.pontos = pontos;
     }
-    public List<ArvoreDeJogadas> getChildren() {
-        return children;
+    public List<ArvoreDeJogadas> getFilhos() {
+        return filhos;
     }
-    public void setChildren(List<ArvoreDeJogadas> children) {
-        this.children = children;
+    public void setFilhos(List<ArvoreDeJogadas> filhos) {
+        this.filhos = filhos;
     }
-    public ArvoreDeJogadas getChild(int index) {
-        return children.get(index);
+    public ArvoreDeJogadas getFilho(int index) {
+        return filhos.get(index);
     }
-    public void setChild(int index, ArvoreDeJogadas children) {
-        this.children.set(index, children);
+    public void setFilho(int index, ArvoreDeJogadas filhos) {
+        this.filhos.set(index, filhos);
     }
-    public void addChild(ArvoreDeJogadas children) {
-        this.children.add(children);
+    public void addFilho(ArvoreDeJogadas filhos) {
+        this.filhos.add(filhos);
     }
     private int randomInt(int min, int max){
         Random random = new Random();
@@ -47,21 +47,19 @@ public class ArvoreDeJogadas {
 
     public void printaArvore(){
         System.out.println(pontos+" ");
-        for(int i=0; i<getChildren().size(); i++){
-            getChild(i).printaArvore();
+        for(int i=0; i<getFilhos().size(); i++){
+            getFilho(i).printaArvore();
         }
     }
-    public int getMenorFilho(){
+    public int getMenorFolha(){
         int menor;
-        if (this.children.isEmpty()){
+        if (this.filhos.isEmpty()){
             return this.pontos;
         }
         else{
-            menor = this.pontos;
-            for(int i=0; i<getChildren().size(); i++){
-                 if (getChild(i).getMenorFilho() < menor){
-                     menor = getChild(i).getMenorFilho();
-                 }
+            menor = getFilho(0).getMenorFolha();
+            for(int i=1; i<getFilhos().size(); i++){
+                menor = Math.min(menor,getFilho(i).getMenorFolha());
             }
             return menor;
         }
