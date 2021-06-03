@@ -27,4 +27,8 @@ public class Jogada {
     public void calculaPontos(){
         setPontos(randomInt(-10, 10));
     }
+
+    public void print(){
+        System.out.println(pontos+" ");
+    }
 }

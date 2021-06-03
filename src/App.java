@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -6,11 +6,12 @@ public class App {
         j.setData(new Jogada(new int[2][2]));
         j.getData().calculaPontos();
 
-        ArrayList<Integer> l = new ArrayList<Integer>();
-        l.add(2);
+        /*ArrayList<Integer> l = new ArrayList<Integer>();
+        l.add(1);
         l.set(0, 3);
         System.out.println(l);
-
+*/
         System.out.println("Raiz: "+j.getData().getPontos());
+        j.printaArvore();
     }
 }
