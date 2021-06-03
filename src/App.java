@@ -7,7 +7,7 @@ public class App {
         j.getData().calculaPontos();
 
         ArrayList<Integer> l = new ArrayList<Integer>();
-        l.add(1);
+        l.add(2);
         l.set(0, 3);
         System.out.println(l);
 
