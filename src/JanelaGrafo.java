@@ -11,19 +11,16 @@ public class JanelaGrafo extends JFrame{
 
     public JanelaGrafo(){
         super("Jgraph teste");
-        setSize(1600,900);
+        setSize(1920,1080);
         setLocationRelativeTo(null);
     }
     private void desenhaJogadas(ArvoreDeJogadas arvore, ArvoreDeJogadas raiz, Object nodoPai, int nivel, int[] posicoes){
         Object PAI_DEFAULT = grafo.getDefaultParent();
         posicoes[nivel] += 1;
-        Object nodo = grafo.insertVertex(PAI_DEFAULT, 
-                                        null, 
-                                        Integer.toString(arvore.getPontos()), 
-                                        ((1600/(raiz.getProfundidade()-nivel+1))/raiz.numeroNosNivel(nivel))*posicoes[nivel], 
-                                        (nivel+1)*80, 
-                                        100, 
-                                        50);
+        int largura = 40;
+        int altura = 20;
+        int posicao = ((getWidth()/(raiz.numeroNosNivel(nivel)+1)) *posicoes[nivel]) - (largura/2);
+        Object nodo = grafo.insertVertex(PAI_DEFAULT, null, Integer.toString(arvore.getPontos()), posicao, (nivel+1)*80, largura, altura);
         if(nivel > 0){
             grafo.insertEdge(PAI_DEFAULT, null, "", nodoPai, nodo);
         }
@@ -34,7 +31,7 @@ public class JanelaGrafo extends JFrame{
     public void desenhaArvoreDeJogadas(ArvoreDeJogadas arvore){
         grafo = new mxGraph();
         componenteGrafo = new mxGraphComponent(grafo);
-        componenteGrafo.setPreferredSize(new Dimension(1600,900));
+        componenteGrafo.setPreferredSize(new Dimension(getWidth(),getHeight()));
         getContentPane().add(componenteGrafo);
 
         int[] posicoes = new int[arvore.getProfundidade()+1];
