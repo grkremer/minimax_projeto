@@ -102,4 +102,32 @@ public class ArvoreDeJogadas {
             return menor;
         }
     }
+    private int minimax(boolean estaMaximizando){
+        if(getProfundidade() != 0){
+            if(estaMaximizando){
+                int pontuacaoMaxima = Integer.MIN_VALUE;
+                int pontuacaoFilho;
+                for(int i=0; i<getFilhos().size(); i++){
+                    pontuacaoFilho = getFilho(i).minimax(false);
+                    pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
+                }
+                setPontos(pontuacaoMaxima);
+                return pontuacaoMaxima;
+            }
+            else{
+                int pontuacaoMinima = Integer.MAX_VALUE;
+                int pontuacaoFilho;
+                for(int i=0; i<getFilhos().size(); i++){
+                    pontuacaoFilho = getFilho(i).minimax(true);
+                    pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);
+                }
+                setPontos(pontuacaoMinima);
+                return pontuacaoMinima;
+            }
+        }
+        return getPontos();
+    }
+    public void minimax(){
+        minimax(true);
+    }
 }
