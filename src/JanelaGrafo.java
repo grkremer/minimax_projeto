@@ -13,6 +13,8 @@ public class JanelaGrafo extends JFrame{
         super("Jgraph teste");
         setSize(1920,1080);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
     }
     private void desenhaJogadas(ArvoreDeJogadas arvore, ArvoreDeJogadas raiz, Object nodoPai, int nivel, int[] posicoes){
         Object PAI_DEFAULT = grafo.getDefaultParent();
@@ -38,5 +40,6 @@ public class JanelaGrafo extends JFrame{
         grafo.getModel().beginUpdate();
         desenhaJogadas(arvore, arvore, null, 0, posicoes);
         grafo.getModel().endUpdate();
+        setVisible(true);
     }
 }

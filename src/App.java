@@ -6,6 +6,5 @@ public class App {
         
         JanelaGrafo janela = new JanelaGrafo();
         janela.desenhaArvoreDeJogadas(arvore);
-        janela.setVisible(true);
     }
 }
