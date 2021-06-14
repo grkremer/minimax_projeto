@@ -1,7 +1,7 @@
 public class App {
     public static void main(String[] args) throws Exception {
         ArvoreDeJogadas arvore = new ArvoreDeJogadas();
-        arvore.geraArvoreAleatoria(3);
+        arvore.geraArvoreAleatoria(6);
         arvore.minimax();
         
         JanelaGrafo janela = new JanelaGrafo();

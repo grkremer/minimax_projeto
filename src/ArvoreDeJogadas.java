@@ -7,6 +7,7 @@ public class ArvoreDeJogadas {
     private int pontos;
     private int profundidade;
     private List<ArvoreDeJogadas> filhos;
+    private boolean acessado = false;
     private static final int MAX_PONTOS = 20;
     private static final int MIN_PONTOS = -20;
 
@@ -46,6 +47,12 @@ public class ArvoreDeJogadas {
     public void setProfundidade(int profundidade) {
         this.profundidade = profundidade;
     }
+    public boolean isAcessado() {
+        return acessado;
+    }
+    public void setAcessado(boolean acessado) {
+        this.acessado = acessado;
+    }
     private int randomInt(int min, int max){
         Random random = new Random();
         return random.ints(min,(max+1)).findFirst().getAsInt();
@@ -70,7 +77,10 @@ public class ArvoreDeJogadas {
 
     private int numeroNosNivel(int nivelAlvo, int nivelAtual){
         if(nivelAlvo == nivelAtual){
-            return 1;
+            if(isAcessado())
+                return 1;
+            else
+                return 0;
         }
         else{
             int resultado = 0;
@@ -129,5 +139,42 @@ public class ArvoreDeJogadas {
     }
     public void minimax(){
         minimax(true);
+    }
+    private int minimaxAlphaBeta(boolean estaMaximizando, int alpha, int beta){
+        setAcessado(true);
+        if(getProfundidade() != 0){
+            if(estaMaximizando){
+                int pontuacaoMaxima = Integer.MIN_VALUE;
+                int pontuacaoFilho;
+                for(int i=0; i<getFilhos().size(); i++){
+                    pontuacaoFilho = getFilho(i).minimaxAlphaBeta(false, alpha, beta);
+                    pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
+                    alpha = Math.max(alpha, pontuacaoFilho);
+                    if(beta <= alpha){
+                        break;
+                    }
+                }
+                setPontos(pontuacaoMaxima);
+                return pontuacaoMaxima;
+            }
+            else{
+                int pontuacaoMinima = Integer.MAX_VALUE;
+                int pontuacaoFilho;
+                for(int i=0; i<getFilhos().size(); i++){
+                    pontuacaoFilho = getFilho(i).minimaxAlphaBeta(true, alpha, beta);
+                    pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);
+                    beta = Math.min(beta, pontuacaoFilho);
+                    if(beta <= alpha){
+                        break;
+                    }
+                }
+                setPontos(pontuacaoMinima);
+                return pontuacaoMinima;
+            }
+        }
+        return getPontos();
+    }
+    public void minimaxAlphaBeta(){
+        minimaxAlphaBeta(true,Integer.MIN_VALUE,Integer.MAX_VALUE);
     }
 }
