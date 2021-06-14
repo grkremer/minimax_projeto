@@ -93,6 +93,23 @@ public class ArvoreDeJogadas {
     public int numeroNosNivel(int nivel){
         return numeroNosNivel(nivel, 0);
     }
+    public int numeroNosTotal(){
+        if(isAcessado()){
+            if(getProfundidade() == 0){
+                return 1;
+            }
+            else{
+                int resultado = 1;
+                for(int i=0; i<getFilhos().size(); i++){
+                    resultado += getFilho(i).numeroNosTotal();
+                }
+                return resultado;
+            }
+        }
+        else{
+            return 0;
+        }
+    }
 
     public void printaArvore(){
         System.out.println(pontos+" ");
@@ -113,6 +130,7 @@ public class ArvoreDeJogadas {
         }
     }
     private int minimax(boolean estaMaximizando){
+        setAcessado(true);
         if(getProfundidade() != 0){
             if(estaMaximizando){
                 int pontuacaoMaxima = Integer.MIN_VALUE;
