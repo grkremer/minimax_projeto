@@ -11,5 +11,7 @@ public class App {
         JanelaGrafo janela2 = new JanelaGrafo();
         janela2.desenhaArvoreDeJogadas(arvore);
         System.out.println("Sem alpha-beta: "+arvore.numeroNosTotal());
+
+        new JanelaJogo(new TicTackle5());
     }
 }

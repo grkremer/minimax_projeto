@@ -57,25 +57,25 @@ public class ArvoreDeJogadas {
         Random random = new Random();
         return random.ints(min,(max+1)).findFirst().getAsInt();
     }
-    public int calculaPontos(){
+    public int calculaPontos() {
         return randomInt(MIN_PONTOS, MAX_PONTOS);
     }
 
-    public void geraArvoreAleatoria(int profundidade){
+    public void geraArvoreAleatoria(int profundidade) {
         setProfundidade(profundidade);
-        if(profundidade == 0){
+        if(profundidade == 0) {
             setPontos(calculaPontos());
         }
-        else{
+        else {
             int numeroDeFilhos = randomInt(2,4);
-            for(int i=0; i<numeroDeFilhos; i++){
+            for(int i=0; i<numeroDeFilhos; i++) {
                 addFilho(new ArvoreDeJogadas());
                 getFilho(i).geraArvoreAleatoria(profundidade-1);;
             }
         }
     }
 
-    private int numeroNosNivel(int nivelAlvo, int nivelAtual){
+    private int numeroNosNivel(int nivelAlvo, int nivelAtual) {
         if(nivelAlvo == nivelAtual){
             if(isAcessado())
                 return 1;
@@ -84,23 +84,23 @@ public class ArvoreDeJogadas {
         }
         else{
             int resultado = 0;
-            for(int i=0; i<getFilhos().size(); i++){
+            for(int i=0; i<getFilhos().size(); i++) {
                 resultado += getFilho(i).numeroNosNivel(nivelAlvo, nivelAtual+1);
             }
             return resultado;
         }
     }
-    public int numeroNosNivel(int nivel){
+    public int numeroNosNivel(int nivel) {
         return numeroNosNivel(nivel, 0);
     }
-    public int numeroNosTotal(){
-        if(isAcessado()){
-            if(getProfundidade() == 0){
+    public int numeroNosTotal() {
+        if(isAcessado()) {
+            if(getProfundidade() == 0) {
                 return 1;
             }
-            else{
+            else {
                 int resultado = 1;
-                for(int i=0; i<getFilhos().size(); i++){
+                for(int i=0; i<getFilhos().size(); i++) {
                     resultado += getFilho(i).numeroNosTotal();
                 }
                 return resultado;
@@ -111,41 +111,41 @@ public class ArvoreDeJogadas {
         }
     }
 
-    public void printaArvore(){
-        System.out.println(pontos+" ");
-        for(int i=0; i<getFilhos().size(); i++){
+    public void printaArvore() {
+        System.out.println(getPontos()+" ");
+        for(int i=0; i<getFilhos().size(); i++) {
             getFilho(i).printaArvore();
         }
     }
-    public int getMenorFolha(){
-        if (this.filhos.isEmpty()){
-            return this.pontos;
+    public int getMenorFolha() {
+        if (getFilhos().isEmpty()) {
+            return getPontos();
         }
-        else{
+        else {
             int menor = getFilho(0).getMenorFolha();
-            for(int i=1; i<getFilhos().size(); i++){
+            for(int i=1; i<getFilhos().size(); i++) {
                 menor = Math.min(menor,getFilho(i).getMenorFolha());
             }
             return menor;
         }
     }
-    private int minimax(boolean estaMaximizando){
+    private int minimax(boolean estaMaximizando) {
         setAcessado(true);
-        if(getProfundidade() != 0){
-            if(estaMaximizando){
+        if(getProfundidade() != 0) {
+            if(estaMaximizando) {
                 int pontuacaoMaxima = Integer.MIN_VALUE;
                 int pontuacaoFilho;
-                for(int i=0; i<getFilhos().size(); i++){
+                for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimax(false);
                     pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
                 }
                 setPontos(pontuacaoMaxima);
                 return pontuacaoMaxima;
             }
-            else{
+            else {
                 int pontuacaoMinima = Integer.MAX_VALUE;
                 int pontuacaoFilho;
-                for(int i=0; i<getFilhos().size(); i++){
+                for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimax(true);
                     pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);
                 }
@@ -155,34 +155,34 @@ public class ArvoreDeJogadas {
         }
         return getPontos();
     }
-    public void minimax(){
+    public void minimax() {
         minimax(true);
     }
-    private int minimaxAlphaBeta(boolean estaMaximizando, int alpha, int beta){
+    private int minimaxAlphaBeta(boolean estaMaximizando, int alpha, int beta) {
         setAcessado(true);
-        if(getProfundidade() != 0){
-            if(estaMaximizando){
+        if(getProfundidade() != 0) {
+            if(estaMaximizando) {
                 int pontuacaoMaxima = Integer.MIN_VALUE;
                 int pontuacaoFilho;
-                for(int i=0; i<getFilhos().size(); i++){
+                for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimaxAlphaBeta(false, alpha, beta);
                     pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
                     alpha = Math.max(alpha, pontuacaoFilho);
-                    if(beta <= alpha){
+                    if(beta <= alpha) {
                         break;
                     }
                 }
                 setPontos(pontuacaoMaxima);
                 return pontuacaoMaxima;
             }
-            else{
+            else {
                 int pontuacaoMinima = Integer.MAX_VALUE;
                 int pontuacaoFilho;
-                for(int i=0; i<getFilhos().size(); i++){
+                for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimaxAlphaBeta(true, alpha, beta);
                     pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);
                     beta = Math.min(beta, pontuacaoFilho);
-                    if(beta <= alpha){
+                    if(beta <= alpha) {
                         break;
                     }
                 }
@@ -192,7 +192,7 @@ public class ArvoreDeJogadas {
         }
         return getPontos();
     }
-    public void minimaxAlphaBeta(){
+    public void minimaxAlphaBeta() {
         minimaxAlphaBeta(true,Integer.MIN_VALUE,Integer.MAX_VALUE);
     }
 }
