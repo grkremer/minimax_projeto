@@ -75,6 +75,48 @@ public class TicTackle5 extends Jogo {
         }
     }
     private void desenhaLinhas(Graphics g) {
+        g.setColor(Color.black);
+        int inicioX;
+        int inicioY;
+        int fimX;
+        int fimY;
+        for(int x=0; x<LARGURA_TABULEIRO; x++) {
+            inicioX = calculaPosicaoFila(x, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+            inicioY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+            fimX = inicioX;
+            fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+            g.drawLine(inicioX, inicioY, fimX, fimY);
+        }
+        for(int y=0; y<LARGURA_TABULEIRO; y++) {
+            inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+            inicioY = calculaPosicaoFila(y, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+            fimX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+            fimY = inicioY;
+            g.drawLine(inicioX, inicioY, fimX, fimY);
+        }
+        inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        inicioY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        fimX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+
+        inicioX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+
+        inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        inicioY = calculaPosicaoFila((int)Math.ceil(ALTURA_TABULEIRO/2), 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        fimX = calculaPosicaoFila((int)Math.ceil(LARGURA_TABULEIRO/2), 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+
+        inicioX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
     }
     @Override
     public void desenhaTabuleiro(Graphics g) {
