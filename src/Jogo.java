@@ -17,7 +17,6 @@ public class Jogo extends JPanel implements ActionListener {
     Jogo() {
         this.setPreferredSize(new Dimension(LARGURA_TELA,ALTURA_TELA));
         this.setFocusable(true);
-        iniciaTimer();
     }
     public String getNome() {
         return nome;
