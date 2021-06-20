@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 public class TicTackle5 extends Jogo {
     private static final int ALTURA_TABULEIRO = 5;
@@ -11,30 +12,32 @@ public class TicTackle5 extends Jogo {
     TicTackle5() {
         super();
         setNome("Tic Tackle 5");
-        setTabuleiro(new int[ALTURA_TABULEIRO][LARGURA_TABULEIRO]);
+        setTabuleiro(new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO]);
         iniciaJogo();
         setBackground(Color.white);
+        //fazJogada(0, 0, 1, 1);
+        //printaPossiveisJogadas();
     }
     public void iniciaJogo() {
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             if(x % 2 == 0) {
-                getTabuleiro()[0][x] = PECA_BRANCA;
+                getTabuleiro()[x][0] = PECA_BRANCA;
             }
             else {
-                getTabuleiro()[0][x] = PECA_PRETA;
+                getTabuleiro()[x][0] = PECA_PRETA;
             }   
         }
         for(int y=1; y < ALTURA_TABULEIRO-1; y++) {
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
-                getTabuleiro()[y][x] = SEM_PECA;
+                getTabuleiro()[x][y] = SEM_PECA;
             }
         }
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             if(x % 2 == 0) {
-                getTabuleiro()[ALTURA_TABULEIRO-1][x] = PECA_PRETA;
+                getTabuleiro()[x][ALTURA_TABULEIRO-1] = PECA_PRETA;
             }
             else {
-                getTabuleiro()[ALTURA_TABULEIRO-1][x] = PECA_BRANCA;
+                getTabuleiro()[x][ALTURA_TABULEIRO-1] = PECA_BRANCA;
             } 
         }
     }
@@ -46,7 +49,7 @@ public class TicTackle5 extends Jogo {
         int posicaoY;
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
-                switch(getTabuleiro()[y][x]) {
+                switch(getTabuleiro()[x][y]) {
                     case SEM_PECA: 
                         posicaoX = calculaPosicaoFila(x, (int)(TAMANHO_PECA/1.5), LARGURA_TELA, LARGURA_TABULEIRO);
                         posicaoY = calculaPosicaoFila(y, (int)(TAMANHO_PECA/1.5), ALTURA_TELA, ALTURA_TABULEIRO);
@@ -77,5 +80,77 @@ public class TicTackle5 extends Jogo {
     public void desenhaTabuleiro(Graphics g) {
         desenhaLinhas(g);
         desenhaPecas(g);
+    }
+    public void fazJogada(int xInicial, int yInicial, int xFinal, int yFinal) {
+        getTabuleiro()[xFinal][yFinal] = getTabuleiro()[xInicial][yInicial];
+        getTabuleiro()[xInicial][yInicial] = SEM_PECA;
+    } 
+    public boolean estaNosLimites(int x, int y) {
+        if(x>=0 && x<LARGURA_TABULEIRO && y>=0 && y<ALTURA_TABULEIRO)
+            return true;
+        else
+            return false;
+    }
+    public boolean verificaJogada(int xInicial, int yInicial, int xFinal, int yFinal) {
+        if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
+            if (getTabuleiro()[xFinal][yFinal] == SEM_PECA && getTabuleiro()[xInicial][yInicial] != SEM_PECA) {
+                //Se quer se mover na diagonal
+                if((Math.abs(xInicial - xFinal) == 1 ) && (Math.abs(yInicial - yFinal) == 1)) {
+                    //Se x e y têm a mesma paridade
+                    if(((xInicial % 2 == 0) && (yInicial % 2 == 0)) || ((xInicial % 2 == 1) && (yInicial % 2 == 1))) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                //Se quer se mover na vertical/horizontal
+                else if((Math.abs(xInicial - xFinal) <= 1 ) && (Math.abs(yInicial - yFinal) <= 1)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+        
+    }
+    public void printaPossiveisJogadas() {
+        ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(PECA_BRANCA);
+        for(int i=0; i < possiveisJogadas.size(); i++) {
+            System.out.println("("+possiveisJogadas.get(i)[0]+", "+possiveisJogadas.get(i)[1]+") -> ("+possiveisJogadas.get(i)[2]+", "+possiveisJogadas.get(i)[3]+")");
+        }
+    }
+    public ArrayList<int[]> listaPossiveisJogadas(int corPeca) {
+        ArrayList<int[]> possiveisJogadas = new ArrayList<int[]>();
+        int[][] regioes = {{1,0},{0,1},{1,1},{-1,-1},{-1,1},{1,-1},{-1,0},{0,-1}};
+        for(int y=0; y < ALTURA_TABULEIRO; y++) {
+            for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                if(getTabuleiro()[x][y] == corPeca) {
+                    for(int i=0; i < regioes.length; i++) {
+                        int novoX = x+regioes[i][0];
+                        int novoY = y+regioes[i][1];
+                        if(verificaJogada(x,y,novoX,novoY)) {
+                            int[] possibilidade = new int[4];
+                            possibilidade[0] = x;
+                            possibilidade[1] = y;
+                            possibilidade[2] = novoX;
+                            possibilidade[3] = novoY;
+                            possiveisJogadas.add(possibilidade);
+                        }
+                    }
+                }
+            }
+        }
+        return possiveisJogadas;
+    }
+    public void maquinaJoga() {
+        
     }
 }
