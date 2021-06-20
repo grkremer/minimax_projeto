@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArvoreDeJogadas {
-    private int[][] tabuleiro;
+    private int[][] copiaTabuleiro;
     private int pontos;
     private int profundidade;
     private List<ArvoreDeJogadas> filhos;
@@ -14,11 +14,11 @@ public class ArvoreDeJogadas {
     public ArvoreDeJogadas() {
         this.filhos = new ArrayList<ArvoreDeJogadas>();
     }
-    public int[][] getTabuleiro() {
-        return tabuleiro;
+    public int[][] getCopiaTabuleiro() {
+        return copiaTabuleiro;
     }
-    public void setTabuleiro(int[][] tabuleiro) {
-        this.tabuleiro = tabuleiro;
+    public void setCopiaTabuleiro(int[][] copiaTabuleiro) {
+        this.copiaTabuleiro = copiaTabuleiro;
     }
     public int getPontos() {
         return pontos;
@@ -57,14 +57,14 @@ public class ArvoreDeJogadas {
         Random random = new Random();
         return random.ints(min,(max+1)).findFirst().getAsInt();
     }
-    public int calculaPontos() {
+    public int geraPontosAleatorios() {
         return randomInt(MIN_PONTOS, MAX_PONTOS);
     }
 
     public void geraArvoreAleatoria(int profundidade) {
         setProfundidade(profundidade);
         if(profundidade == 0) {
-            setPontos(calculaPontos());
+            setPontos(geraPontosAleatorios());
         }
         else {
             int numeroDeFilhos = randomInt(2,4);
