@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TicTackle5 extends Jogo {
     private static final int ALTURA_TABULEIRO = 5;
@@ -226,6 +227,7 @@ public class TicTackle5 extends Jogo {
     public int maximoAlinhado(int corPeca) {
         int maximo = 0;
         int contagem;
+        
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
             contagem = 0;
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
@@ -237,6 +239,9 @@ public class TicTackle5 extends Jogo {
                     contagem = 0;
                 }
             }
+        }
+        if (maximo >= 4) {
+            return maximo;
         }
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             contagem = 0;
@@ -250,6 +255,9 @@ public class TicTackle5 extends Jogo {
                 }
             }
         }
+        if (maximo >= 4) {
+            return maximo;
+        }
         contagem = 0;
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             if(getTabuleiro()[x][x] == corPeca) {
@@ -259,6 +267,9 @@ public class TicTackle5 extends Jogo {
             else {
                 contagem = 0;
             }
+        }
+        if (maximo >= 4) {
+            return maximo;
         }
         contagem = 0;
         for(int x=1; x < LARGURA_TABULEIRO; x++) {
@@ -270,6 +281,11 @@ public class TicTackle5 extends Jogo {
                 contagem = 0;
             }
         }
+
+        if (maximo >= 4) {
+            return maximo;
+        }
+
         contagem = 0;
         for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
             if(getTabuleiro()[x][x+1] == corPeca) {
@@ -279,7 +295,12 @@ public class TicTackle5 extends Jogo {
             else {
                 contagem = 0;
             }
-        } 
+        }
+
+        if (maximo >= 4) {
+            return maximo;
+        }
+
         contagem = 0;
         for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
             if(getTabuleiro()[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
@@ -290,6 +311,9 @@ public class TicTackle5 extends Jogo {
                 contagem = 0;
             }
         }
+        if (maximo >= 4) {
+            return maximo;
+        }
         contagem = 0;
         for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
             if(getTabuleiro()[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
@@ -299,6 +323,9 @@ public class TicTackle5 extends Jogo {
             else {
                 contagem = 0;
             }
+        }
+        if (maximo >= 4) {
+            return maximo;
         }
         contagem = 0;
         for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
@@ -327,6 +354,9 @@ public class TicTackle5 extends Jogo {
                 }
             }
         }
+        if (maximo >= 4) {
+            return maximo;
+        }
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             contagem = 0;
             for(int y=0; y < ALTURA_TABULEIRO; y++) {
@@ -339,6 +369,9 @@ public class TicTackle5 extends Jogo {
                 }
             }
         }
+        if (maximo >= 4) {
+            return maximo;
+        }
         contagem = 0;
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             if(tabuleiro[x][x] == corPeca) {
@@ -348,6 +381,9 @@ public class TicTackle5 extends Jogo {
             else {
                 contagem = 0;
             }
+        }
+        if (maximo >= 4) {
+            return maximo;
         }
         contagem = 0;
         for(int x=1; x < LARGURA_TABULEIRO; x++) {
@@ -359,6 +395,9 @@ public class TicTackle5 extends Jogo {
                 contagem = 0;
             }
         }
+        if (maximo >= 4) {
+            return maximo;
+        }
         contagem = 0;
         for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
             if(tabuleiro[x][x+1] == corPeca) {
@@ -369,6 +408,9 @@ public class TicTackle5 extends Jogo {
                 contagem = 0;
             }
         } 
+        if (maximo >= 4) {
+            return maximo;
+        }
         contagem = 0;
         for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
             if(tabuleiro[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
@@ -379,6 +421,9 @@ public class TicTackle5 extends Jogo {
                 contagem = 0;
             }
         }
+        if (maximo >= 4) {
+            return maximo;
+        }
         contagem = 0;
         for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
             if(tabuleiro[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
@@ -388,6 +433,9 @@ public class TicTackle5 extends Jogo {
             else {
                 contagem = 0;
             }
+        }
+        if (maximo >= 4) {
+            return maximo;
         }
         contagem = 0;
         for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
@@ -433,15 +481,37 @@ public class TicTackle5 extends Jogo {
     
     private int geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         int maxAlinhado =  maximoAlinhado(corPeca, tabuleiro);
+        double maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
         float custo;
-        if(maxAlinhado > 4) {
+        if(maxAlinhado >= 4) {
             custo = maxPontos;
         }
         else {
-            custo = (maxAlinhado-1.0f)/(4.0f-1.0f) * (maxPontos-minPontos) + minPontos;
+            int custoLinha = normalizaPontuacao(1.0, 4.0, (double)minPontos, (double)maxPontos, maxAlinhado);
+            int custoDistancia = normalizaPontuacao(1.0, Math.sqrt(20), (double)minPontos, (double)maxPontos, maxDistancia);
+            int custoDistancia2 = normalizaPontuacao(1.0, Math.sqrt(20), (double)minPontos, (double)maxPontos, geraMaiorDistanciaSegundaMenor(corPeca, tabuleiro));
+            custo = custoLinha * 0.5f + custoDistancia * -0.4f + custoDistancia2 * -0.1f;
         }
         return (int)custo;
     }
+
+
+    private int geraCustoPeca2(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+        int maxAlinhado =  maximoAlinhado(corPeca, tabuleiro);
+        double maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
+        float custo;
+        if(maxAlinhado >= 4) {
+            custo = maxPontos;
+        }
+        else {
+            int custoLinha = normalizaPontuacao(1.0, 4.0, (double)minPontos, (double)maxPontos, maxAlinhado);
+            int custoDistancia = normalizaPontuacao(1.0, Math.sqrt(20), (double)minPontos, (double)maxPontos, maxDistancia);
+            //int custoDistancia2 = normalizaPontuacao(1.0, Math.sqrt(20), (double)minPontos, (double)maxPontos, geraMaiorDistanciaSegundaMenor(corPeca, tabuleiro));
+            custo = custoLinha * 0.5f + custoDistancia * -0.5f;
+        }
+        return (int)custo;
+    }
+
     public int geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         if(corPeca == PECA_PRETA) {
             ArvoreDeJogadas j = new ArvoreDeJogadas();
@@ -455,7 +525,7 @@ public class TicTackle5 extends Jogo {
                 return minPontos;
             }
             else{
-                return (int)(geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.7f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.3f);
+                return (int)(geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f);
             }
         }
         
@@ -507,4 +577,72 @@ public class TicTackle5 extends Jogo {
             }
         }
     }
+    public double geraMaiorDistanciaMenor(int corPeca, int tabuleiro[][]) {
+        int pecas[][] = new int[LARGURA_TABULEIRO][2];
+        int i = 0;
+        int j = 0;
+        for(int y=0; y < ALTURA_TABULEIRO; y++) {
+            for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    pecas[i][0] = x;
+                    pecas[i][1] = y;
+                    i++;
+                }
+            }
+        }
+        double[] distancias = new double[LARGURA_TABULEIRO];
+        double distancia = 0;
+        
+        for (i =0; i < LARGURA_TABULEIRO; i++){
+            distancias[i] = Double.POSITIVE_INFINITY;
+            for (j = 0; j < LARGURA_TABULEIRO; j++){
+                if (i!= j) {
+                    distancia =  Math.sqrt(Math.pow((pecas [i][0] - pecas [j][0]),2) + Math.pow((pecas [i][1] - pecas [j][1]),2));
+                    distancias[i] = Math.min(distancias[i], distancia);                  
+                }
+            }
+        }
+        Arrays.sort(distancias);
+        return distancias[LARGURA_TABULEIRO-1];
+    }
+
+    public double geraMaiorDistanciaSegundaMenor(int corPeca, int tabuleiro[][]) {
+        int pecas[][] = new int[LARGURA_TABULEIRO][2];
+        int i = 0;
+        int j = 0;
+        for(int y=0; y < ALTURA_TABULEIRO; y++) {
+            for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    pecas[i][0] = x;
+                    pecas[i][1] = y;
+                    i++;
+                }
+            }
+        }
+        double[] distancias = new double[LARGURA_TABULEIRO];
+        double distancia = 0;
+        
+        for (i =0; i < LARGURA_TABULEIRO; i++){
+            distancias[i] = Double.POSITIVE_INFINITY;
+            double menor = Double.POSITIVE_INFINITY;
+            
+            for (j = 0; j < LARGURA_TABULEIRO; j++){
+                if (i!= j) {
+                    distancia =  Math.sqrt(Math.pow((pecas [i][0] - pecas [j][0]),2) + Math.pow((pecas [i][1] - pecas [j][1]),2));
+                    if (distancia <= menor) {
+                        distancias[i] = menor;
+                        menor = distancia;
+                    }               
+                }
+            }
+        }
+        Arrays.sort(distancias);
+        return distancias[LARGURA_TABULEIRO-1];
+        
+    }
+
+    private int normalizaPontuacao(double minimoAntigo, double maximoAntigo, double minimoNovo, double maximoNovo, double valor){
+        return (int)((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
+    }
 }
+    
