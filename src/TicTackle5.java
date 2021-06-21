@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class TicTackle5 extends Jogo {
     private static final int ALTURA_TABULEIRO = 5;
@@ -514,8 +515,17 @@ public class TicTackle5 extends Jogo {
 
     public int geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         if(corPeca == PECA_PRETA) {
-            ArvoreDeJogadas j = new ArvoreDeJogadas();
-            return j.geraPontosAleatorios();
+            if(verificaVitoria(PECA_PRETA, tabuleiro)) {
+                return maxPontos;
+            }
+            else if(verificaVitoria(PECA_BRANCA, tabuleiro)) {
+                return minPontos;
+            }
+            else{
+                return (int)(geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*-0.7f);
+            }
+            //ArvoreDeJogadas j = new ArvoreDeJogadas();
+            //return j.geraPontosAleatorios();
         }
         else {
             if(verificaVitoria(PECA_BRANCA, tabuleiro)) {
@@ -525,7 +535,7 @@ public class TicTackle5 extends Jogo {
                 return minPontos;
             }
             else{
-                return (int)(geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f);
+                return (int)(geraCustoPeca2(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca2(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f);
             }
         }
         
@@ -567,12 +577,23 @@ public class TicTackle5 extends Jogo {
     public void maquinaJoga(int corPeca) {
         ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, 4);
         jogadas.minimaxAlphaBeta();
+        Collections.shuffle(jogadas.getFilhos());
         int pontuacaoMaxima = Integer.MIN_VALUE;
+        int profundidadeMinima = Integer.MAX_VALUE;
         for(int i=0; i < jogadas.getFilhos().size(); i++) {
             if(jogadas.getFilho(i).isAcessado()) {
                 if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
                     setTabuleiro(jogadas.getFilho(i).getCopiaTabuleiro());
                     pontuacaoMaxima = jogadas.getFilho(i).getPontos();
+                    if(pontuacaoMaxima == jogadas.MAX_PONTOS) {
+                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
+                    }
+                }
+                else if(jogadas.getFilho(i).getPontos() == jogadas.MAX_PONTOS) {
+                    if(jogadas.getFilho(i).getProfundidade() < profundidadeMinima) {
+                        setTabuleiro(jogadas.getFilho(i).getCopiaTabuleiro());
+                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
+                    }
                 }
             }
         }
@@ -622,16 +643,19 @@ public class TicTackle5 extends Jogo {
         double[] distancias = new double[LARGURA_TABULEIRO];
         double distancia = 0;
         
-        for (i =0; i < LARGURA_TABULEIRO; i++){
+        for (i =0; i < LARGURA_TABULEIRO; i++) {
             distancias[i] = Double.POSITIVE_INFINITY;
             double menor = Double.POSITIVE_INFINITY;
             
-            for (j = 0; j < LARGURA_TABULEIRO; j++){
+            for (j = 0; j < LARGURA_TABULEIRO; j++) {
                 if (i!= j) {
                     distancia =  Math.sqrt(Math.pow((pecas [i][0] - pecas [j][0]),2) + Math.pow((pecas [i][1] - pecas [j][1]),2));
                     if (distancia <= menor) {
                         distancias[i] = menor;
                         menor = distancia;
+                    }
+                    else if(distancias[i] == Double.POSITIVE_INFINITY) {
+                        distancias[i] = distancia;
                     }               
                 }
             }

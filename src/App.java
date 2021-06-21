@@ -18,7 +18,7 @@ public class App {
             Thread.sleep(TEMPO);
             if(t.verificaVitoria(1)) vitoriasBranco++;
             else {
-                Thread.sleep(6000);
+                //Thread.sleep(6000);
                 vitoriasPreto++;
             }
             System.out.println("Branco "+vitoriasBranco+" x "+vitoriasPreto+" Preto ("+(i+1)+" jogos)");
