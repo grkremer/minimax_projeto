@@ -164,7 +164,35 @@ public class TicTackle5 extends Jogo {
         else {
             return false;
         }
-        
+    }
+    public boolean verificaJogada(int xInicial, int yInicial, int xFinal, int yFinal, int[][] tabuleiro) {
+        if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
+            if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
+                //Se quer se mover na diagonal
+                if((Math.abs(xInicial - xFinal) == 1 ) && (Math.abs(yInicial - yFinal) == 1)) {
+                    //Se x e y têm a mesma paridade
+                    if(((xInicial % 2 == 0) && (yInicial % 2 == 0)) || ((xInicial % 2 == 1) && (yInicial % 2 == 1))) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                //Se quer se mover na vertical/horizontal
+                else if((Math.abs(xInicial - xFinal) <= 1 ) && (Math.abs(yInicial - yFinal) <= 1)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
     }
     public void printaPossiveisJogadas(int corPeca) {
         ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(corPeca,getTabuleiro());
@@ -181,7 +209,7 @@ public class TicTackle5 extends Jogo {
                     for(int i=0; i < regioes.length; i++) {
                         int novoX = x+regioes[i][0];
                         int novoY = y+regioes[i][1];
-                        if(verificaJogada(x,y,novoX,novoY)) {
+                        if(verificaJogada(x,y,novoX,novoY,tabuleiro)) {
                             int[] possibilidade = new int[4];
                             possibilidade[0] = x;
                             possibilidade[1] = y;
@@ -405,18 +433,30 @@ public class TicTackle5 extends Jogo {
     
     private int geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         int maxAlinhado =  maximoAlinhado(corPeca, tabuleiro);
-        float custo = (maxAlinhado-1.0f)/(5.0f-1.0f) * (maxPontos-minPontos) + minPontos;
+        float custo;
+        if(maxAlinhado > 4) {
+            custo = maxPontos;
+        }
+        else {
+            custo = (maxAlinhado-1.0f)/(4.0f-1.0f) * (maxPontos-minPontos) + minPontos;
+        }
         return (int)custo;
     }
     public int geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         if(corPeca == PECA_PRETA) {
             ArvoreDeJogadas j = new ArvoreDeJogadas();
             return j.geraPontosAleatorios();
-            //return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos);
-            //return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos) - geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos);
         }
         else {
-            return geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos);
+            if(verificaVitoria(PECA_BRANCA, tabuleiro)) {
+                return maxPontos;
+            }
+            else if(verificaVitoria(PECA_PRETA, tabuleiro)) {
+                return minPontos;
+            }
+            else{
+                return (int)(geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.7f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.3f);
+            }
         }
         
     }
