@@ -284,6 +284,95 @@ public class TicTackle5 extends Jogo {
         }
         return maximo;
     }
+    public int maximoAlinhado(int corPeca, int[][] tabuleiro) {
+        int maximo = 0;
+        int contagem;
+        for(int y=0; y < ALTURA_TABULEIRO; y++) {
+            contagem = 0;
+            for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    contagem++;
+                    maximo = Math.max(maximo, contagem);
+                }
+                else {
+                    contagem = 0;
+                }
+            }
+        }
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            contagem = 0;
+            for(int y=0; y < ALTURA_TABULEIRO; y++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    contagem++;
+                    maximo = Math.max(maximo, contagem);
+                }
+                else {
+                    contagem = 0;
+                }
+            }
+        }
+        contagem = 0;
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            if(tabuleiro[x][x] == corPeca) {
+                contagem++;
+                maximo = Math.max(maximo, contagem);
+            }
+            else {
+                contagem = 0;
+            }
+        }
+        contagem = 0;
+        for(int x=1; x < LARGURA_TABULEIRO; x++) {
+            if(tabuleiro[x][x-1] == corPeca) {
+                contagem++;
+                maximo = Math.max(maximo, contagem);
+            }
+            else {
+                contagem = 0;
+            }
+        }
+        contagem = 0;
+        for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
+            if(tabuleiro[x][x+1] == corPeca) {
+                contagem++;
+                maximo = Math.max(maximo, contagem);
+            }
+            else {
+                contagem = 0;
+            }
+        } 
+        contagem = 0;
+        for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
+            if(tabuleiro[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
+                contagem++;
+                maximo = Math.max(maximo, contagem);
+            }
+            else {
+                contagem = 0;
+            }
+        }
+        contagem = 0;
+        for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
+            if(tabuleiro[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                contagem++;
+                maximo = Math.max(maximo, contagem);
+            }
+            else {
+                contagem = 0;
+            }
+        }
+        contagem = 0;
+        for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
+            if(tabuleiro[x+1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                contagem++;
+                maximo = Math.max(maximo, contagem);
+            }
+            else {
+                contagem = 0;
+            }
+        }
+        return maximo;
+    }
     public boolean verificaVitoria(int corPeca) {
         if(maximoAlinhado(corPeca) >= 4) {
             return true;
@@ -292,6 +381,18 @@ public class TicTackle5 extends Jogo {
             return false;
         }
     }
+    public boolean verificaVitoria(int corPeca, int[][] tabuleiro) {
+        if(maximoAlinhado(corPeca, tabuleiro) >= 4) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    public boolean verificaFimDeJogo(int[][] tabuleiro) {
+        return verificaVitoria(PECA_BRANCA, tabuleiro) || verificaVitoria(PECA_PRETA, tabuleiro);
+    }
+    
     private int[][] criaCopiaTabuleiro(int[][] tabuleiro) {
         int[][] novoTabuleiro = new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
@@ -301,10 +402,28 @@ public class TicTackle5 extends Jogo {
         }
         return novoTabuleiro;
     }
-    public void constroiArvoreDeJogadas(int corPeca, ArvoreDeJogadas jogadas, int profundidadeMax) {
-        ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(corPeca,jogadas.getCopiaTabuleiro());
-        if(profundidadeMax == 0 || possiveisJogadas.size() == 0) {
-            jogadas.setPontos(jogadas.geraPontosAleatorios());
+    
+    private int geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+        int maxAlinhado =  maximoAlinhado(corPeca, tabuleiro);
+        float custo = (maxAlinhado-1.0f)/(5.0f-1.0f) * (maxPontos-minPontos) + minPontos;
+        return (int)custo;
+    }
+    public int geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+        if(corPeca == PECA_PRETA) {
+            ArvoreDeJogadas j = new ArvoreDeJogadas();
+            return j.geraPontosAleatorios();
+            //return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos);
+            //return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos) - geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos);
+        }
+        else {
+            return geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos);
+        }
+        
+    }
+    public void constroiArvoreDeJogadas(int corPecaJogador, int corPecaAtual, ArvoreDeJogadas jogadas, int profundidadeMax) {
+        ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(corPecaAtual,jogadas.getCopiaTabuleiro());
+        if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || verificaFimDeJogo(jogadas.getCopiaTabuleiro())) {
+            jogadas.setPontos(geraCusto(corPecaJogador, jogadas.getCopiaTabuleiro(), jogadas.MIN_PONTOS, jogadas.MAX_PONTOS));
             jogadas.setProfundidade(0);
         }
         else {
@@ -313,18 +432,18 @@ public class TicTackle5 extends Jogo {
                 int[][] novoTabuleiro = criaCopiaTabuleiro(jogadas.getCopiaTabuleiro());
                 novoTabuleiro = fazJogada(possiveisJogadas.get(i)[0], possiveisJogadas.get(i)[1], possiveisJogadas.get(i)[2], possiveisJogadas.get(i)[3], novoTabuleiro);
                 proximasJogadas.setCopiaTabuleiro(novoTabuleiro);
-                if(corPeca == PECA_BRANCA) {
-                    constroiArvoreDeJogadas(PECA_PRETA, proximasJogadas, profundidadeMax-1);
+                if(corPecaAtual == PECA_BRANCA) {
+                    constroiArvoreDeJogadas(corPecaJogador, PECA_PRETA, proximasJogadas, profundidadeMax-1);
                 }
                 else {
-                    constroiArvoreDeJogadas(PECA_BRANCA, proximasJogadas, profundidadeMax-1);
+                    constroiArvoreDeJogadas(corPecaJogador, PECA_BRANCA, proximasJogadas, profundidadeMax-1);
                 }
                 jogadas.addFilho(proximasJogadas);
             }
 
             int maiorProfundidadeFilho = 0;
             for(int i=0; i < jogadas.getFilhos().size(); i++) {
-                maiorProfundidadeFilho = Math.max(maiorProfundidadeFilho, jogadas.getFilho(0).getPontos());
+                maiorProfundidadeFilho = Math.max(maiorProfundidadeFilho, jogadas.getFilho(i).getProfundidade());
             }
             jogadas.setProfundidade(maiorProfundidadeFilho+1);
         }
@@ -332,11 +451,11 @@ public class TicTackle5 extends Jogo {
     public ArvoreDeJogadas constroiArvoreDeJogadas(int corPeca, int profundidadeMax) {
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas();
         jogadas.setCopiaTabuleiro(criaCopiaTabuleiro(getTabuleiro()));
-        constroiArvoreDeJogadas(corPeca, jogadas, profundidadeMax);
+        constroiArvoreDeJogadas(corPeca, corPeca, jogadas, profundidadeMax);
         return jogadas;
     }
     public void maquinaJoga(int corPeca) {
-        ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, 3);
+        ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, 4);
         jogadas.minimaxAlphaBeta();
         int pontuacaoMaxima = Integer.MIN_VALUE;
         for(int i=0; i < jogadas.getFilhos().size(); i++) {
