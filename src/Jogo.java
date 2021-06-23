@@ -40,6 +40,10 @@ public class Jogo extends JPanel implements ActionListener {
         setTimer(new Timer(DELAY, this));
         getTimer().start();
     }
+    public void paraTimer() {
+        getTimer().stop();
+        repaint();
+    }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         desenhaTabuleiro(g);

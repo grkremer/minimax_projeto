@@ -1,5 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,12 +13,72 @@ public class TicTackle5 extends Jogo {
     private static final int PECA_BRANCA = 1;
     private static final int PECA_PRETA = 2;
     private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*LARGURA_TABULEIRO);
+    private boolean vezDoPlayer = false;
+    private boolean selecionado = false;
+    private int[] posSelecionado = {0, 0};
+
     TicTackle5() {
         super();
         setNome("Tic Tackle 5");
         setTabuleiro(new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO]);
-        inicializaTabuleiro();
         setBackground(Color.white);
+        addMouseListener(new EventosMouse());
+    }
+    public boolean isVezDoPlayer() {
+        return vezDoPlayer;
+    }
+    public void setVezDoPlayer(boolean vezDoPlayer) {
+        this.vezDoPlayer = vezDoPlayer;
+    }
+    public boolean isSelecionado() {
+        return selecionado;
+    }
+    public void setSelecionado(boolean selecionado) {
+        this.selecionado = selecionado;
+    }
+    public int[] getPosSelecionado() {
+        return posSelecionado;
+    }
+    public void setPosSelecionado(int[] posSelecionado) {
+        this.posSelecionado = posSelecionado;
+    }
+
+    public void partidaBotXPlayer() throws InterruptedException {
+        inicializaTabuleiro();
+        iniciaTimer();
+        int chance;
+        while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
+            setVezDoPlayer(true);
+            System.out.println("Vez das peças brancas");
+            while(isVezDoPlayer()) {
+                Thread.sleep(1);
+            }
+            if(!verificaVitoria(PECA_BRANCA)) {
+                System.out.println("Vez das peças pretas");
+                chance = maquinaJoga(PECA_PRETA,5);
+                System.out.println("Chance de vitória das peças pretas: "+chance+"%");
+            }
+        }
+        paraTimer();
+    }
+    public void partidaBotXBot() throws InterruptedException {
+        inicializaTabuleiro();
+        iniciaTimer();
+        int chance;
+        while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
+            System.out.println("Vez das peças brancas");
+            chance = maquinaJoga(PECA_BRANCA,1);
+            System.out.println("Chance de vitória das peças brancas: "+chance+"%");
+            Thread.sleep(500);
+            if(!verificaVitoria(PECA_BRANCA)) {
+                System.out.println("Vez das peças pretas");
+                chance = maquinaJoga(PECA_PRETA,5);
+                System.out.println("Chance de vitória das peças pretas: "+chance+"%");
+                Thread.sleep(250);
+            }
+        }
+        getTimer().stop();
+        repaint();
     }
     public void inicializaTabuleiro() {
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
@@ -61,14 +123,24 @@ public class TicTackle5 extends Jogo {
                         posicaoY = calculaPosicaoFila(y, TAMANHO_PECA, ALTURA_TELA, ALTURA_TABULEIRO);
                         g.setColor(Color.white);
                         g.fillOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        g.setColor(Color.black);
-                        g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
+                        if(isSelecionado() && getPosSelecionado()[0] == x && getPosSelecionado()[1] == y) {
+                            g.setColor(Color.blue);
+                            g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
+                        }
+                        else {
+                            g.setColor(Color.black);
+                            g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
+                        }
                         break;
                     case PECA_PRETA:
                         posicaoX = calculaPosicaoFila(x, TAMANHO_PECA, LARGURA_TELA, LARGURA_TABULEIRO);
                         posicaoY = calculaPosicaoFila(y, TAMANHO_PECA, ALTURA_TELA, ALTURA_TABULEIRO);
                         g.setColor(Color.black);
                         g.fillOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
+                        if(isSelecionado() && getPosSelecionado()[0] == x && getPosSelecionado()[1] == y) {
+                            g.setColor(Color.blue);
+                            g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
+                        }
                         break;
                 }
             }
@@ -496,7 +568,6 @@ public class TicTackle5 extends Jogo {
         return (int)custo;
     }
 
-
     private int geraCustoPeca2(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         int maxAlinhado =  maximoAlinhado(corPeca, tabuleiro);
         double maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
@@ -535,7 +606,7 @@ public class TicTackle5 extends Jogo {
                 return minPontos;
             }
             else{
-                return (int)(geraCustoPeca2(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca2(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f);
+                return (int)(geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f);
             }
         }
         
@@ -574,10 +645,10 @@ public class TicTackle5 extends Jogo {
         constroiArvoreDeJogadas(corPeca, corPeca, jogadas, profundidadeMax);
         return jogadas;
     }
-    public void maquinaJoga(int corPeca) {
-        ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, 4);
+    public int maquinaJoga(int corPeca, int profundidade) {
+        ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, profundidade);
         jogadas.minimaxAlphaBeta();
-        Collections.shuffle(jogadas.getFilhos());
+        //Collections.shuffle(jogadas.getFilhos());
         int pontuacaoMaxima = Integer.MIN_VALUE;
         int profundidadeMinima = Integer.MAX_VALUE;
         for(int i=0; i < jogadas.getFilhos().size(); i++) {
@@ -597,6 +668,7 @@ public class TicTackle5 extends Jogo {
                 }
             }
         }
+        return normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0, 100, pontuacaoMaxima);
     }
     public double geraMaiorDistanciaMenor(int corPeca, int tabuleiro[][]) {
         int pecas[][] = new int[LARGURA_TABULEIRO][2];
@@ -667,6 +739,46 @@ public class TicTackle5 extends Jogo {
 
     private int normalizaPontuacao(double minimoAntigo, double maximoAntigo, double minimoNovo, double maximoNovo, double valor){
         return (int)((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
+    }
+
+    public class EventosMouse extends MouseAdapter {
+        private int[] posClick;
+        public int[] getPosClick() {
+            return posClick;
+        }
+        public void setPosClick(int[] posClick) {
+            this.posClick = posClick;
+        }
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int[] pos = {e.getX(), e.getY()};
+            setPosClick(pos);
+            if(isVezDoPlayer()) {
+                if(!isSelecionado()) {
+                    int[] posPeca = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
+                                    (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
+                    setPosSelecionado(posPeca);
+                    if(getTabuleiro()[posPeca[0]][posPeca[1]] == PECA_BRANCA) {
+                        setSelecionado(true);
+                    }
+                }
+                else {
+                    int[] posJogada = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
+                                    (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
+                    if(verificaJogada(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1])) {
+                        fazJogada(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1]);
+                        setVezDoPlayer(false);
+                        setSelecionado(false);
+                    }
+                    else if(getTabuleiro()[posJogada[0]][posJogada[1]] == PECA_BRANCA) {
+                        setPosSelecionado(posJogada);
+                    }
+                    else {
+                        setSelecionado(false);
+                    }
+                }
+            }
+        }
     }
 }
     
