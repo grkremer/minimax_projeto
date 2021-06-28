@@ -28,7 +28,7 @@ public class JanelaGrafo extends JFrame {
             int largura = 40;
             int altura = 20;
             int posicao = ((getWidth()/(raiz.numeroNosNivel(nivel)+1)) *posicoes[nivel]) - (largura/2);
-            Object nodo = getGrafo().insertVertex(PAI_DEFAULT, null, Integer.toString(arvore.getPontos()), posicao, (nivel+1)*80, largura, altura);
+            Object nodo = getGrafo().insertVertex(PAI_DEFAULT, null, Float.toString(arvore.getPontos()), posicao, (nivel+1)*80, largura, altura);
             if(nivel > 0) {
                 getGrafo().insertEdge(PAI_DEFAULT, null, "", nodoPai, nodo);
             }
