@@ -606,7 +606,7 @@ public class TicTackle5 extends Jogo {
                 return minPontos;
             }
             else{
-                return (int)(geraCustoPeca2(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca2(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f);
+                return (int)(geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f);
             }
         }
         

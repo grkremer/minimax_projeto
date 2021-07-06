@@ -8,10 +8,10 @@ public class App {
         /*for(int i=0; i<1000; i++){
             t.inicializaTabuleiro();
             while(!t.verificaVitoria(1) && !t.verificaVitoria(2)){
-                t.maquinaJoga(1,1);
+                t.maquinaJoga(1,4);
                 t.repaint();
                 Thread.sleep(0);
-                t.maquinaJoga(2,5);
+                t.maquinaJoga(2,1);
                 t.repaint();
                 Thread.sleep(0);
             }

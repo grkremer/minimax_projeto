@@ -8,8 +8,14 @@ public class ArvoreDeJogadas {
     private int profundidade;
     private List<ArvoreDeJogadas> filhos;
     private boolean acessado = false;
-    public final int MAX_PONTOS = 100;
-    public final int MIN_PONTOS = -100;
+    public  int max_pontos = 10;
+    public  int min_pontos = -10;
+    public void setDificulty(int dificuldade){
+        if (dificuldade == 1){
+            max_pontos = 3;
+            min_pontos = -3;
+        }
+    }
 
     public ArvoreDeJogadas() {
         this.filhos = new ArrayList<ArvoreDeJogadas>();
