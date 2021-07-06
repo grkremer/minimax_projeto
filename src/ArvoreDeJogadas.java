@@ -159,8 +159,8 @@ public class ArvoreDeJogadas {
         setAcessado(true);
         if(getProfundidade() != 0) {
             if(estaMaximizando) {
-                float pontuacaoMaxima = Float.NEGATIVE_INFINITY;
-                float pontuacaoFilho;
+                int pontuacaoMaxima = Integer.MIN_VALUE;
+                int pontuacaoFilho;
                 for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimax(false);
                     pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
@@ -169,8 +169,8 @@ public class ArvoreDeJogadas {
                 return pontuacaoMaxima;
             }
             else {
-                float pontuacaoMinima = Float.POSITIVE_INFINITY;
-                float pontuacaoFilho;
+                int pontuacaoMinima = Integer.MAX_VALUE;
+                int pontuacaoFilho;
                 for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimax(true);
                     pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);
@@ -184,12 +184,12 @@ public class ArvoreDeJogadas {
     public void minimax() {
         minimax(true);
     }
-    private float minimaxAlphaBeta(boolean estaMaximizando, float alpha, float beta) {
+    private int minimaxAlphaBeta(boolean estaMaximizando, float alpha, float beta) {
         setAcessado(true);
         if(getProfundidade() != 0) {
             if(estaMaximizando) {
-                float pontuacaoMaxima = Float.NEGATIVE_INFINITY;
-                float pontuacaoFilho;
+                int pontuacaoMaxima = Integer.MIN_VALUE;
+                int pontuacaoFilho;
                 for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimaxAlphaBeta(false, alpha, beta);
                     pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
@@ -202,8 +202,8 @@ public class ArvoreDeJogadas {
                 return pontuacaoMaxima;
             }
             else {
-                float pontuacaoMinima = Float.POSITIVE_INFINITY;
-                float pontuacaoFilho;
+                int pontuacaoMinima = Integer.MAX_VALUE;
+                int pontuacaoFilho;
                 for(int i=0; i<getFilhos().size(); i++) {
                     pontuacaoFilho = getFilho(i).minimaxAlphaBeta(true, alpha, beta);
                     pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);

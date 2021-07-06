@@ -598,7 +598,7 @@ public class TicTackle5 extends Jogo {
     public void constroiArvoreDeJogadas(int corPecaJogador, int corPecaAtual, ArvoreDeJogadas jogadas, int profundidadeMax) {
         ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(corPecaAtual,jogadas.getCopiaTabuleiro());
         if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || verificaFimDeJogo(jogadas.getCopiaTabuleiro())) {
-            jogadas.setPontos(geraCusto(corPecaJogador, jogadas.getCopiaTabuleiro(), jogadas.getMinPontos(), jogadas.getMaxPontos()));
+            jogadas.setPontos((int)geraCusto(corPecaJogador, jogadas.getCopiaTabuleiro(), jogadas.getMinPontos(), jogadas.getMaxPontos()));
             jogadas.setProfundidade(0);
         }
         else {
@@ -635,7 +635,7 @@ public class TicTackle5 extends Jogo {
         ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, profundidade);
         Collections.shuffle(jogadas.getFilhos());
         jogadas.minimaxAlphaBeta();
-        
+
         int pontuacaoMaxima = Integer.MIN_VALUE;
         int profundidadeMinima = Integer.MAX_VALUE;
         for(int i=0; i < jogadas.getFilhos().size(); i++) {
