@@ -552,7 +552,7 @@ public class TicTackle5 extends Jogo {
         return novoTabuleiro;
     }
     
-    private int geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+    private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         float maxAlinhado =  (float)maximoAlinhado(corPeca, tabuleiro);
         float maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
         float custo;
@@ -568,7 +568,7 @@ public class TicTackle5 extends Jogo {
         return custo;
     }
 
-    public int geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+    public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         if(corPeca == PECA_PRETA) {
             if(verificaVitoria(PECA_PRETA, tabuleiro)) {
                 return maxPontos;

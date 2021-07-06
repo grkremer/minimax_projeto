@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ArvoreDeJogadas {
     private int[][] copiaTabuleiro;
-    private float pontos;
+    private int pontos;
     private int profundidade;
     private List<ArvoreDeJogadas> filhos;
     private boolean acessado = false;
@@ -46,10 +46,10 @@ public class ArvoreDeJogadas {
     public void setCopiaTabuleiro(int[][] copiaTabuleiro) {
         this.copiaTabuleiro = copiaTabuleiro;
     }
-    public float getPontos() {
+    public int getPontos() {
         return pontos;
     }
-    public void setPontos(float pontos) {
+    public void setPontos(int pontos) {
         this.pontos = pontos;
     }
     public List<ArvoreDeJogadas> getFilhos() {
@@ -155,7 +155,7 @@ public class ArvoreDeJogadas {
             return menor;
         }
     }
-    private float minimax(boolean estaMaximizando) {
+    private int minimax(boolean estaMaximizando) {
         setAcessado(true);
         if(getProfundidade() != 0) {
             if(estaMaximizando) {
