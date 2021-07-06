@@ -8,13 +8,33 @@ public class ArvoreDeJogadas {
     private int profundidade;
     private List<ArvoreDeJogadas> filhos;
     private boolean acessado = false;
-    public int max_pontos = 10;
-    public int min_pontos = -10;
+    public  int maxPontos = 10;
+    public  int minPontos = -10;
     public void setDificulty(int dificuldade){
         if (dificuldade == 1){
-            max_pontos = 3;
-            min_pontos = -3;
+            setMaxPontos(3);
+            setMinPontos(-3);
         }
+        if (dificuldade == 2){
+            setMaxPontos(10);
+            setMinPontos(-10);
+        }
+        if (dificuldade == 3){
+            setMaxPontos(100);
+            setMinPontos(-100);
+        }
+    }
+    public void setMaxPontos(int maxPontos) {
+        this.maxPontos = maxPontos;
+    }
+    public void setMinPontos(int minPontos) {
+        this.minPontos = minPontos;
+    }
+    public int getMaxPontos() {
+        return maxPontos;
+    }
+    public int getMinPontos() {
+        return minPontos;
     }
 
     public ArvoreDeJogadas() {
@@ -63,8 +83,8 @@ public class ArvoreDeJogadas {
         Random random = new Random();
         return random.ints((int)min,(int)(max+1)).findFirst().getAsInt();
     }
-    public float geraPontosAleatorios() {
-        return (float)randomInt(MIN_PONTOS, MAX_PONTOS);
+    public int geraPontosAleatorios() {
+        return randomInt(getMinPontos(), getMaxPontos());
     }
 
     public void geraArvoreAleatoria(int profundidade) {
