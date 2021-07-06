@@ -3,19 +3,19 @@ public class App {
         //final int TEMPO = 250;
         TicTackle5 t = new TicTackle5();
         new JanelaJogo(t);
-        /*int vitoriasBranco = 0;
+        int vitoriasBranco = 0;
         int vitoriasPreto = 0;
-        for(int i=0; i<1000; i++){
+        /*for(int i=0; i<1000; i++){
             t.inicializaTabuleiro();
             while(!t.verificaVitoria(1) && !t.verificaVitoria(2)){
-                t.maquinaJoga(1);
+                t.maquinaJoga(1,4);
                 t.repaint();
-                Thread.sleep(TEMPO);
-                t.maquinaJoga(2);
+                Thread.sleep(0);
+                t.maquinaJoga(2,1);
                 t.repaint();
-                Thread.sleep(TEMPO);
+                Thread.sleep(0);
             }
-            Thread.sleep(TEMPO);
+            Thread.sleep(0);
             if(t.verificaVitoria(1)) vitoriasBranco++;
             else {
                 //Thread.sleep(6000);

@@ -552,33 +552,33 @@ public class TicTackle5 extends Jogo {
         return novoTabuleiro;
     }
     
-    private float geraCustoPeca(int corPeca, int[][] tabuleiro, float minPontos, float maxPontos) {
-        int maxAlinhado =  maximoAlinhado(corPeca, tabuleiro);
+    private int geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+        float maxAlinhado =  (float)maximoAlinhado(corPeca, tabuleiro);
         float maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
         float custo;
         if(maxAlinhado >= 4) {
             custo = maxPontos;
         }
         else {
-            float custoLinha = normalizaPontuacao(1.0f, 4.0f, minPontos, maxPontos, (float)maxAlinhado);
-            float custoDistancia = normalizaPontuacao(1.0f, (float)Math.sqrt(20), minPontos, maxPontos, maxDistancia);
-            float custoDistancia2 = normalizaPontuacao(1.0f, (float)Math.sqrt(20), minPontos, maxPontos, geraMaiorDistanciaSegundaMenor(corPeca, tabuleiro));
-            custo = custoLinha * 0.5f + custoDistancia * -0.4f + custoDistancia2 * -0.1f;
+            float custoLinha = normalizaPontuacao(1, 4, (float)minPontos, (float)maxPontos, maxAlinhado);
+            float custoDistancia = normalizaPontuacao(1, (float)Math.sqrt(20), (float)minPontos, (float)maxPontos, maxDistancia);
+            float custoDistancia2 = normalizaPontuacao(1, (float)Math.sqrt(20), (float)minPontos, (float)maxPontos, geraMaiorDistanciaSegundaMenor(corPeca, tabuleiro));
+            custo = custoLinha *0.5f + custoDistancia * -0.4f + custoDistancia2 * -0.1f;
         }
         return custo;
     }
 
-    private float geraCustoPeca2(int corPeca, int[][] tabuleiro, float minPontos, float maxPontos) {
-        int maxAlinhado =  maximoAlinhado(corPeca, tabuleiro);
+    private int geraCustoPeca2(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+        float maxAlinhado =  (float)maximoAlinhado(corPeca, tabuleiro);
         float maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
         float custo;
         if(maxAlinhado >= 4) {
             custo = maxPontos;
         }
         else {
-            float custoLinha = normalizaPontuacao(1.0f, 4.0f, minPontos, maxPontos, (float)maxAlinhado);
-            float custoDistancia = normalizaPontuacao(1.0f, (float)Math.sqrt(20), minPontos, maxPontos, maxDistancia);
-            //int custoDistancia2 = normalizaPontuacao(1.0, Math.sqrt(20), (double)minPontos, (double)maxPontos, geraMaiorDistanciaSegundaMenor(corPeca, tabuleiro));
+            float custoLinha = normalizaPontuacao(1, 4, (float)minPontos, (float)maxPontos, maxAlinhado);
+            float custoDistancia = normalizaPontuacao(1, (float)Math.sqrt(20), (float)minPontos, (float)maxPontos, maxDistancia);
+            //int custoDistancia2 = normalizaPontuacao(1.0, Math.sqrt(20), (float)minPontos, (float)maxPontos, geraMaiorDistanciaSegundaMenor(corPeca, tabuleiro));
             custo = custoLinha * 0.5f + custoDistancia * -0.5f;
         }
         return custo;
@@ -649,7 +649,8 @@ public class TicTackle5 extends Jogo {
         ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, profundidade);
         Collections.shuffle(jogadas.getFilhos());
         jogadas.minimaxAlphaBeta();
-        float pontuacaoMaxima = Float.NEGATIVE_INFINITY;
+
+        int pontuacaoMaxima = Integer.MIN_VALUE;
         int profundidadeMinima = Integer.MAX_VALUE;
         for(int i=0; i < jogadas.getFilhos().size(); i++) {
             if(jogadas.getFilho(i).isAcessado()) {
@@ -668,7 +669,7 @@ public class TicTackle5 extends Jogo {
                 }
             }
         }
-        return normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0f, 100f, pontuacaoMaxima);
+        return normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0, 100, (float)pontuacaoMaxima);
     }
     public float geraMaiorDistanciaMenor(int corPeca, int tabuleiro[][]) {
         int pecas[][] = new int[LARGURA_TABULEIRO][2];
@@ -691,7 +692,7 @@ public class TicTackle5 extends Jogo {
             for (j = 0; j < LARGURA_TABULEIRO; j++){
                 if (i!= j) {
                     distancia =  (float)Math.sqrt(Math.pow((pecas [i][0] - pecas [j][0]),2) + Math.pow((pecas [i][1] - pecas [j][1]),2));
-                    distancias[i] = (float)Math.min(distancias[i], distancia);                  
+                    distancias[i] = Math.min(distancias[i], distancia);                  
                 }
             }
         }
@@ -738,7 +739,7 @@ public class TicTackle5 extends Jogo {
     }
 
     private float normalizaPontuacao(float minimoAntigo, float maximoAntigo, float minimoNovo, float maximoNovo, float valor){
-        return (valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo;
+        return ((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
     }
 
     public class EventosMouse extends MouseAdapter {
