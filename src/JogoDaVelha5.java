@@ -53,6 +53,25 @@ public class JogoDaVelha5 extends Jogo {
         }
         paraTimer();
     }
+    public void partidaPlayerXPlayer() throws InterruptedException {
+        inicializaTabuleiro();
+        iniciaTimer();
+        float chance;
+        while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
+            setVezDoPlayer(true);
+            System.out.println("Vez das peças brancas");
+            verificaSimetria();
+            while(isVezDoPlayer()) {
+                Thread.sleep(1);
+            }
+            if(!verificaVitoria(PECA_BRANCA)) {
+                System.out.println("Vez das peças pretas");
+                verificaSimetria();
+            }
+        }
+        paraTimer();
+    }
+
     public void partidaBotXBot() throws InterruptedException {
         inicializaTabuleiro();
         iniciaTimer();
@@ -550,12 +569,12 @@ public class JogoDaVelha5 extends Jogo {
         }
         return true;
     }
-
+    
     public int[][] criaCopiaHorizontalTabuleiro(){
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
             for(int y = 0; y < ALTURA_TABULEIRO; y++){
-                tabuleiro[x][y] = getTabuleiro()[x][ALTURA_TABULEIRO-y];
+                tabuleiro[x][y] = getTabuleiro()[x][ALTURA_TABULEIRO-1-y];
             }
         }
         return tabuleiro;
@@ -565,11 +584,12 @@ public class JogoDaVelha5 extends Jogo {
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
             for(int y = 0; y < ALTURA_TABULEIRO; y++){
-                tabuleiro[x][y] = getTabuleiro()[LARGURA_TABULEIRO-x][y];
+                tabuleiro[x][y] = getTabuleiro()[LARGURA_TABULEIRO-1-x][y];
             }
         }
         return tabuleiro;
     }
+    
     public int[][] criaCopiaDiagonalTabuleiro(){
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
@@ -584,10 +604,24 @@ public class JogoDaVelha5 extends Jogo {
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
             for(int y = ALTURA_TABULEIRO-1; y >= 0; y--){
-                tabuleiro[x][y] = getTabuleiro()[y][LARGURA_TABULEIRO-x];
+                tabuleiro[x][y] = getTabuleiro()[y][LARGURA_TABULEIRO-1-x];
             }
         }
         return tabuleiro;
     }
 
+    public void verificaSimetria(){
+        if (verificaIgualdade(criaCopiaVerticalTabuleiro())){
+            System.out.println("Simetria Vertical");
+        }
+        if (verificaIgualdade(criaCopiaHorizontalTabuleiro())){
+            System.out.println("Simetria Horizontal");
+        }
+        if (verificaIgualdade(criaCopiaDiagonalTabuleiro())){
+            System.out.println("Simetria Diagonal");
+        }
+        if (verificaIgualdade(criaCopiaOutraDiagonalTabuleiro())){
+            System.out.println("Simetria Outra Diagonal");
+        }
+    }
 }
