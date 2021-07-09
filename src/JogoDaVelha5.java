@@ -539,4 +539,55 @@ public class JogoDaVelha5 extends Jogo {
             }
         }
     }
+
+    public boolean verificaIgualdade(int [][] tabuleiro){
+        for(int x = 0; x < LARGURA_TABULEIRO; x++){
+            for(int y = 0; y < ALTURA_TABULEIRO; y++){
+                if(getTabuleiro()[x][y] != tabuleiro[x][y]){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public int[][] criaCopiaHorizontalTabuleiro(){
+        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
+        for(int x = 0; x < LARGURA_TABULEIRO; x++){
+            for(int y = 0; y < ALTURA_TABULEIRO; y++){
+                tabuleiro[x][y] = getTabuleiro()[x][ALTURA_TABULEIRO-y];
+            }
+        }
+        return tabuleiro;
+    }
+
+    public int[][] criaCopiaVerticalTabuleiro(){
+        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
+        for(int x = 0; x < LARGURA_TABULEIRO; x++){
+            for(int y = 0; y < ALTURA_TABULEIRO; y++){
+                tabuleiro[x][y] = getTabuleiro()[LARGURA_TABULEIRO-x][y];
+            }
+        }
+        return tabuleiro;
+    }
+    public int[][] criaCopiaDiagonalTabuleiro(){
+        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
+        for(int x = 0; x < LARGURA_TABULEIRO; x++){
+            for(int y = 0; y < ALTURA_TABULEIRO; y++){
+                tabuleiro[x][y] = getTabuleiro()[y][x];
+            }
+        }
+        return tabuleiro;
+    }
+
+    public int[][] criaCopiaOutraDiagonalTabuleiro(){
+        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
+        for(int x = 0; x < LARGURA_TABULEIRO; x++){
+            for(int y = ALTURA_TABULEIRO-1; y >= 0; y--){
+                tabuleiro[x][y] = getTabuleiro()[y][LARGURA_TABULEIRO-x];
+            }
+        }
+        return tabuleiro;
+    }
+
 }
