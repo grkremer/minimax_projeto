@@ -8,8 +8,8 @@ public class ArvoreDeJogadas {
     private int profundidade;
     private List<ArvoreDeJogadas> filhos;
     private boolean acessado = false;
-    public  int maxPontos = 10;
-    public  int minPontos = -10;
+    private  int maxPontos = 10;
+    private  int minPontos = -10;
     public void setDificulty(int dificuldade){
         if (dificuldade == 1){
             setMaxPontos(3);

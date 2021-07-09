@@ -50,13 +50,14 @@ public class JogoDaVelha5 extends Jogo {
                 chance = maquinaJoga(PECA_PRETA,5);
                 System.out.println("Chance de vitória das peças pretas: "+chance+"%");
             }
+            int n = numeroDeAlinhamentos(PECA_PRETA,getTabuleiro());
+            System.out.println("Alinhamentos: "+n);
         }
         paraTimer();
     }
     public void partidaPlayerXPlayer() throws InterruptedException {
         inicializaTabuleiro();
         iniciaTimer();
-        float chance;
         while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
             setVezDoPlayer(true);
             System.out.println("Vez das peças brancas");
@@ -68,6 +69,7 @@ public class JogoDaVelha5 extends Jogo {
                 System.out.println("Vez das peças pretas");
                 verificaSimetria();
             }
+            System.out.println("------------");
         }
         paraTimer();
     }
@@ -131,8 +133,53 @@ public class JogoDaVelha5 extends Jogo {
             }
         }
     }
+    private void desenhaLinhas(Graphics g) {
+        g.setColor(Color.black);
+        int inicioX;
+        int inicioY;
+        int fimX;
+        int fimY;
+        for(int x=0; x<LARGURA_TABULEIRO; x++) {
+            inicioX = calculaPosicaoFila(x, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+            inicioY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+            fimX = inicioX;
+            fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+            g.drawLine(inicioX, inicioY, fimX, fimY);
+        }
+        for(int y=0; y<LARGURA_TABULEIRO; y++) {
+            inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+            inicioY = calculaPosicaoFila(y, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+            fimX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+            fimY = inicioY;
+            g.drawLine(inicioX, inicioY, fimX, fimY);
+        }
+        inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        inicioY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        fimX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+
+        inicioX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+
+        inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        inicioY = calculaPosicaoFila((int)Math.ceil(ALTURA_TABULEIRO/2), 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        fimX = calculaPosicaoFila((int)Math.ceil(LARGURA_TABULEIRO/2), 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+
+        inicioX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
+        fimY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
+        g.drawLine(inicioX, inicioY, fimX, fimY);
+    }
     @Override
     public void desenhaTabuleiro(Graphics g) {
+        desenhaLinhas(g);
         desenhaPecas(g);
     }
     public void fazJogada(int x, int y, int peca) {
@@ -439,9 +486,150 @@ public class JogoDaVelha5 extends Jogo {
         return novoTabuleiro;
     }
     
+    public int numeroDeAlinhamentos(int corPeca) {
+        int contagem = 0;
+        boolean encontrouPecaLinha;
+        
+        for(int y=0; y < ALTURA_TABULEIRO; y++) {
+            encontrouPecaLinha = false;
+            for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                if(getTabuleiro()[x][y] == corPeca) {
+                    if(encontrouPecaLinha)  contagem++;
+                    else encontrouPecaLinha = true;
+                }
+            }
+        }
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            encontrouPecaLinha = false;
+            for(int y=0; y < ALTURA_TABULEIRO; y++) {
+                if(getTabuleiro()[x][y] == corPeca) {
+                    if(encontrouPecaLinha)  contagem++;
+                    else encontrouPecaLinha = true;
+                }
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            if(getTabuleiro()[x][x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=1; x < LARGURA_TABULEIRO; x++) {
+            if(getTabuleiro()[x][x-1] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+
+        encontrouPecaLinha = false;
+        for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
+            if(getTabuleiro()[x][x+1] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
+            if(getTabuleiro()[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
+            if(getTabuleiro()[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
+            if(getTabuleiro()[x+1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        return contagem;
+    }
+
+    public int numeroDeAlinhamentos(int corPeca, int[][] tabuleiro) {
+        int contagem = 0;
+        boolean encontrouPecaLinha;
+        
+        for(int y=0; y < ALTURA_TABULEIRO; y++) {
+            encontrouPecaLinha = false;
+            for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    if(encontrouPecaLinha)  contagem++;
+                    else encontrouPecaLinha = true;
+                }
+            }
+        }
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            encontrouPecaLinha = false;
+            for(int y=0; y < ALTURA_TABULEIRO; y++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    if(encontrouPecaLinha)  contagem++;
+                    else encontrouPecaLinha = true;
+                }
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            if(tabuleiro[x][x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=1; x < LARGURA_TABULEIRO; x++) {
+            if(tabuleiro[x][x-1] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+
+        encontrouPecaLinha = false;
+        for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
+            if(tabuleiro[x][x+1] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
+            if(tabuleiro[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
+            if(tabuleiro[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
+            if(tabuleiro[x+1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        return contagem;
+    }
+
     private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        ArvoreDeJogadas j = new ArvoreDeJogadas();
-        return j.geraPontosAleatorios();
+        //ArvoreDeJogadas j = new ArvoreDeJogadas();
+        //return j.geraPontosAleatorios();
+        float pontosAlinhamentos = normalizaPontuacao(0.0f, 16.0f, (float)minPontos, (float)maxPontos, (float)numeroDeAlinhamentos(corPeca,tabuleiro));
+        float pontosMaximoAlinhado = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)maximoAlinhado(corPeca,tabuleiro));
+        return pontosAlinhamentos*0.7f + pontosMaximoAlinhado*0.3f;
     }
 
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
@@ -453,7 +641,7 @@ public class JogoDaVelha5 extends Jogo {
                 return minPontos;
             }
             else{
-                return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*-0.7f;
+                return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*-0.5f;
             }
         }
         else {
@@ -464,7 +652,7 @@ public class JogoDaVelha5 extends Jogo {
                 return minPontos;
             }
             else{
-                return geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f;
+                return geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.5f;
             }
         }
         
@@ -505,11 +693,38 @@ public class JogoDaVelha5 extends Jogo {
         constroiArvoreDeJogadas(corPeca, corPeca, jogadas, profundidadeMax);
         return jogadas;
     }
+    private int invertePeca(int peca) {
+        if(peca == PECA_BRANCA) {
+            return PECA_PRETA;
+        }
+        else {
+            return PECA_BRANCA;
+        }
+    }
+    private void minimizaDanos(int corPeca, int[][] tabuleiro) {
+        ArvoreDeJogadas jogadas = new ArvoreDeJogadas();
+        jogadas.setDificulty(3);
+        ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(tabuleiro);
+        Collections.shuffle(possiveisJogadas);
+        int pontuacaoMaxima = Integer.MIN_VALUE;
+        int pontuacao;
+        for(int i=0; i < possiveisJogadas.size(); i++) {
+            int[][] novoTabuleiro = criaCopiaTabuleiro(tabuleiro);
+            novoTabuleiro = fazJogada(possiveisJogadas.get(i)[0], possiveisJogadas.get(i)[1], invertePeca(corPeca), novoTabuleiro);
+            pontuacao = (int)geraCusto(invertePeca(corPeca), novoTabuleiro, jogadas.getMinPontos(), jogadas.getMaxPontos());
+            if(pontuacao > pontuacaoMaxima) {
+                novoTabuleiro = fazJogada(possiveisJogadas.get(i)[0], possiveisJogadas.get(i)[1], corPeca, novoTabuleiro);
+                pontuacaoMaxima = pontuacao;
+                setTabuleiro(novoTabuleiro);
+            }
+        }
+    }
     public float maquinaJoga(int corPeca, int profundidade) {
         ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, profundidade);
         Collections.shuffle(jogadas.getFilhos());
         jogadas.minimaxAlphaBeta();
 
+        int[][] tabuleiroAntigo = criaCopiaTabuleiro(getTabuleiro());
         int pontuacaoMaxima = Integer.MIN_VALUE;
         int profundidadeMinima = Integer.MAX_VALUE;
         for(int i=0; i < jogadas.getFilhos().size(); i++) {
@@ -528,6 +743,9 @@ public class JogoDaVelha5 extends Jogo {
                     }
                 }
             }
+        }
+        if(pontuacaoMaxima == jogadas.getMinPontos()) {
+            minimizaDanos(corPeca, tabuleiroAntigo);
         }
         return normalizaPontuacao(jogadas.getMinPontos(), jogadas.getMaxPontos(), 0, 100, (float)pontuacaoMaxima);
     }
@@ -570,7 +788,7 @@ public class JogoDaVelha5 extends Jogo {
         return true;
     }
     
-    public int[][] criaCopiaHorizontalTabuleiro(){
+    private int[][] criaCopiaHorizontalTabuleiro(){
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
             for(int y = 0; y < ALTURA_TABULEIRO; y++){
@@ -580,7 +798,7 @@ public class JogoDaVelha5 extends Jogo {
         return tabuleiro;
     }
 
-    public int[][] criaCopiaVerticalTabuleiro(){
+    private int[][] criaCopiaVerticalTabuleiro(){
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
             for(int y = 0; y < ALTURA_TABULEIRO; y++){
@@ -590,7 +808,7 @@ public class JogoDaVelha5 extends Jogo {
         return tabuleiro;
     }
     
-    public int[][] criaCopiaDiagonalTabuleiro(){
+    private int[][] criaCopiaDiagonalTabuleiro(){
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
             for(int y = 0; y < ALTURA_TABULEIRO; y++){
@@ -600,7 +818,7 @@ public class JogoDaVelha5 extends Jogo {
         return tabuleiro;
     }
 
-    public int[][] criaCopiaOutraDiagonalTabuleiro(){
+    private int[][] criaCopiaOutraDiagonalTabuleiro(){
         int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
         for(int x = 0; x < LARGURA_TABULEIRO; x++){
             for(int y = ALTURA_TABULEIRO-1; y >= 0; y--){
