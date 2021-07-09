@@ -1,10 +1,10 @@
 public class App {
     public static void main(String[] args) throws Exception {
         //final int TEMPO = 250;
-        TicTackle5 t = new TicTackle5();
+        JogoDaVelha5 t = new JogoDaVelha5();
         new JanelaJogo(t);
-        int vitoriasBranco = 0;
-        int vitoriasPreto = 0;
+        //int vitoriasBranco = 0;
+        //int vitoriasPreto = 0;
         /*for(int i=0; i<1000; i++){
             t.inicializaTabuleiro();
             while(!t.verificaVitoria(1) && !t.verificaVitoria(2)){
@@ -23,7 +23,7 @@ public class App {
             }
             System.out.println("Branco "+vitoriasBranco+" x "+vitoriasPreto+" Preto ("+(i+1)+" jogos)");
         }*/
-        t.partidaBotXPlayer();
+        t.partidaBotXBot();
         //t.partidaBotXBot();
     }
 }
