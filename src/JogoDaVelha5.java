@@ -61,13 +61,15 @@ public class JogoDaVelha5 extends Jogo {
         while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
             setVezDoPlayer(true);
             System.out.println("Vez das peças brancas");
-            verificaSimetria();
+            verificaSimetriaHorizontal(getTabuleiro());
+            verificaSimetriaVertical(getTabuleiro());
+            verificaSimetriaDiagonal(getTabuleiro());
+            verificaSimetriaOutraDiagonal(getTabuleiro());
             while(isVezDoPlayer()) {
                 Thread.sleep(1);
             }
             if(!verificaVitoria(PECA_BRANCA)) {
                 System.out.println("Vez das peças pretas");
-                verificaSimetria();
             }
             System.out.println("------------");
         }
@@ -221,6 +223,10 @@ public class JogoDaVelha5 extends Jogo {
         ArrayList<int[]> possiveisJogadas = new ArrayList<int[]>();
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                verificaSimetriaVertical(tabuleiro);
+                verificaSimetriaHorizontal(tabuleiro);
+                verificaSimetriaDiagonal(tabuleiro);
+                verificaSimetriaOutraDiagonal(tabuleiro);
                 if(verificaJogada(x,y,tabuleiro)) {
                     int[] possibilidade = new int[2];
                     possibilidade[0] = x;
@@ -456,6 +462,27 @@ public class JogoDaVelha5 extends Jogo {
         }
         return maximo;
     }
+
+    public boolean tentaAcharTripla(int corPeca, int[][] tabuleiro) {
+
+        for(int y=0; y < ALTURA_TABULEIRO; y++) //horizontal
+            if(tabuleiro[0][y] == SEM_PECA && tabuleiro[4][y] == SEM_PECA)
+                if (tabuleiro[1][y] == corPeca && tabuleiro[2][y] == corPeca && tabuleiro[3][y] == corPeca)
+                    return true;
+
+        for(int x=0; x < ALTURA_TABULEIRO; x++) //vertical
+            if(tabuleiro[x][0] == SEM_PECA && tabuleiro[x][4] == SEM_PECA)
+                if (tabuleiro[x][1] == corPeca && tabuleiro[x][2] == corPeca && tabuleiro[x][3] == corPeca)
+                    return true;
+
+        if (tabuleiro[0][0] == SEM_PECA && tabuleiro[1][1]== corPeca && tabuleiro [2][2] == corPeca && tabuleiro[3][3] == corPeca && tabuleiro [4][4] == SEM_PECA)
+            return true;
+
+        if (tabuleiro[0][4] == SEM_PECA && tabuleiro[1][3]== corPeca && tabuleiro [2][2] == corPeca && tabuleiro[3][1] == corPeca && tabuleiro [4][0] == SEM_PECA)
+            return true;
+        return false;
+    }
+
     public boolean verificaVitoria(int corPeca) {
         if(maximoAlinhado(corPeca) >= 4) {
             return true;
@@ -777,69 +804,54 @@ public class JogoDaVelha5 extends Jogo {
         }
     }
 
-    public boolean verificaIgualdade(int [][] tabuleiro){
-        for(int x = 0; x < LARGURA_TABULEIRO; x++){
-            for(int y = 0; y < ALTURA_TABULEIRO; y++){
-                if(getTabuleiro()[x][y] != tabuleiro[x][y]){
-                    return false;
-                }
+    public boolean verificaSimetriaVertical(int tabuleiro [][]){
+        for (int x = 0; x < 2; x++){
+            for(int y = 0; y < 5; y++){
+                if (tabuleiro[x][y] != tabuleiro[4-x][y]) return false;
             }
         }
+        //System.out.println("Simetria Vertical");
         return true;
     }
-    
-    private int[][] criaCopiaHorizontalTabuleiro(){
-        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
-        for(int x = 0; x < LARGURA_TABULEIRO; x++){
-            for(int y = 0; y < ALTURA_TABULEIRO; y++){
-                tabuleiro[x][y] = getTabuleiro()[x][ALTURA_TABULEIRO-1-y];
+
+    public boolean verificaSimetriaHorizontal(int tabuleiro [][]){
+        for (int y = 0; y < 2; y++){
+            for(int x = 0; x < 5; x++){
+                if (tabuleiro[x][y] != tabuleiro[x][4-y]) return false;
             }
         }
-        return tabuleiro;
+        //System.out.println("Simetria Horizontal");
+        return true;
     }
 
-    private int[][] criaCopiaVerticalTabuleiro(){
-        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
-        for(int x = 0; x < LARGURA_TABULEIRO; x++){
-            for(int y = 0; y < ALTURA_TABULEIRO; y++){
-                tabuleiro[x][y] = getTabuleiro()[LARGURA_TABULEIRO-1-x][y];
-            }
-        }
-        return tabuleiro;
-    }
-    
-    private int[][] criaCopiaDiagonalTabuleiro(){
-        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
-        for(int x = 0; x < LARGURA_TABULEIRO; x++){
-            for(int y = 0; y < ALTURA_TABULEIRO; y++){
-                tabuleiro[x][y] = getTabuleiro()[y][x];
-            }
-        }
-        return tabuleiro;
+    public boolean verificaSimetriaDiagonal(int tabuleiro [][]){
+        if (tabuleiro[0][1] != tabuleiro[1][0]) return false;
+        if (tabuleiro[0][2] != tabuleiro[2][0]) return false;
+        if (tabuleiro[0][3] != tabuleiro[3][0]) return false;
+        if (tabuleiro[0][4] != tabuleiro[4][0]) return false;
+        if (tabuleiro[1][2] != tabuleiro[2][1]) return false;
+        if (tabuleiro[1][3] != tabuleiro[3][1]) return false;
+        if (tabuleiro[1][4] != tabuleiro[4][1]) return false;
+        if (tabuleiro[2][3] != tabuleiro[3][2]) return false;
+        if (tabuleiro[2][4] != tabuleiro[4][2]) return false;
+        if (tabuleiro[3][4] != tabuleiro[4][3]) return false;
+        //System.out.println("Simetria Diagonal");
+        return true;
     }
 
-    private int[][] criaCopiaOutraDiagonalTabuleiro(){
-        int tabuleiro[][] = new int [LARGURA_TABULEIRO][ALTURA_TABULEIRO];
-        for(int x = 0; x < LARGURA_TABULEIRO; x++){
-            for(int y = ALTURA_TABULEIRO-1; y >= 0; y--){
-                tabuleiro[x][y] = getTabuleiro()[y][LARGURA_TABULEIRO-1-x];
-            }
-        }
-        return tabuleiro;
+    public boolean verificaSimetriaOutraDiagonal(int tabuleiro [][]){
+        if (tabuleiro[0][0] != tabuleiro[4][4]) return false;
+        if (tabuleiro[0][1] != tabuleiro[3][4]) return false;
+        if (tabuleiro[0][2] != tabuleiro[2][4]) return false;
+        if (tabuleiro[0][3] != tabuleiro[1][4]) return false;
+        if (tabuleiro[1][0] != tabuleiro[4][3]) return false;
+        if (tabuleiro[1][1] != tabuleiro[3][3]) return false;
+        if (tabuleiro[1][2] != tabuleiro[2][3]) return false;
+        if (tabuleiro[2][0] != tabuleiro[4][2]) return false;
+        if (tabuleiro[2][1] != tabuleiro[3][2]) return false;
+        if (tabuleiro[3][0] != tabuleiro[4][1]) return false;
+        //System.out.println("Simetria Outra Diagonal");
+        return true;
     }
 
-    public void verificaSimetria(){
-        if (verificaIgualdade(criaCopiaVerticalTabuleiro())){
-            System.out.println("Simetria Vertical");
-        }
-        if (verificaIgualdade(criaCopiaHorizontalTabuleiro())){
-            System.out.println("Simetria Horizontal");
-        }
-        if (verificaIgualdade(criaCopiaDiagonalTabuleiro())){
-            System.out.println("Simetria Diagonal");
-        }
-        if (verificaIgualdade(criaCopiaOutraDiagonalTabuleiro())){
-            System.out.println("Simetria Outra Diagonal");
-        }
-    }
 }
