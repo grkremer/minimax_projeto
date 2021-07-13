@@ -12,6 +12,7 @@ public class JogoDaVelha5 extends Jogo {
     private static final int PECA_BRANCA = 1;
     private static final int PECA_PRETA = 2;
     private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*LARGURA_TABULEIRO);
+    private static final int MAXIMO_JOGADAS = 15000000;
     private boolean vezDoPlayer = false;
     private int pecaPlayer = PECA_BRANCA;
 
@@ -47,7 +48,7 @@ public class JogoDaVelha5 extends Jogo {
             }
             if(!verificaVitoria(PECA_BRANCA)) {
                 System.out.println("Vez das peças pretas");
-                chance = maquinaJoga(PECA_PRETA,5);
+                chance = maquinaJoga(PECA_PRETA,7);
                 System.out.println("Chance de vitória das peças pretas: "+chance+"%");
             }
             int n = numeroDeAlinhamentos(PECA_PRETA,getTabuleiro());
@@ -219,14 +220,35 @@ public class JogoDaVelha5 extends Jogo {
             System.out.println("("+possiveisJogadas.get(i)[0]+", "+possiveisJogadas.get(i)[1]+") -> ("+possiveisJogadas.get(i)[2]+", "+possiveisJogadas.get(i)[3]+")");
         }
     }
+    private boolean condicaoLoopSimetria(int larguraMax, boolean temDiagonal, boolean temOutraDiagonal, int x, int y) {
+        boolean condicaoLargura = x < larguraMax;
+        boolean condicaoDiagonal = true;
+        boolean condicaoOutraDiagonal = true;
+        if(temDiagonal) {
+            condicaoDiagonal = (x+y) < LARGURA_TABULEIRO;
+        }
+        if(temOutraDiagonal) {
+            condicaoOutraDiagonal = x<=y;
+        }
+        return condicaoLargura && condicaoDiagonal && condicaoOutraDiagonal;
+    }
     public ArrayList<int[]> listaPossiveisJogadas(int[][] tabuleiro) {
         ArrayList<int[]> possiveisJogadas = new ArrayList<int[]>();
-        for(int y=0; y < ALTURA_TABULEIRO; y++) {
-            for(int x=0; x < LARGURA_TABULEIRO; x++) {
-                verificaSimetriaVertical(tabuleiro);
-                verificaSimetriaHorizontal(tabuleiro);
-                verificaSimetriaDiagonal(tabuleiro);
-                verificaSimetriaOutraDiagonal(tabuleiro);
+        boolean horizontal = verificaSimetriaHorizontal(tabuleiro);
+        boolean vertical = verificaSimetriaVertical(tabuleiro);
+        boolean diagonal = verificaSimetriaDiagonal(tabuleiro);
+        boolean outraDiagonal = verificaSimetriaOutraDiagonal(tabuleiro);
+        int alturaMax = ALTURA_TABULEIRO;
+        int larguraMax = LARGURA_TABULEIRO;
+
+        if(horizontal) {
+            alturaMax = ALTURA_TABULEIRO-2;
+        }
+        if(vertical) {
+            larguraMax = LARGURA_TABULEIRO-2;
+        }
+        for(int y=0; y < alturaMax; y++) {
+            for(int x=0; condicaoLoopSimetria(larguraMax,diagonal,outraDiagonal,x,y); x++) {
                 if(verificaJogada(x,y,tabuleiro)) {
                     int[] possibilidade = new int[2];
                     possibilidade[0] = x;
@@ -660,33 +682,19 @@ public class JogoDaVelha5 extends Jogo {
     }
 
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        if(corPeca == PECA_PRETA) {
-            if(verificaVitoria(PECA_PRETA, tabuleiro)) {
-                return maxPontos;
-            }
-            else if(verificaVitoria(PECA_BRANCA, tabuleiro)) {
-                return minPontos;
-            }
-            else{
-                return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*-0.5f;
-            }
+        if(verificaVitoria(corPeca, tabuleiro)) {
+            return maxPontos;
         }
-        else {
-            if(verificaVitoria(PECA_BRANCA, tabuleiro)) {
-                return maxPontos;
-            }
-            else if(verificaVitoria(PECA_PRETA, tabuleiro)) {
-                return minPontos;
-            }
-            else{
-                return geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.5f;
-            }
+        else if(verificaVitoria(invertePeca(corPeca), tabuleiro)) {
+            return minPontos;
         }
-        
+        else{
+            return geraCustoPeca(corPeca, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(invertePeca(corPeca), tabuleiro, minPontos, maxPontos)*-0.5f;
+        }        
     }
-    public void constroiArvoreDeJogadas(int corPecaJogador, int corPecaAtual, ArvoreDeJogadas jogadas, int profundidadeMax) {
+    public void constroiArvoreDeJogadas(int corPecaJogador, int corPecaAtual, ArvoreDeJogadas jogadas, int profundidadeMax, int maximoJogadas) {
         ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(jogadas.getCopiaTabuleiro());
-        if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || verificaFimDeJogo(jogadas.getCopiaTabuleiro())) {
+        if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || verificaFimDeJogo(jogadas.getCopiaTabuleiro()) || maximoJogadas <= possiveisJogadas.size()) {
             jogadas.setPontos((int)geraCusto(corPecaJogador, jogadas.getCopiaTabuleiro(), jogadas.getMinPontos(), jogadas.getMaxPontos()));
             jogadas.setProfundidade(0);
         }
@@ -697,11 +705,12 @@ public class JogoDaVelha5 extends Jogo {
                 int[][] novoTabuleiro = criaCopiaTabuleiro(jogadas.getCopiaTabuleiro());
                 novoTabuleiro = fazJogada(possiveisJogadas.get(i)[0], possiveisJogadas.get(i)[1], corPecaAtual, novoTabuleiro);
                 proximasJogadas.setCopiaTabuleiro(novoTabuleiro);
+                int maximoProximasJogadas = (int)(maximoJogadas-possiveisJogadas.size())/possiveisJogadas.size();
                 if(corPecaAtual == PECA_BRANCA) {
-                    constroiArvoreDeJogadas(corPecaJogador, PECA_PRETA, proximasJogadas, profundidadeMax-1);
+                    constroiArvoreDeJogadas(corPecaJogador, PECA_PRETA, proximasJogadas, profundidadeMax-1, maximoProximasJogadas);
                 }
                 else {
-                    constroiArvoreDeJogadas(corPecaJogador, PECA_BRANCA, proximasJogadas, profundidadeMax-1);
+                    constroiArvoreDeJogadas(corPecaJogador, PECA_BRANCA, proximasJogadas, profundidadeMax-1, maximoProximasJogadas);
                 }
                 jogadas.addFilho(proximasJogadas);
             }
@@ -717,7 +726,7 @@ public class JogoDaVelha5 extends Jogo {
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas();
         jogadas.setDificulty(3);
         jogadas.setCopiaTabuleiro(criaCopiaTabuleiro(getTabuleiro()));
-        constroiArvoreDeJogadas(corPeca, corPeca, jogadas, profundidadeMax);
+        constroiArvoreDeJogadas(corPeca, corPeca, jogadas, profundidadeMax, MAXIMO_JOGADAS);
         return jogadas;
     }
     private int invertePeca(int peca) {
