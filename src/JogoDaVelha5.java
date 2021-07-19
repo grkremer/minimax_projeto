@@ -673,12 +673,105 @@ public class JogoDaVelha5 extends Jogo {
         return contagem;
     }
 
+    public int numeroDeAlinhamentosComVazios(int corPeca, int[][] tabuleiro) {
+        int pontos = 0;
+        boolean encontrouPecaLinha;
+
+        int nCorPeca;
+        int nOutraCor;
+        int nConsecutivos;
+        
+        for(int y=0; y < ALTURA_TABULEIRO; y++) {
+            encontrouPecaLinha = false;
+            nCorPeca = 0;
+            nOutraCor = 0;
+            nConsecutivos = 0;
+            for(int x=0; x < LARGURA_TABULEIRO; x++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    nCorPeca++;
+                    if(encontrouPecaLinha) nConsecutivos++;
+                    else encontrouPecaLinha = true;
+                }
+                else if(tabuleiro[x][y] != SEM_PECA) {
+                    encontrouPecaLinha = false;
+                }
+                else {
+                    nOutraCor++;
+                    encontrouPecaLinha = false;
+                }
+            }
+            if(nOutraCor <=1 || tabuleiro[0][y] == invertePeca(corPeca) || tabuleiro[LARGURA_TABULEIRO][y] == invertePeca(corPeca)) {
+                pontos+=(nCorPeca+nConsecutivos-nOutraCor);
+            }
+        }
+
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            encontrouPecaLinha = false;
+            for(int y=0; y < ALTURA_TABULEIRO; y++) {
+                if(tabuleiro[x][y] == corPeca) {
+                    if(encontrouPecaLinha)  contagem++;
+                    else encontrouPecaLinha = true;
+                }
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=0; x < LARGURA_TABULEIRO; x++) {
+            if(tabuleiro[x][x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=1; x < LARGURA_TABULEIRO; x++) {
+            if(tabuleiro[x][x-1] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+
+        encontrouPecaLinha = false;
+        for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
+            if(tabuleiro[x][x+1] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
+            if(tabuleiro[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
+            if(tabuleiro[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        encontrouPecaLinha = false;
+        for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
+            if(tabuleiro[x+1][LARGURA_TABULEIRO-1-x] == corPeca) {
+                if(encontrouPecaLinha)  contagem++;
+                else encontrouPecaLinha = true;
+            }
+        }
+        return contagem;
+    }
+
     private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         //ArvoreDeJogadas j = new ArvoreDeJogadas();
         //return j.geraPontosAleatorios();
-        float pontosAlinhamentos = normalizaPontuacao(0.0f, 16.0f, (float)minPontos, (float)maxPontos, (float)numeroDeAlinhamentos(corPeca,tabuleiro));
-        float pontosMaximoAlinhado = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)maximoAlinhado(corPeca,tabuleiro));
-        return pontosAlinhamentos*0.7f + pontosMaximoAlinhado*0.3f;
+        if(tentaAcharTripla(corPeca,tabuleiro)) {
+            return (float) maxPontos;
+        }
+        else {
+            float pontosAlinhamentos = normalizaPontuacao(0.0f, 16.0f, (float)minPontos, (float)maxPontos, (float)numeroDeAlinhamentosComVazios(corPeca,tabuleiro));
+            //float pontosMaximoAlinhado = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)maximoAlinhado(corPeca,tabuleiro));
+            return pontosAlinhamentos;
+        }
     }
 
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
