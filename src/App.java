@@ -23,7 +23,7 @@ public class App {
             }
             System.out.println("Branco "+vitoriasBranco+" x "+vitoriasPreto+" Preto ("+(i+1)+" jogos)");
         }*/
-        t.partidaBotXPlayer();
+        t.partidaPlayerXPlayer();
         //t.partidaBotXBot();
     }
 }
