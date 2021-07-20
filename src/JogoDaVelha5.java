@@ -12,8 +12,8 @@ public class JogoDaVelha5 extends Jogo {
     private static final int PECA_BRANCA = 1;
     private static final int PECA_PRETA = 2;
     private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*LARGURA_TABULEIRO);
-    //private static final int MAXIMO_JOGADAS = 15000000;
-    private static final int MAXIMO_JOGADAS = Integer.MAX_VALUE;
+    private static final int MAXIMO_JOGADAS = 15000000;
+    //private static final int MAXIMO_JOGADAS = Integer.MAX_VALUE;
     private boolean vezDoPlayer = false;
     private int pecaPlayer = PECA_BRANCA;
 
@@ -853,22 +853,33 @@ public class JogoDaVelha5 extends Jogo {
     private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         //ArvoreDeJogadas j = new ArvoreDeJogadas();
         //return j.geraPontosAleatorios();
-        float pontosAlinhamentos = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)contaDuplas(corPeca,tabuleiro));
+        float pontosTripla = (float)minPontos;
+        if(tentaAcharTripla(corPeca, tabuleiro)) {
+            pontosTripla = (float)maxPontos;
+        }
+        float pontosDuplas = normalizaPontuacao(0.0f, 8.0f, (float)minPontos, (float)maxPontos, (float)contaDuplas(corPeca,tabuleiro));
+        float pontosAlinhamentos = normalizaPontuacao(0.0f, 16.0f, (float)minPontos, (float)maxPontos, (float)numeroDeAlinhamentosComVazios(corPeca,tabuleiro));
         //float pontosMaximoAlinhado = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)maximoAlinhado(corPeca,tabuleiro));
-        return pontosAlinhamentos;
+        return pontosAlinhamentos*0.5f + pontosDuplas*0.2f + pontosTripla*0.3f;
     }
 
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        boolean tripla = tentaAcharTripla(corPeca,tabuleiro);
-        boolean triplaInimigo = tentaAcharTripla(invertePeca(corPeca),tabuleiro);
-        if(verificaVitoria(corPeca, tabuleiro)||(tripla && !triplaInimigo)) {
+        //boolean tripla = tentaAcharTripla(corPeca,tabuleiro);
+        //boolean triplaInimigo = tentaAcharTripla(invertePeca(corPeca),tabuleiro);
+        //if(verificaVitoria(corPeca, tabuleiro)||(tripla && !triplaInimigo)) {
+        //    return maxPontos;
+        //}
+        //else if(verificaVitoria(invertePeca(corPeca), tabuleiro)||(triplaInimigo && !tripla)) {
+        //    return minPontos;
+        //}
+        if(verificaVitoria(corPeca, tabuleiro)) {
             return maxPontos;
         }
-        else if(verificaVitoria(invertePeca(corPeca), tabuleiro)||(triplaInimigo && !tripla)) {
+        else if(verificaVitoria(invertePeca(corPeca), tabuleiro)) {
             return minPontos;
         }
         else{
-            return geraCustoPeca(corPeca, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(invertePeca(corPeca), tabuleiro, minPontos, maxPontos)*-0.5f;
+            return geraCustoPeca(corPeca, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(invertePeca(corPeca), tabuleiro, minPontos, maxPontos)*-0.7f;
         }        
     }
 
