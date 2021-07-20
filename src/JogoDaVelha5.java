@@ -12,7 +12,8 @@ public class JogoDaVelha5 extends Jogo {
     private static final int PECA_BRANCA = 1;
     private static final int PECA_PRETA = 2;
     private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*LARGURA_TABULEIRO);
-    private static final int MAXIMO_JOGADAS = 15000000;
+    //private static final int MAXIMO_JOGADAS = 15000000;
+    private static final int MAXIMO_JOGADAS = Integer.MAX_VALUE;
     private boolean vezDoPlayer = false;
     private int pecaPlayer = PECA_BRANCA;
 
@@ -36,10 +37,17 @@ public class JogoDaVelha5 extends Jogo {
         this.pecaPlayer = pecaPlayer;
     }
 
+    private int calculaNivel(int jogada) {
+        if(jogada == 0)
+            return 6;
+        else
+            return 5;
+    }
     public void partidaBotXPlayer() throws InterruptedException {
         inicializaTabuleiro();
         iniciaTimer();
         float chance;
+        int jogadaMaquina = 0;
         while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
             setVezDoPlayer(true);
             System.out.println("Vez das peças brancas");
@@ -48,10 +56,11 @@ public class JogoDaVelha5 extends Jogo {
             }
             if(!verificaVitoria(PECA_BRANCA)) {
                 System.out.println("Vez das peças pretas");
-                chance = maquinaJoga(PECA_PRETA,7);
+                chance = maquinaJoga(PECA_PRETA,calculaNivel(jogadaMaquina));
+                jogadaMaquina++;
                 System.out.println("Chance de vitória das peças pretas: "+chance+"%");
             }
-            int n = numeroDeAlinhamentos(PECA_PRETA,getTabuleiro());
+            int n = numeroDeAlinhamentosComVazios(PECA_PRETA,getTabuleiro());
             System.out.println("Alinhamentos: "+n);
         }
         paraTimer();
@@ -224,10 +233,10 @@ public class JogoDaVelha5 extends Jogo {
         boolean condicaoLargura = x < larguraMax;
         boolean condicaoDiagonal = true;
         boolean condicaoOutraDiagonal = true;
-        if(temDiagonal) {
+        if(temOutraDiagonal) {
             condicaoDiagonal = (x+y) < LARGURA_TABULEIRO;
         }
-        if(temOutraDiagonal) {
+        if(temDiagonal) {
             condicaoOutraDiagonal = x<=y;
         }
         return condicaoLargura && condicaoDiagonal && condicaoOutraDiagonal;
@@ -692,7 +701,7 @@ public class JogoDaVelha5 extends Jogo {
                     if(encontrouPecaLinha) nConsecutivos++;
                     else encontrouPecaLinha = true;
                 }
-                else if(tabuleiro[x][y] != SEM_PECA) {
+                else if(tabuleiro[x][y] == SEM_PECA) {
                     encontrouPecaLinha = false;
                 }
                 else {
@@ -700,89 +709,187 @@ public class JogoDaVelha5 extends Jogo {
                     encontrouPecaLinha = false;
                 }
             }
-            if(nOutraCor <=1 || tabuleiro[0][y] == invertePeca(corPeca) || tabuleiro[LARGURA_TABULEIRO][y] == invertePeca(corPeca)) {
-                pontos+=(nCorPeca+nConsecutivos-nOutraCor);
-            }
+            if(nOutraCor == 0 || (nOutraCor == 1 && (tabuleiro[0][y] == invertePeca(corPeca) || tabuleiro[LARGURA_TABULEIRO-1][y] == invertePeca(corPeca))))
+                if(nCorPeca > 0)
+                    pontos+=(nCorPeca+nConsecutivos-nOutraCor);
         }
 
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             encontrouPecaLinha = false;
+            nCorPeca = 0;
+            nOutraCor = 0;
+            nConsecutivos = 0;
             for(int y=0; y < ALTURA_TABULEIRO; y++) {
                 if(tabuleiro[x][y] == corPeca) {
-                    if(encontrouPecaLinha)  contagem++;
+                    nCorPeca++;
+                    if(encontrouPecaLinha) nConsecutivos++;
                     else encontrouPecaLinha = true;
                 }
+                else if(tabuleiro[x][y] == SEM_PECA) {
+                    encontrouPecaLinha = false;
+                }
+                else {
+                    nOutraCor++;
+                    encontrouPecaLinha = false;
+                }
             }
+            if(nOutraCor == 0 || (nOutraCor == 1 && (tabuleiro[x][0] == invertePeca(corPeca) || tabuleiro[x][ALTURA_TABULEIRO-1] == invertePeca(corPeca))))
+                if(nCorPeca > 0)
+                    pontos+=(nCorPeca+nConsecutivos-nOutraCor);
         }
+
         encontrouPecaLinha = false;
+        nCorPeca = 0;
+        nOutraCor = 0;
+        nConsecutivos = 0;
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             if(tabuleiro[x][x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
+                nCorPeca++;
+                if(encontrouPecaLinha) nConsecutivos++;
                 else encontrouPecaLinha = true;
             }
+            else if(tabuleiro[x][x] == SEM_PECA) {
+                encontrouPecaLinha = false;
+            }
+            else {
+                nOutraCor++;
+                encontrouPecaLinha = false;
+            }
         }
+        if(nOutraCor == 0 || (nOutraCor == 1 && (tabuleiro[0][0] == invertePeca(corPeca) || tabuleiro[LARGURA_TABULEIRO-1][ALTURA_TABULEIRO-1] == invertePeca(corPeca))))
+                if(nCorPeca > 0)
+                    pontos+=(nCorPeca+nConsecutivos-nOutraCor);
+
         encontrouPecaLinha = false;
+        nCorPeca = 0;
+        nOutraCor = 0;
+        nConsecutivos = 0;
         for(int x=1; x < LARGURA_TABULEIRO; x++) {
             if(tabuleiro[x][x-1] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
+                nCorPeca++;
+                if(encontrouPecaLinha) nConsecutivos++;
                 else encontrouPecaLinha = true;
             }
+            else if(tabuleiro[x][x-1] == SEM_PECA) {
+                encontrouPecaLinha = false;
+            }
+            else {
+                nOutraCor++;
+                encontrouPecaLinha = false;
+            }
         }
+        if(nOutraCor == 0)
+            if(nCorPeca > 0)
+                pontos+=(nCorPeca+nConsecutivos);
 
         encontrouPecaLinha = false;
+        nCorPeca = 0;
+        nOutraCor = 0;
+        nConsecutivos = 0;
         for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
             if(tabuleiro[x][x+1] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
+                nCorPeca++;
+                if(encontrouPecaLinha) nConsecutivos++;
                 else encontrouPecaLinha = true;
             }
+            else if(tabuleiro[x][x+1] == SEM_PECA) {
+                encontrouPecaLinha = false;
+            }
+            else {
+                nOutraCor++;
+                encontrouPecaLinha = false;
+            }
         }
+        if(nOutraCor == 0)
+            if(nCorPeca > 0)
+                pontos+=(nCorPeca+nConsecutivos);
 
         encontrouPecaLinha = false;
+        nCorPeca = 0;
+        nOutraCor = 0;
+        nConsecutivos = 0;
         for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
             if(tabuleiro[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
+                nCorPeca++;
+                if(encontrouPecaLinha) nConsecutivos++;
                 else encontrouPecaLinha = true;
             }
+            else if(tabuleiro[x][(LARGURA_TABULEIRO-1)-x] == SEM_PECA) {
+                encontrouPecaLinha = false;
+            }
+            else {
+                nOutraCor++;
+                encontrouPecaLinha = false;
+            }
         }
+        if(nOutraCor == 0 || (nOutraCor == 1 && (tabuleiro[4][0] == invertePeca(corPeca) || tabuleiro[0][4] == invertePeca(corPeca))))
+                if(nCorPeca > 0)
+                    pontos+=(nCorPeca+nConsecutivos-nOutraCor);
+
         encontrouPecaLinha = false;
+        nCorPeca = 0;
+        nOutraCor = 0;
+        nConsecutivos = 0;
         for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
             if(tabuleiro[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
+                nCorPeca++;
+                if(encontrouPecaLinha) nConsecutivos++;
                 else encontrouPecaLinha = true;
             }
+            else if(tabuleiro[x-1][LARGURA_TABULEIRO-1-x] == SEM_PECA) {
+                encontrouPecaLinha = false;
+            }
+            else {
+                nOutraCor++;
+                encontrouPecaLinha = false;
+            }
         }
+        if(nOutraCor == 0)
+            if(nCorPeca > 0)
+                pontos+=(nCorPeca+nConsecutivos);
+
         encontrouPecaLinha = false;
+        nCorPeca = 0;
+        nOutraCor = 0;
+        nConsecutivos = 0;
         for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
             if(tabuleiro[x+1][LARGURA_TABULEIRO-1-x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
+                nCorPeca++;
+                if(encontrouPecaLinha) nConsecutivos++;
                 else encontrouPecaLinha = true;
             }
+            else if(tabuleiro[x+1][LARGURA_TABULEIRO-1-x] == SEM_PECA) {
+                encontrouPecaLinha = false;
+            }
+            else {
+                nOutraCor++;
+                encontrouPecaLinha = false;
+            }
         }
-        return contagem;
+        if(nOutraCor == 0)
+            if(nCorPeca > 0)
+                pontos+=(nCorPeca+nConsecutivos);
+
+        return pontos;
     }
 
     private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         //ArvoreDeJogadas j = new ArvoreDeJogadas();
         //return j.geraPontosAleatorios();
-        if(tentaAcharTripla(corPeca,tabuleiro)) {
-            return (float) maxPontos;
-        }
-        else {
-            float pontosAlinhamentos = normalizaPontuacao(0.0f, 16.0f, (float)minPontos, (float)maxPontos, (float)numeroDeAlinhamentosComVazios(corPeca,tabuleiro));
-            //float pontosMaximoAlinhado = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)maximoAlinhado(corPeca,tabuleiro));
-            return pontosAlinhamentos;
-        }
+        float pontosAlinhamentos = normalizaPontuacao(0.0f, 15.0f, (float)minPontos, (float)maxPontos, (float)numeroDeAlinhamentosComVazios(corPeca,tabuleiro));
+        //float pontosMaximoAlinhado = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)maximoAlinhado(corPeca,tabuleiro));
+        return pontosAlinhamentos;
     }
 
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        if(verificaVitoria(corPeca, tabuleiro)) {
-            return maxPontos;
-        }
-        else if(verificaVitoria(invertePeca(corPeca), tabuleiro)) {
+        if(verificaVitoria(invertePeca(corPeca), tabuleiro)) {
             return minPontos;
         }
+        else if(verificaVitoria(corPeca, tabuleiro)) {
+            return maxPontos;
+        }
         else{
-            return geraCustoPeca(corPeca, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(invertePeca(corPeca), tabuleiro, minPontos, maxPontos)*-0.5f;
+            return geraCustoPeca(corPeca, tabuleiro, minPontos, maxPontos)*0.4f + geraCustoPeca(invertePeca(corPeca), tabuleiro, minPontos, maxPontos)*-0.6f;
         }        
     }
     public void constroiArvoreDeJogadas(int corPecaJogador, int corPecaAtual, ArvoreDeJogadas jogadas, int profundidadeMax, int maximoJogadas) {
@@ -852,6 +959,7 @@ public class JogoDaVelha5 extends Jogo {
         ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, profundidade);
         Collections.shuffle(jogadas.getFilhos());
         jogadas.minimaxAlphaBeta();
+        System.out.println("Profundidade: "+jogadas.getProfundidade());
 
         int[][] tabuleiroAntigo = criaCopiaTabuleiro(getTabuleiro());
         int pontuacaoMaxima = Integer.MIN_VALUE;
