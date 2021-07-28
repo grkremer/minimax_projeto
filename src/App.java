@@ -1,7 +1,7 @@
 public class App {
     public static void main(String[] args) throws Exception {
         //final int TEMPO = 250;
-        JogoDaVelha5 t = new JogoDaVelha5();
+        Alquerque t = new Alquerque();
         new JanelaJogo(t);
         //int vitoriasBranco = 0;
         //int vitoriasPreto = 0;
@@ -23,7 +23,7 @@ public class App {
             }
             System.out.println("Branco "+vitoriasBranco+" x "+vitoriasPreto+" Preto ("+(i+1)+" jogos)");
         }*/
-        t.partidaBotXBot();
+        t.partidaBotXPlayer();
         //t.partidaBotXBot();
     }
 }
