@@ -1,7 +1,7 @@
 public class App {
     public static void main(String[] args) throws Exception {
         //final int TEMPO = 250;
-        Alquerque t = new Alquerque();
+        Jogo t = new Alquerque();
         new JanelaJogo(t);
         //int vitoriasBranco = 0;
         //int vitoriasPreto = 0;

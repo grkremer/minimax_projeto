@@ -1,85 +1,19 @@
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class TicTackle5 extends Jogo {
-    private static final int ALTURA_TABULEIRO = 5;
-    private static final int LARGURA_TABULEIRO = 5;
-    private static final int SEM_PECA = 0;
-    private static final int PECA_BRANCA = 1;
-    private static final int PECA_PRETA = 2;
-    private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*LARGURA_TABULEIRO);
-    private boolean vezDoPlayer = false;
-    private boolean selecionado = false;
-    private int[] posSelecionado = {0, 0};
-
     TicTackle5() {
         super();
         setNome("Tic Tackle 5");
-        setTabuleiro(new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO]);
-        setBackground(Color.white);
+        setProfundidade(5);
         addMouseListener(new EventosMouse());
     }
-    public boolean isVezDoPlayer() {
-        return vezDoPlayer;
-    }
-    public void setVezDoPlayer(boolean vezDoPlayer) {
-        this.vezDoPlayer = vezDoPlayer;
-    }
-    public boolean isSelecionado() {
-        return selecionado;
-    }
-    public void setSelecionado(boolean selecionado) {
-        this.selecionado = selecionado;
-    }
-    public int[] getPosSelecionado() {
-        return posSelecionado;
-    }
-    public void setPosSelecionado(int[] posSelecionado) {
-        this.posSelecionado = posSelecionado;
-    }
 
-    public void partidaBotXPlayer() throws InterruptedException {
-        inicializaTabuleiro();
-        iniciaTimer();
-        float chance;
-        while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
-            setVezDoPlayer(true);
-            System.out.println("Vez das peças brancas");
-            while(isVezDoPlayer()) {
-                Thread.sleep(1);
-            }
-            if(!verificaVitoria(PECA_BRANCA)) {
-                System.out.println("Vez das peças pretas");
-                chance = maquinaJoga(PECA_PRETA,5);
-                System.out.println("Chance de vitória das peças pretas: "+chance+"%");
-            }
-        }
-        paraTimer();
-    }
-    public void partidaBotXBot() throws InterruptedException {
-        inicializaTabuleiro();
-        iniciaTimer();
-        float chance;
-        while(!verificaVitoria(PECA_BRANCA) && !verificaVitoria(PECA_PRETA)) {
-            System.out.println("Vez das peças brancas");
-            chance = maquinaJoga(PECA_BRANCA,1);
-            System.out.println("Chance de vitória das peças brancas: "+chance+"%");
-            Thread.sleep(500);
-            if(!verificaVitoria(PECA_BRANCA)) {
-                System.out.println("Vez das peças pretas");
-                chance = maquinaJoga(PECA_PRETA,5);
-                System.out.println("Chance de vitória das peças pretas: "+chance+"%");
-                Thread.sleep(250);
-            }
-        }
-        getTimer().stop();
-        repaint();
-    }
+    @Override
     public void inicializaTabuleiro() {
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
             if(x % 2 == 0) {
@@ -103,113 +37,17 @@ public class TicTackle5 extends Jogo {
             } 
         }
     }
-    private int calculaPosicaoFila(int posicaoObjeto, int tamanhoObjeto, int pixelsFila, int tamanhoFila) {
-        return ((pixelsFila/(tamanhoFila+1)) *(posicaoObjeto+1)) - (tamanhoObjeto/2);
-    }
-    private void desenhaPecas(Graphics g) {
-        int posicaoX;
-        int posicaoY;
-        for(int y=0; y < ALTURA_TABULEIRO; y++) {
-            for(int x=0; x < LARGURA_TABULEIRO; x++) {
-                switch(getTabuleiro()[x][y]) {
-                    case SEM_PECA: 
-                        posicaoX = calculaPosicaoFila(x, (int)(TAMANHO_PECA/1.5), LARGURA_TELA, LARGURA_TABULEIRO);
-                        posicaoY = calculaPosicaoFila(y, (int)(TAMANHO_PECA/1.5), ALTURA_TELA, ALTURA_TABULEIRO);
-                        g.setColor(Color.lightGray);
-                        g.fillOval(posicaoX, posicaoY, (int)(TAMANHO_PECA/1.5), (int)(TAMANHO_PECA/1.5));
-                        break;
-                    case PECA_BRANCA:
-                        posicaoX = calculaPosicaoFila(x, TAMANHO_PECA, LARGURA_TELA, LARGURA_TABULEIRO);
-                        posicaoY = calculaPosicaoFila(y, TAMANHO_PECA, ALTURA_TELA, ALTURA_TABULEIRO);
-                        g.setColor(Color.white);
-                        g.fillOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        if(isSelecionado() && getPosSelecionado()[0] == x && getPosSelecionado()[1] == y) {
-                            g.setColor(Color.blue);
-                            g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        }
-                        else {
-                            g.setColor(Color.black);
-                            g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        }
-                        break;
-                    case PECA_PRETA:
-                        posicaoX = calculaPosicaoFila(x, TAMANHO_PECA, LARGURA_TELA, LARGURA_TABULEIRO);
-                        posicaoY = calculaPosicaoFila(y, TAMANHO_PECA, ALTURA_TELA, ALTURA_TABULEIRO);
-                        g.setColor(Color.black);
-                        g.fillOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        if(isSelecionado() && getPosSelecionado()[0] == x && getPosSelecionado()[1] == y) {
-                            g.setColor(Color.blue);
-                            g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        }
-                        break;
-                }
-            }
-        }
-    }
-    private void desenhaLinhas(Graphics g) {
-        g.setColor(Color.black);
-        int inicioX;
-        int inicioY;
-        int fimX;
-        int fimY;
-        for(int x=0; x<LARGURA_TABULEIRO; x++) {
-            inicioX = calculaPosicaoFila(x, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-            inicioY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-            fimX = inicioX;
-            fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-            g.drawLine(inicioX, inicioY, fimX, fimY);
-        }
-        for(int y=0; y<LARGURA_TABULEIRO; y++) {
-            inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-            inicioY = calculaPosicaoFila(y, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-            fimX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-            fimY = inicioY;
-            g.drawLine(inicioX, inicioY, fimX, fimY);
-        }
-        inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-        inicioY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-        fimX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-        g.drawLine(inicioX, inicioY, fimX, fimY);
-
-        inicioX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-        fimX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-        g.drawLine(inicioX, inicioY, fimX, fimY);
-
-        inicioX = calculaPosicaoFila(0, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-        inicioY = calculaPosicaoFila((int)Math.ceil(ALTURA_TABULEIRO/2), 1, ALTURA_TELA, ALTURA_TABULEIRO);
-        fimX = calculaPosicaoFila((int)Math.ceil(LARGURA_TABULEIRO/2), 1, LARGURA_TELA, LARGURA_TABULEIRO);
-        fimY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-        g.drawLine(inicioX, inicioY, fimX, fimY);
-        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-        g.drawLine(inicioX, inicioY, fimX, fimY);
-
-        inicioX = calculaPosicaoFila(LARGURA_TABULEIRO-1, 1, LARGURA_TELA, LARGURA_TABULEIRO);
-        fimY = calculaPosicaoFila(0, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-        g.drawLine(inicioX, inicioY, fimX, fimY);
-        fimY = calculaPosicaoFila(ALTURA_TABULEIRO-1, 1, ALTURA_TELA, ALTURA_TABULEIRO);
-        g.drawLine(inicioX, inicioY, fimX, fimY);
-    }
     @Override
-    public void desenhaTabuleiro(Graphics g) {
-        desenhaLinhas(g);
-        desenhaPecas(g);
-    }
-    public void fazJogada(int xInicial, int yInicial, int xFinal, int yFinal) {
-        getTabuleiro()[xFinal][yFinal] = getTabuleiro()[xInicial][yInicial];
-        getTabuleiro()[xInicial][yInicial] = SEM_PECA;
-    } 
-    public int[][] fazJogada(int xInicial, int yInicial, int xFinal, int yFinal, int[][] tabuleiro) {
+    public int[][] fazMovimento(ArrayList<Integer> jogada, int[][] tabuleiro) {
+        int xInicial = jogada.get(0);
+        int yInicial = jogada.get(1);
+        int xFinal = jogada.get(2);
+        int yFinal = jogada.get(3);
         tabuleiro[xFinal][yFinal] = tabuleiro[xInicial][yInicial];
         tabuleiro[xInicial][yInicial] = SEM_PECA;
         return tabuleiro;
     } 
-    public boolean estaNosLimites(int x, int y) {
-        if(x>=0 && x<LARGURA_TABULEIRO && y>=0 && y<ALTURA_TABULEIRO)
-            return true;
-        else
-            return false;
-    }
+
     public boolean verificaJogada(int xInicial, int yInicial, int xFinal, int yFinal) {
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (getTabuleiro()[xFinal][yFinal] == SEM_PECA && getTabuleiro()[xInicial][yInicial] != SEM_PECA) {
@@ -268,14 +106,10 @@ public class TicTackle5 extends Jogo {
             return false;
         }
     }
-    public void printaPossiveisJogadas(int corPeca) {
-        ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(corPeca,getTabuleiro());
-        for(int i=0; i < possiveisJogadas.size(); i++) {
-            System.out.println("("+possiveisJogadas.get(i)[0]+", "+possiveisJogadas.get(i)[1]+") -> ("+possiveisJogadas.get(i)[2]+", "+possiveisJogadas.get(i)[3]+")");
-        }
-    }
-    public ArrayList<int[]> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
-        ArrayList<int[]> possiveisJogadas = new ArrayList<int[]>();
+
+    @Override
+    public ArrayList<ArrayList<Integer>> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
+        ArrayList<ArrayList<Integer>> possiveisJogadas = new ArrayList<ArrayList<Integer>>();
         int[][] regioes = {{1,0},{0,1},{1,1},{-1,-1},{-1,1},{1,-1},{-1,0},{0,-1}};
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
@@ -284,11 +118,7 @@ public class TicTackle5 extends Jogo {
                         int novoX = x+regioes[i][0];
                         int novoY = y+regioes[i][1];
                         if(verificaJogada(x,y,novoX,novoY,tabuleiro)) {
-                            int[] possibilidade = new int[4];
-                            possibilidade[0] = x;
-                            possibilidade[1] = y;
-                            possibilidade[2] = novoX;
-                            possibilidade[3] = novoY;
+                            ArrayList<Integer> possibilidade = new ArrayList<Integer>(List.of(x, y, novoX, novoY));
                             possiveisJogadas.add(possibilidade);
                         }
                     }
@@ -296,121 +126,6 @@ public class TicTackle5 extends Jogo {
             }
         }
         return possiveisJogadas;
-    }
-    public int maximoAlinhado(int corPeca) {
-        int maximo = 0;
-        int contagem;
-        
-        for(int y=0; y < ALTURA_TABULEIRO; y++) {
-            contagem = 0;
-            for(int x=0; x < LARGURA_TABULEIRO; x++) {
-                if(getTabuleiro()[x][y] == corPeca) {
-                    contagem++;
-                    maximo = Math.max(maximo, contagem);
-                }
-                else {
-                    contagem = 0;
-                }
-            }
-        }
-        if (maximo >= 4) {
-            return maximo;
-        }
-        for(int x=0; x < LARGURA_TABULEIRO; x++) {
-            contagem = 0;
-            for(int y=0; y < ALTURA_TABULEIRO; y++) {
-                if(getTabuleiro()[x][y] == corPeca) {
-                    contagem++;
-                    maximo = Math.max(maximo, contagem);
-                }
-                else {
-                    contagem = 0;
-                }
-            }
-        }
-        if (maximo >= 4) {
-            return maximo;
-        }
-        contagem = 0;
-        for(int x=0; x < LARGURA_TABULEIRO; x++) {
-            if(getTabuleiro()[x][x] == corPeca) {
-                contagem++;
-                maximo = Math.max(maximo, contagem);
-            }
-            else {
-                contagem = 0;
-            }
-        }
-        if (maximo >= 4) {
-            return maximo;
-        }
-        contagem = 0;
-        for(int x=1; x < LARGURA_TABULEIRO; x++) {
-            if(getTabuleiro()[x][x-1] == corPeca) {
-                contagem++;
-                maximo = Math.max(maximo, contagem);
-            }
-            else {
-                contagem = 0;
-            }
-        }
-
-        if (maximo >= 4) {
-            return maximo;
-        }
-
-        contagem = 0;
-        for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
-            if(getTabuleiro()[x][x+1] == corPeca) {
-                contagem++;
-                maximo = Math.max(maximo, contagem);
-            }
-            else {
-                contagem = 0;
-            }
-        }
-
-        if (maximo >= 4) {
-            return maximo;
-        }
-
-        contagem = 0;
-        for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
-            if(getTabuleiro()[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
-                contagem++;
-                maximo = Math.max(maximo, contagem);
-            }
-            else {
-                contagem = 0;
-            }
-        }
-        if (maximo >= 4) {
-            return maximo;
-        }
-        contagem = 0;
-        for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
-            if(getTabuleiro()[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
-                contagem++;
-                maximo = Math.max(maximo, contagem);
-            }
-            else {
-                contagem = 0;
-            }
-        }
-        if (maximo >= 4) {
-            return maximo;
-        }
-        contagem = 0;
-        for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
-            if(getTabuleiro()[x+1][LARGURA_TABULEIRO-1-x] == corPeca) {
-                contagem++;
-                maximo = Math.max(maximo, contagem);
-            }
-            else {
-                contagem = 0;
-            }
-        }
-        return maximo;
     }
     public int maximoAlinhado(int corPeca, int[][] tabuleiro) {
         int maximo = 0;
@@ -522,14 +237,8 @@ public class TicTackle5 extends Jogo {
         }
         return maximo;
     }
-    public boolean verificaVitoria(int corPeca) {
-        if(maximoAlinhado(corPeca) >= 4) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+
+    @Override
     public boolean verificaVitoria(int corPeca, int[][] tabuleiro) {
         if(maximoAlinhado(corPeca, tabuleiro) >= 4) {
             return true;
@@ -538,19 +247,12 @@ public class TicTackle5 extends Jogo {
             return false;
         }
     }
+    @Override
     public boolean verificaFimDeJogo(int[][] tabuleiro) {
         return verificaVitoria(PECA_BRANCA, tabuleiro) || verificaVitoria(PECA_PRETA, tabuleiro);
     }
     
-    private int[][] criaCopiaTabuleiro(int[][] tabuleiro) {
-        int[][] novoTabuleiro = new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO];
-        for(int y=0; y < ALTURA_TABULEIRO; y++) {
-            for(int x=0; x < LARGURA_TABULEIRO; x++) {
-                novoTabuleiro[x][y] = tabuleiro[x][y];
-            }
-        }
-        return novoTabuleiro;
-    }
+
     
     private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         float maxAlinhado =  (float)maximoAlinhado(corPeca, tabuleiro);
@@ -568,6 +270,7 @@ public class TicTackle5 extends Jogo {
         return custo;
     }
 
+    @Override
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         if(corPeca == PECA_PRETA) {
             if(verificaVitoria(PECA_PRETA, tabuleiro)) {
@@ -595,53 +298,19 @@ public class TicTackle5 extends Jogo {
         }
         
     }
-    public void constroiArvoreDeJogadas(int corPecaJogador, int corPecaAtual, ArvoreDeJogadas jogadas, int profundidadeMax) {
-        ArrayList<int[]> possiveisJogadas = listaPossiveisJogadas(corPecaAtual,jogadas.getCopiaTabuleiro());
-        if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || verificaFimDeJogo(jogadas.getCopiaTabuleiro())) {
-            jogadas.setPontos((int)geraCusto(corPecaJogador, jogadas.getCopiaTabuleiro(), jogadas.getMinPontos(), jogadas.getMaxPontos()));
-            jogadas.setProfundidade(0);
-        }
-        else {
-            for(int i=0; i < possiveisJogadas.size(); i++) {
-                ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas();
-                proximasJogadas.setDificulty(3);
-                int[][] novoTabuleiro = criaCopiaTabuleiro(jogadas.getCopiaTabuleiro());
-                novoTabuleiro = fazJogada(possiveisJogadas.get(i)[0], possiveisJogadas.get(i)[1], possiveisJogadas.get(i)[2], possiveisJogadas.get(i)[3], novoTabuleiro);
-                proximasJogadas.setCopiaTabuleiro(novoTabuleiro);
-                if(corPecaAtual == PECA_BRANCA) {
-                    constroiArvoreDeJogadas(corPecaJogador, PECA_PRETA, proximasJogadas, profundidadeMax-1);
-                }
-                else {
-                    constroiArvoreDeJogadas(corPecaJogador, PECA_BRANCA, proximasJogadas, profundidadeMax-1);
-                }
-                jogadas.addFilho(proximasJogadas);
-            }
-
-            int maiorProfundidadeFilho = 0;
-            for(int i=0; i < jogadas.getFilhos().size(); i++) {
-                maiorProfundidadeFilho = Math.max(maiorProfundidadeFilho, jogadas.getFilho(i).getProfundidade());
-            }
-            jogadas.setProfundidade(maiorProfundidadeFilho+1);
-        }
-    }
-    public ArvoreDeJogadas constroiArvoreDeJogadas(int corPeca, int profundidadeMax) {
-        ArvoreDeJogadas jogadas = new ArvoreDeJogadas();
-        jogadas.setDificulty(3);
-        jogadas.setCopiaTabuleiro(criaCopiaTabuleiro(getTabuleiro()));
-        constroiArvoreDeJogadas(corPeca, corPeca, jogadas, profundidadeMax);
-        return jogadas;
-    }
-    public float maquinaJoga(int corPeca, int profundidade) {
-        ArvoreDeJogadas jogadas = constroiArvoreDeJogadas(corPeca, profundidade);
+    @Override
+    public ArrayList<Integer> jogadaDaMaquina(int corPeca, int profundidade) {
+        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade);
         Collections.shuffle(jogadas.getFilhos());
         jogadas.minimaxAlphaBeta();
 
         int pontuacaoMaxima = Integer.MIN_VALUE;
         int profundidadeMinima = Integer.MAX_VALUE;
+        ArrayList<Integer> melhorJogada = jogadas.getFilho(0).getJogada();
         for(int i=0; i < jogadas.getFilhos().size(); i++) {
             if(jogadas.getFilho(i).isAcessado()) {
                 if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
-                    setTabuleiro(jogadas.getFilho(i).getCopiaTabuleiro());
+                    melhorJogada = jogadas.getFilho(i).getJogada();
                     pontuacaoMaxima = jogadas.getFilho(i).getPontos();
                     if(pontuacaoMaxima == jogadas.getMaxPontos()) {
                         profundidadeMinima = jogadas.getFilho(i).getProfundidade();
@@ -649,14 +318,17 @@ public class TicTackle5 extends Jogo {
                 }
                 else if(jogadas.getFilho(i).getPontos() == jogadas.getMaxPontos()) {
                     if(jogadas.getFilho(i).getProfundidade() < profundidadeMinima) {
-                        setTabuleiro(jogadas.getFilho(i).getCopiaTabuleiro());
+                        melhorJogada = jogadas.getFilho(i).getJogada();
                         profundidadeMinima = jogadas.getFilho(i).getProfundidade();
                     }
                 }
             }
         }
-        return normalizaPontuacao(jogadas.getMinPontos(), jogadas.getMaxPontos(), 0, 100, (float)pontuacaoMaxima);
+        float chance = normalizaPontuacao(jogadas.getMinPontos(), jogadas.getMaxPontos(), 0, 100, (float)pontuacaoMaxima);
+        System.out.println("Chance de vitória: "+chance+"%");
+        return melhorJogada;
     }
+
     public float geraMaiorDistanciaMenor(int corPeca, int tabuleiro[][]) {
         int pecas[][] = new int[LARGURA_TABULEIRO][2];
         int i = 0;
@@ -724,10 +396,6 @@ public class TicTackle5 extends Jogo {
         
     }
 
-    private float normalizaPontuacao(float minimoAntigo, float maximoAntigo, float minimoNovo, float maximoNovo, float valor){
-        return ((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
-    }
-
     public class EventosMouse extends MouseAdapter {
         private int[] posClick;
         public int[] getPosClick() {
@@ -753,7 +421,8 @@ public class TicTackle5 extends Jogo {
                     int[] posJogada = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
                                     (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
                     if(verificaJogada(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1])) {
-                        fazJogada(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1]);
+                        ArrayList<Integer> jogada = new ArrayList<Integer>(List.of(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1]));
+                        setJogadaDoPlayer(jogada);
                         setVezDoPlayer(false);
                         setSelecionado(false);
                     }

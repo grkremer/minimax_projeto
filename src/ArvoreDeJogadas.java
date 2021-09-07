@@ -3,13 +3,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArvoreDeJogadas {
-    private int[][] copiaTabuleiro;
+    private ArrayList<Integer> jogada;
     private int pontos;
     private int profundidade;
     private List<ArvoreDeJogadas> filhos;
     private boolean acessado = false;
-    private  int maxPontos = 10;
-    private  int minPontos = -10;
+    private int maxPontos = 10;
+    private int minPontos = -10;
     public void setDificulty(int dificuldade){
         if (dificuldade == 1){
             setMaxPontos(3);
@@ -37,14 +37,11 @@ public class ArvoreDeJogadas {
         return minPontos;
     }
 
-    public ArvoreDeJogadas() {
-        this.filhos = new ArrayList<ArvoreDeJogadas>();
+    public void setJogada(ArrayList<Integer> jogada) {
+        this.jogada = jogada;
     }
-    public int[][] getCopiaTabuleiro() {
-        return copiaTabuleiro;
-    }
-    public void setCopiaTabuleiro(int[][] copiaTabuleiro) {
-        this.copiaTabuleiro = copiaTabuleiro;
+    public ArrayList<Integer> getJogada() {
+        return jogada;
     }
     public int getPontos() {
         return pontos;
@@ -79,6 +76,60 @@ public class ArvoreDeJogadas {
     public void setAcessado(boolean acessado) {
         this.acessado = acessado;
     }
+    
+    public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax) {
+        this.filhos = new ArrayList<ArvoreDeJogadas>();
+        ArrayList<ArrayList<Integer>> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || jogo.verificaFimDeJogo(tabuleiro)) {
+            this.setPontos((int)jogo.geraCusto(corPecaJogador, tabuleiro, this.getMinPontos(), this.getMaxPontos()));
+            this.setProfundidade(0);
+        }
+        else {
+            for(int i=0; i < possiveisJogadas.size(); i++) {
+                int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
+                novoTabuleiro = jogo.fazJogada(possiveisJogadas.get(i), novoTabuleiro);
+                ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1);
+                proximasJogadas.setDificulty(3);
+                proximasJogadas.setJogada(possiveisJogadas.get(i));
+                this.addFilho(proximasJogadas);
+            }
+
+            int maiorProfundidadeFilho = 0;
+            for(int i=0; i < this.getFilhos().size(); i++) {
+                maiorProfundidadeFilho = Math.max(maiorProfundidadeFilho, this.getFilho(i).getProfundidade());
+            }
+            this.setProfundidade(maiorProfundidadeFilho+1);
+        }
+    }
+    public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, int maximoJogadas) {
+        this.filhos = new ArrayList<ArvoreDeJogadas>();
+        ArrayList<ArrayList<Integer>> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || jogo.verificaFimDeJogo(tabuleiro) || maximoJogadas <= possiveisJogadas.size()) {
+            this.setPontos((int)jogo.geraCusto(corPecaJogador, tabuleiro, this.getMinPontos(), this.getMaxPontos()));
+            this.setProfundidade(0);
+        }
+        else {
+            for(int i=0; i < possiveisJogadas.size(); i++) {
+                int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
+                novoTabuleiro = jogo.fazJogada(possiveisJogadas.get(i), novoTabuleiro);
+                int maximoProximasJogadas = (int)(maximoJogadas-possiveisJogadas.size())/possiveisJogadas.size();
+                ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, maximoProximasJogadas);
+                proximasJogadas.setDificulty(3);
+                proximasJogadas.setJogada(possiveisJogadas.get(i));
+                this.addFilho(proximasJogadas);
+            }
+
+            int maiorProfundidadeFilho = 0;
+            for(int i=0; i < this.getFilhos().size(); i++) {
+                maiorProfundidadeFilho = Math.max(maiorProfundidadeFilho, this.getFilho(i).getProfundidade());
+            }
+            this.setProfundidade(maiorProfundidadeFilho+1);
+        }
+    }
+    
+    public ArvoreDeJogadas(int profundidade) {
+        geraArvoreAleatoria(profundidade);
+    }
     private int randomInt(float min, float max){
         Random random = new Random();
         return random.ints((int)min,(int)(max+1)).findFirst().getAsInt();
@@ -86,7 +137,6 @@ public class ArvoreDeJogadas {
     public int geraPontosAleatorios() {
         return randomInt(getMinPontos(), getMaxPontos());
     }
-
     public void geraArvoreAleatoria(int profundidade) {
         setProfundidade(profundidade);
         if(profundidade == 0) {
@@ -95,8 +145,7 @@ public class ArvoreDeJogadas {
         else {
             int numeroDeFilhos = randomInt(2,4);
             for(int i=0; i<numeroDeFilhos; i++) {
-                addFilho(new ArvoreDeJogadas());
-                getFilho(i).geraArvoreAleatoria(profundidade-1);;
+                addFilho(new ArvoreDeJogadas(profundidade-1));
             }
         }
     }
