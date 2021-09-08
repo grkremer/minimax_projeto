@@ -3,8 +3,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -19,14 +21,15 @@ public class Jogo extends JPanel implements ActionListener {
     public static final int PECA_PRETA = 2;
     private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*LARGURA_TABULEIRO);
     private static final int DELAY_TIMER = 75;
-    public static final int DELAY_JOGADA = 500;
+    public static final int DELAY_JOGADA = 750;
     private Timer timer;
     private String nome;
     private int[][] tabuleiro;
     private int profundidade;
+    private int maximoJogadas = Integer.MAX_VALUE;
     private int pecaPlayer = PECA_BRANCA;
     private boolean vezDoPlayer = false;
-    private ArrayList<Integer> jogadaDoPlayer;
+    private Jogada jogadaDoPlayer;
     private boolean selecionado = false;
     private int[] posSelecionado = {0, 0};
 
@@ -35,6 +38,7 @@ public class Jogo extends JPanel implements ActionListener {
         setFocusable(true);
         setTabuleiro(new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO]);
         setBackground(Color.white);
+        addMouseListener(new EventosMouse());
     }
 
     //  getters e setters
@@ -74,10 +78,10 @@ public class Jogo extends JPanel implements ActionListener {
     public void setPosSelecionado(int[] posSelecionado) {
         this.posSelecionado = posSelecionado;
     }
-    public ArrayList<Integer> getJogadaDoPlayer() {
+    public Jogada getJogadaDoPlayer() {
         return jogadaDoPlayer;
     }
-    public void setJogadaDoPlayer(ArrayList<Integer> jogadaDoPlayer) {
+    public void setJogadaDoPlayer(Jogada jogadaDoPlayer) {
         this.jogadaDoPlayer = jogadaDoPlayer;
     }
     public int getPecaPlayer() {
@@ -91,6 +95,12 @@ public class Jogo extends JPanel implements ActionListener {
     }
     public void setProfundidade(int profundidade) {
         this.profundidade = profundidade;
+    }
+    public int getMaximoJogadas() {
+        return maximoJogadas;
+    }
+    public void setMaximoJogadas(int maximoJogadas) {
+        this.maximoJogadas = maximoJogadas;
     }
 
     //  funções da engine
@@ -212,6 +222,17 @@ public class Jogo extends JPanel implements ActionListener {
         }
         return novoTabuleiro;
     }
+    static public String pecaParaString(int peca) {
+        switch(peca) {
+            case PECA_BRANCA:
+                return "PEÇA BRANCA";
+            case PECA_PRETA:
+                return "PEÇA PRETA";
+            case SEM_PECA:
+            default:
+                return "SEM PEÇA"; 
+        }
+    }
     public int invertePeca(int peca) {
         if(peca == PECA_BRANCA) {
             return PECA_PRETA;
@@ -220,20 +241,46 @@ public class Jogo extends JPanel implements ActionListener {
             return PECA_BRANCA;
         }
     }
-    public int[][] fazJogada(ArrayList<Integer> jogada) throws InterruptedException {
-        for(int i=0; (i+3)<jogada.size(); i+=2){
-            ArrayList<Integer> movimento = new ArrayList<>(List.of(jogada.get(i), jogada.get(i+1), jogada.get(i+2), jogada.get(i+3)));
-            fazMovimento(movimento, getTabuleiro());
-            Thread.sleep(DELAY_JOGADA);
-        }
-        return getTabuleiro();
+    public void inserePeca(int[] posicao, int corPeca, int[][] tabuleiro) {
+        tabuleiro[posicao[0]][posicao[1]] = corPeca;
+    }
+    public void fazMovimento(int[][] movimento, int[][] tabuleiro) {
+        int xInicial = movimento[0][0];
+        int yInicial = movimento[0][1];
+        int xFinal = movimento[1][0];
+        int yFinal = movimento[1][1];
+        tabuleiro[xFinal][yFinal] = tabuleiro[xInicial][yInicial];
+        tabuleiro[xInicial][yInicial] = SEM_PECA;
     } 
-    public int[][] fazJogada(ArrayList<Integer> jogada, int[][] tabuleiro) {
-        for(int i=0; (i+3)<jogada.size(); i+=2){
-            ArrayList<Integer> movimento = new ArrayList<>(List.of(jogada.get(i), jogada.get(i+1), jogada.get(i+2), jogada.get(i+3)));
-            tabuleiro = fazMovimento(movimento, tabuleiro);
+    public void retiraPecas(ArrayList<int[]> pecasEliminadas, int[][] tabuleiro) {
+        for(int[] peca : pecasEliminadas) {
+            tabuleiro[peca[0]][peca[1]] = SEM_PECA;
         }
-        return tabuleiro;
+    }
+    public void fazJogada(Jogada jogada) throws InterruptedException {
+        if(jogada.getMovimentos().isEmpty()) {
+            inserePeca(jogada.getPosicao(), jogada.getCorPeca(), getTabuleiro());
+        }
+        else {
+            for(int i=0; i<jogada.getMovimentos().size(); i++){
+                fazMovimento(jogada.getMovimentos().get(i), getTabuleiro());
+                Thread.sleep(DELAY_JOGADA);
+            }
+            retiraPecas(jogada.getPecasEliminadas(), getTabuleiro());
+        }
+        jogada.print();
+        Thread.sleep(DELAY_JOGADA);
+    } 
+    public void fazJogada(Jogada jogada, int[][] tabuleiro) {
+        if(jogada.getMovimentos().isEmpty()) {
+            inserePeca(jogada.getPosicao(), jogada.getCorPeca(), tabuleiro);
+        }
+        else {
+            for(int i=0; i<jogada.getMovimentos().size(); i++){
+                fazMovimento(jogada.getMovimentos().get(i), tabuleiro);
+            }
+            retiraPecas(jogada.getPecasEliminadas(), tabuleiro);
+        }
     } 
     public boolean estaNosLimites(int x, int y) {
         if(x>=0 && x<LARGURA_TABULEIRO && y>=0 && y<ALTURA_TABULEIRO)
@@ -253,6 +300,36 @@ public class Jogo extends JPanel implements ActionListener {
         }
         return cont;
     }
+    public Jogada jogadaDaMaquina(int corPeca, int profundidade) {
+        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());
+        Collections.shuffle(jogadas.getFilhos());
+        jogadas.minimaxAlphaBeta();
+
+        int pontuacaoMaxima = Integer.MIN_VALUE;
+        int profundidadeMinima = Integer.MAX_VALUE;
+        Jogada melhorJogada = jogadas.getFilho(0).getJogada();
+        for(int i=0; i < jogadas.getFilhos().size(); i++) {
+            if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
+                melhorJogada = jogadas.getFilho(i).getJogada();
+                pontuacaoMaxima = jogadas.getFilho(i).getPontos();
+                if(pontuacaoMaxima == jogadas.MAX_PONTOS) {
+                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
+                }
+            }
+            else if(jogadas.getFilho(i).getPontos() == jogadas.MAX_PONTOS) {
+                if(jogadas.getFilho(i).calculaProfundidade() < profundidadeMinima) {
+                    melhorJogada = jogadas.getFilho(i).getJogada();
+                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
+                }
+            }
+        }
+        if(pontuacaoMaxima == jogadas.MIN_PONTOS) {
+            melhorJogada = jogadaDanoMinimo(melhorJogada, corPeca);
+        }
+        float chance = normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0, 100, (float)pontuacaoMaxima);
+        System.out.println("Chance de vitória: "+chance+"%");
+        return melhorJogada;    
+    }
     private void playerFazJogada() throws InterruptedException {
         setVezDoPlayer(true);
         while(isVezDoPlayer()) {
@@ -263,7 +340,7 @@ public class Jogo extends JPanel implements ActionListener {
     public void partidaBotXPlayer() throws InterruptedException {
         inicializaTabuleiro();
         iniciaTimer();
-        while(!verificaVitoria(PECA_BRANCA, getTabuleiro()) && !verificaVitoria(PECA_PRETA, getTabuleiro())) {
+        while(!verificaFimDeJogo(getTabuleiro())) {
             System.out.println("Vez das peças brancas");
             if(getPecaPlayer() == PECA_BRANCA) {
                 playerFazJogada();
@@ -285,7 +362,7 @@ public class Jogo extends JPanel implements ActionListener {
     public void partidaBotXBot() throws InterruptedException {
         inicializaTabuleiro();
         iniciaTimer();
-        while(!verificaVitoria(PECA_BRANCA, getTabuleiro()) && !verificaVitoria(PECA_PRETA, getTabuleiro())) {
+        while(!verificaFimDeJogo(getTabuleiro())) {
             System.out.println("Vez das peças brancas");
             fazJogada(jogadaDaMaquina(PECA_BRANCA, getProfundidade()), getTabuleiro());     
             if(!verificaVitoria(PECA_BRANCA, getTabuleiro())) {
@@ -297,11 +374,8 @@ public class Jogo extends JPanel implements ActionListener {
     }
 
     //  funções específicas (para implementar com override)
-    public ArrayList<ArrayList<Integer>> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {     
-        return new ArrayList<ArrayList<Integer>>();
-    }
-    public int[][] fazMovimento(ArrayList<Integer> jogada, int[][] tabuleiro) {
-        return tabuleiro;
+    public ArrayList<Jogada> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {     
+        return new ArrayList<Jogada>();
     }
     public boolean verificaFimDeJogo(int[][] tabuleiro) {
         return true;
@@ -315,7 +389,21 @@ public class Jogo extends JPanel implements ActionListener {
     public boolean verificaVitoria(int corPeca, int[][] tabuleiro) {
         return true;
     }
-    public ArrayList<Integer> jogadaDaMaquina(int corPeca, int profundidade) {
-        return new ArrayList<Integer>();
+    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
+        return antigaMelhorJogada;
+    }
+    public void interpretaJogadaPlayer(int[] posClick) {
+
+    }
+
+    // classe de que captura eventos do mouse
+    public class EventosMouse extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int[] posClick = {(int)(e.getX()*LARGURA_TABULEIRO)/LARGURA_TELA, (int)(e.getY()*ALTURA_TABULEIRO)/ALTURA_TELA};
+            if(isVezDoPlayer()) {
+                interpretaJogadaPlayer(posClick);
+            }
+        }
     }
 }

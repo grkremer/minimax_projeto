@@ -1,15 +1,11 @@
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
 
 public class Alquerque extends Jogo {
     Alquerque() {
         super();
         setNome("Alquerque");
         setProfundidade(6);
-        addMouseListener(new EventosMouse());
     }
 
     @Override
@@ -32,26 +28,20 @@ public class Alquerque extends Jogo {
             getTabuleiro()[x][4] = PECA_BRANCA;
         }
     }
-    @Override
-    public int[][] fazMovimento(ArrayList<Integer> jogada, int[][] tabuleiro) {
-        int xInicial = jogada.get(0);
-        int yInicial = jogada.get(1);
-        int xFinal = jogada.get(2);
-        int yFinal = jogada.get(3);
-        tabuleiro[xFinal][yFinal] = tabuleiro[xInicial][yInicial];
-        tabuleiro[xInicial][yInicial] = SEM_PECA;
-        if(Math.abs(xFinal - xInicial) == 2 || Math.abs(yFinal - yInicial) == 2) {
-            int[] posPecaEntrePecas = posPecaEntrePecas(xInicial, yInicial, xFinal, yFinal, tabuleiro);
-            tabuleiro[posPecaEntrePecas[0]][posPecaEntrePecas[1]] = SEM_PECA;
-        }
-        return tabuleiro;
+    
+    private boolean comeuPeca(int[][] movimento) {
+        int xInicial = movimento[0][0];
+        int yInicial = movimento[0][1];
+        int xFinal = movimento[1][0];
+        int yFinal = movimento[1][1];
+        return Math.abs(xFinal - xInicial) == 2 || Math.abs(yFinal - yInicial) == 2;
     }
     
     private int pecaEntrePecas(int x1, int y1, int x2, int y2, int[][] tabuleiro) {
-        int[] posNovo = posPecaEntrePecas(x1, y1, x2, y2, tabuleiro);
+        int[] posNovo = posPecaEntrePecas(x1, y1, x2, y2);
         return tabuleiro[posNovo[0]][posNovo[1]];
     }
-    private int[] posPecaEntrePecas(int x1, int y1, int x2, int y2, int[][] tabuleiro) {
+    private int[] posPecaEntrePecas(int x1, int y1, int x2, int y2) {
         int xNovo, yNovo;
         int[] posNovo = new int[2];
 
@@ -128,8 +118,8 @@ public class Alquerque extends Jogo {
             return false;
         }
     }
-    private ArrayList<ArrayList<Integer>> testaPossiveisJogadaPeca(int x, int y, int regiao, int[][] tabuleiro) {
-        ArrayList<ArrayList<Integer>> possiveisJogadas = new ArrayList<ArrayList<Integer>>();
+    private ArrayList<ArrayList<int[][]>> listaPossiveisMovimentosPeca(int x, int y, int regiao, int[][] tabuleiro) {
+        ArrayList<ArrayList<int[][]>> possiveisMovimentos = new ArrayList<ArrayList<int[][]>>();
         int[][] regioes = {{1,0},{0,1},{1,1},{-1,-1},{-1,1},{1,-1},{-1,0},{0,-1}};
         if(regiao == 2) {
             for(int i=0; i < regioes.length; i++)
@@ -140,63 +130,66 @@ public class Alquerque extends Jogo {
         for(int i=0; i < regioes.length; i++) {
             int novoX = x+regioes[i][0];
             int novoY = y+regioes[i][1];
-            ArrayList<Integer> jogada = new ArrayList<>(List.of(x, y, novoX, novoY));
             if(verificaJogada(x,y,novoX,novoY,tabuleiro)) {
-                ArrayList<Integer> possibilidade = new ArrayList<Integer>();
-                possibilidade.add(x);
-                possibilidade.add(y);
-                possibilidade.add(novoX);
-                possibilidade.add(novoY);
+                int[][] movimento = {{x, y}, {novoX, novoY}};
+                ArrayList<int[][]> possibilidade = new ArrayList<int[][]>();
+                possibilidade.add(movimento);
                 if(regiao == 2) {
                     int[][] novoTabuleiro = criaCopiaTabuleiro(tabuleiro);
-                    novoTabuleiro = fazJogada(jogada, novoTabuleiro);
-                    ArrayList<ArrayList<Integer>> novasPossiveisJogadas = new ArrayList<ArrayList<Integer>>();
-                    novasPossiveisJogadas = testaPossiveisJogadaPeca(novoX, novoY, 2, novoTabuleiro);
+                    fazMovimento(movimento, novoTabuleiro);
+                    ArrayList<int[]> pecasEliminadas = new ArrayList<int[]>();
+                    pecasEliminadas.add(posPecaEntrePecas(movimento[0][0], movimento[0][1], movimento[1][0], movimento[1][1]));
+                    retiraPecas(pecasEliminadas, novoTabuleiro);
+                    ArrayList<ArrayList<int[][]>> novosPossiveisMovimentos = listaPossiveisMovimentosPeca(novoX, novoY, 2, novoTabuleiro);
 
-                    if(novasPossiveisJogadas.isEmpty()) {
-                        possiveisJogadas.add(possibilidade);
+                    if(novosPossiveisMovimentos.isEmpty()) {
+                        possiveisMovimentos.add(possibilidade);
                     }
                     else {
-                        for(int j=0; j<novasPossiveisJogadas.size(); j++) {
-                            novasPossiveisJogadas.get(j).remove(0);
-                            novasPossiveisJogadas.get(j).remove(0);
-                            possibilidade.addAll(novasPossiveisJogadas.get(j));
-                            possiveisJogadas.add(possibilidade);
-
-                            possibilidade = new ArrayList<Integer>();
-                            possibilidade.add(x);
-                            possibilidade.add(y);
-                            possibilidade.add(novoX);
-                            possibilidade.add(novoY);
+                        for(int j=0; j<novosPossiveisMovimentos.size(); j++) {
+                            ArrayList<int[][]> novaPossibilidade = new ArrayList<int[][]>();
+                            novaPossibilidade.addAll(possibilidade);
+                            novaPossibilidade.addAll(novosPossiveisMovimentos.get(j));
+                            possiveisMovimentos.add(novaPossibilidade);
                         }
                     }
                 }
                 else {
-                    possiveisJogadas.add(possibilidade);
+                    possiveisMovimentos.add(possibilidade);
                 }
             }
         }
-        return possiveisJogadas;
+        return possiveisMovimentos;
     }
-    private ArrayList<ArrayList<Integer>> testaPossiveisJogadas(int corPeca, int regiao, int[][] tabuleiro) {
-        ArrayList<ArrayList<Integer>> possiveisJogadas = new ArrayList<ArrayList<Integer>>();
+    private ArrayList<Jogada> listaPossiveisJogadasRegiao(int corPeca, int regiao, int[][] tabuleiro) {
+        ArrayList<ArrayList<int[][]>> possiveisMovimentos = new ArrayList<ArrayList<int[][]>>();
+        ArrayList<Jogada> possiveisJogadas = new ArrayList<Jogada>();
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
                 if(tabuleiro[x][y] == corPeca) {
-                    possiveisJogadas.addAll(testaPossiveisJogadaPeca(x, y, regiao, tabuleiro));
+                    possiveisMovimentos.addAll(listaPossiveisMovimentosPeca(x, y, regiao, tabuleiro));
                 }
             }
+        }
+        for(ArrayList<int[][]> movimentos : possiveisMovimentos) {
+            ArrayList<int[]> pecasEliminadas = new ArrayList<int[]>();
+            for(int[][] movimento : movimentos) {
+                if(comeuPeca(movimento)) {
+                    pecasEliminadas.add(posPecaEntrePecas(movimento[0][0], movimento[0][1], movimento[1][0], movimento[1][1]));
+                }
+            }
+            possiveisJogadas.add(new Jogada(corPeca, movimentos, pecasEliminadas));
         }
         return possiveisJogadas;
     }
     @Override
-    public ArrayList<ArrayList<Integer>> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
-        ArrayList<ArrayList<Integer>> possiveisJogadas;
+    public ArrayList<Jogada> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
+        ArrayList<Jogada> possiveisJogadas;
         
-        possiveisJogadas = testaPossiveisJogadas(corPeca, 2, tabuleiro);
+        possiveisJogadas = listaPossiveisJogadasRegiao(corPeca, 2, tabuleiro);
 
         if(possiveisJogadas.isEmpty()) {
-            possiveisJogadas = testaPossiveisJogadas(corPeca, 1, tabuleiro);
+            possiveisJogadas = listaPossiveisJogadasRegiao(corPeca, 1, tabuleiro);
         }
         return possiveisJogadas;
     }
@@ -231,86 +224,39 @@ public class Alquerque extends Jogo {
             return geraCustoPeca(corPeca, tabuleiro, minPontos, maxPontos)*0.5f + geraCustoPeca(invertePeca(corPeca), tabuleiro, minPontos, maxPontos)*-0.5f;
         }  
     }
-    @Override
-    public ArrayList<Integer> jogadaDaMaquina(int corPeca, int profundidade) {
-        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade);
-        Collections.shuffle(jogadas.getFilhos());
-        jogadas.minimaxAlphaBeta();
-
-        int pontuacaoMaxima = Integer.MIN_VALUE;
-        int profundidadeMinima = Integer.MAX_VALUE;
-        ArrayList<Integer> melhorJogada = jogadas.getFilho(0).getJogada();
-        for(int i=0; i < jogadas.getFilhos().size(); i++) {
-            if(jogadas.getFilho(i).isAcessado()) {
-                if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
-                    melhorJogada = jogadas.getFilho(i).getJogada();
-                    pontuacaoMaxima = jogadas.getFilho(i).getPontos();
-                    if(pontuacaoMaxima == jogadas.getMaxPontos()) {
-                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
-                    }
-                }
-                else if(jogadas.getFilho(i).getPontos() == jogadas.getMaxPontos()) {
-                    if(jogadas.getFilho(i).getProfundidade() < profundidadeMinima) {
-                        melhorJogada = jogadas.getFilho(i).getJogada();
-                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
-                    }
-                }
+    
+    private Jogada jogadaDaLista(int xInicial, int yInicial, int xFinal, int yFinal, ArrayList<Jogada> possiveisJogadas) {
+        for(int i=0; i< possiveisJogadas.size(); i++) {
+            if(possiveisJogadas.get(i).getMovimentos().get(0)[0][0] == xInicial && 
+            possiveisJogadas.get(i).getMovimentos().get(0)[0][1] == yInicial && 
+            possiveisJogadas.get(i).getMovimentos().get(possiveisJogadas.get(i).getMovimentos().size()-1)[1][0] == xFinal && 
+            possiveisJogadas.get(i).getMovimentos().get(possiveisJogadas.get(i).getMovimentos().size()-1)[1][1] == yFinal) {
+                return possiveisJogadas.get(i);
             }
         }
-        float chance = normalizaPontuacao(jogadas.getMinPontos(), jogadas.getMaxPontos(), 0, 100, (float)pontuacaoMaxima);
-        System.out.println("Chance de vitória: "+chance+"%");
-        return melhorJogada;
+        return null;
     }
-
-    public class EventosMouse extends MouseAdapter {
-        private int[] posClick;
-        public int[] getPosClick() {
-            return posClick;
-        }
-        public void setPosClick(int[] posClick) {
-            this.posClick = posClick;
-        }
-        private ArrayList<Integer> jogadaDaLista(int xInicial, int yInicial, int xFinal, int yFinal, ArrayList<ArrayList<Integer>> possiveisJogadas) {
-            for(int i=0; i< possiveisJogadas.size(); i++) {
-                if(possiveisJogadas.get(i).get(0) == xInicial && 
-                possiveisJogadas.get(i).get(1) == yInicial && 
-                possiveisJogadas.get(i).get(possiveisJogadas.get(i).size()-2) == xFinal && 
-                possiveisJogadas.get(i).get(possiveisJogadas.get(i).size()-1) == yFinal) {
-                    return possiveisJogadas.get(i);
-                }
+    @Override
+    public void interpretaJogadaPlayer(int[] posClick) {
+        if(!isSelecionado()) {
+            setPosSelecionado(posClick);
+            if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
+                setSelecionado(true);
             }
-            return new ArrayList<Integer>();
         }
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            int[] pos = {e.getX(), e.getY()};
-            setPosClick(pos);
-            if(isVezDoPlayer()) {
-                if(!isSelecionado()) {
-                    int[] posPeca = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
-                                    (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
-                    setPosSelecionado(posPeca);
-                    if(getTabuleiro()[posPeca[0]][posPeca[1]] == PECA_BRANCA) {
-                        setSelecionado(true);
-                    }
-                }
-                else {
-                    int[] posJogada = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
-                                    (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
-                    ArrayList<ArrayList<Integer>> possiveisJogadas = listaPossiveisJogadas(PECA_BRANCA, getTabuleiro());
-                    ArrayList<Integer> jogada = jogadaDaLista(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1], possiveisJogadas);
-                    if(!jogada.isEmpty()) {
-                        setJogadaDoPlayer(jogada);
-                        setVezDoPlayer(false);
-                        setSelecionado(false);
-                    }
-                    else if(getTabuleiro()[posJogada[0]][posJogada[1]] == PECA_BRANCA) {
-                        setPosSelecionado(posJogada);
-                    }
-                    else {
-                        setSelecionado(false);
-                    }
-                }
+        else {
+            ArrayList<Jogada> possiveisJogadas = listaPossiveisJogadas(getPecaPlayer(), getTabuleiro());
+            Jogada jogada = jogadaDaLista(getPosSelecionado()[0], getPosSelecionado()[1], posClick[0], posClick[1], possiveisJogadas);
+            if(!Objects.isNull(jogada)) {
+                setJogadaDoPlayer(jogada);
+                setVezDoPlayer(false);
+                setSelecionado(false);
+            }
+            else if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
+                setPosSelecionado(posClick);
+            }
+            else {
+                setSelecionado(false);
             }
         }
     }

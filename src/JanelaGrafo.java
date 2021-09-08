@@ -22,19 +22,17 @@ public class JanelaGrafo extends JFrame {
         this.grafo = grafo;
     }
     private void desenhaJogadas(ArvoreDeJogadas arvore, ArvoreDeJogadas raiz, Object nodoPai, int nivel, int[] posicoes) {
-        if(arvore.isAcessado()) {
-            Object PAI_DEFAULT = getGrafo().getDefaultParent();
-            posicoes[nivel] += 1;
-            int largura = 40;
-            int altura = 20;
-            int posicao = ((getWidth()/(raiz.numeroNosNivel(nivel)+1)) *posicoes[nivel]) - (largura/2);
-            Object nodo = getGrafo().insertVertex(PAI_DEFAULT, null, Float.toString(arvore.getPontos()), posicao, (nivel+1)*80, largura, altura);
-            if(nivel > 0) {
-                getGrafo().insertEdge(PAI_DEFAULT, null, "", nodoPai, nodo);
-            }
-            for(int i=0; i<arvore.getFilhos().size(); i++) {
-                desenhaJogadas(arvore.getFilho(i), raiz, nodo, nivel+1, posicoes);
-            }
+        Object PAI_DEFAULT = getGrafo().getDefaultParent();
+        posicoes[nivel] += 1;
+        int largura = 40;
+        int altura = 20;
+        int posicao = ((getWidth()/(raiz.numeroNosNivel(nivel)+1)) *posicoes[nivel]) - (largura/2);
+        Object nodo = getGrafo().insertVertex(PAI_DEFAULT, null, Float.toString(arvore.getPontos()), posicao, (nivel+1)*80, largura, altura);
+        if(nivel > 0) {
+            getGrafo().insertEdge(PAI_DEFAULT, null, "", nodoPai, nodo);
+        }
+        for(int i=0; i<arvore.getFilhos().size(); i++) {
+            desenhaJogadas(arvore.getFilho(i), raiz, nodo, nivel+1, posicoes);
         }
     }
     /**
@@ -48,7 +46,7 @@ public class JanelaGrafo extends JFrame {
         componenteGrafo.setPreferredSize(new Dimension(getWidth(),getHeight()));
         getContentPane().add(componenteGrafo);
 
-        int[] posicoes = new int[arvore.getProfundidade()+1];
+        int[] posicoes = new int[arvore.calculaProfundidade()+1];
         getGrafo().getModel().beginUpdate();
         desenhaJogadas(arvore, arvore, null, 0, posicoes);
         getGrafo().getModel().endUpdate();

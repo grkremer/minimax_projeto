@@ -1,18 +1,12 @@
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class JogoDaVelha5 extends Jogo {
-    private static final int MAXIMO_JOGADAS = 15000000;
-    //private static final int MAXIMO_JOGADAS = Integer.MAX_VALUE;
-
     JogoDaVelha5() {
         super();
         setNome("Jogo da Velha 5");
         setProfundidade(5);
-        addMouseListener(new EventosMouse());
+        setMaximoJogadas(15000000);
     }
     
     @Override
@@ -23,17 +17,6 @@ public class JogoDaVelha5 extends Jogo {
             }
         }
     }
-    @Override
-    public int[][] fazJogada(ArrayList<Integer> jogada) throws InterruptedException {
-        fazJogada(jogada, getTabuleiro());
-        Thread.sleep(DELAY_JOGADA);
-        return getTabuleiro();
-    } 
-    @Override
-    public int[][] fazJogada(ArrayList<Integer> jogada, int[][] tabuleiro) {
-        tabuleiro[jogada.get(0)][jogada.get(1)] = jogada.get(2);
-        return tabuleiro;
-    } 
     
     public boolean verificaJogada(int x, int y, int[][] tabuleiro) {
         if (estaNosLimites(x, y) && tabuleiro[x][y] == SEM_PECA) {
@@ -44,6 +27,52 @@ public class JogoDaVelha5 extends Jogo {
         }
     }
     
+    public boolean verificaSimetriaVertical(int tabuleiro [][]){
+        for (int x = 0; x < 2; x++){
+            for(int y = 0; y < 5; y++){
+                if (tabuleiro[x][y] != tabuleiro[4-x][y]) return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean verificaSimetriaHorizontal(int tabuleiro [][]){
+        for (int y = 0; y < 2; y++){
+            for(int x = 0; x < 5; x++){
+                if (tabuleiro[x][y] != tabuleiro[x][4-y]) return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean verificaSimetriaDiagonal(int tabuleiro [][]){
+        if (tabuleiro[0][1] != tabuleiro[1][0]) return false;
+        if (tabuleiro[0][2] != tabuleiro[2][0]) return false;
+        if (tabuleiro[0][3] != tabuleiro[3][0]) return false;
+        if (tabuleiro[0][4] != tabuleiro[4][0]) return false;
+        if (tabuleiro[1][2] != tabuleiro[2][1]) return false;
+        if (tabuleiro[1][3] != tabuleiro[3][1]) return false;
+        if (tabuleiro[1][4] != tabuleiro[4][1]) return false;
+        if (tabuleiro[2][3] != tabuleiro[3][2]) return false;
+        if (tabuleiro[2][4] != tabuleiro[4][2]) return false;
+        if (tabuleiro[3][4] != tabuleiro[4][3]) return false;
+        return true;
+    }
+
+    public boolean verificaSimetriaOutraDiagonal(int tabuleiro [][]){
+        if (tabuleiro[0][0] != tabuleiro[4][4]) return false;
+        if (tabuleiro[0][1] != tabuleiro[3][4]) return false;
+        if (tabuleiro[0][2] != tabuleiro[2][4]) return false;
+        if (tabuleiro[0][3] != tabuleiro[1][4]) return false;
+        if (tabuleiro[1][0] != tabuleiro[4][3]) return false;
+        if (tabuleiro[1][1] != tabuleiro[3][3]) return false;
+        if (tabuleiro[1][2] != tabuleiro[2][3]) return false;
+        if (tabuleiro[2][0] != tabuleiro[4][2]) return false;
+        if (tabuleiro[2][1] != tabuleiro[3][2]) return false;
+        if (tabuleiro[3][0] != tabuleiro[4][1]) return false;
+        return true;
+    }
+
     private boolean condicaoLoopSimetria(int larguraMax, boolean temDiagonal, boolean temOutraDiagonal, int x, int y) {
         boolean condicaoLargura = x < larguraMax;
         boolean condicaoDiagonal = true;
@@ -58,8 +87,8 @@ public class JogoDaVelha5 extends Jogo {
     }
     
     @Override
-    public ArrayList<ArrayList<Integer>> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
-        ArrayList<ArrayList<Integer>> possiveisJogadas = new  ArrayList<ArrayList<Integer>>();
+    public ArrayList<Jogada> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
+        ArrayList<Jogada> possiveisJogadas = new ArrayList<Jogada>();
         boolean horizontal = verificaSimetriaHorizontal(tabuleiro);
         boolean vertical = verificaSimetriaVertical(tabuleiro);
         boolean diagonal = verificaSimetriaDiagonal(tabuleiro);
@@ -76,7 +105,8 @@ public class JogoDaVelha5 extends Jogo {
         for(int y=0; y < alturaMax; y++) {
             for(int x=0; condicaoLoopSimetria(larguraMax,diagonal,outraDiagonal,x,y); x++) {
                 if(verificaJogada(x,y,tabuleiro)) {
-                    ArrayList<Integer> possibilidade = new ArrayList<Integer>(List.of(x, y, corPeca));
+                    int[] posJogada = {x, y};
+                    Jogada possibilidade = new Jogada(corPeca, posJogada);
                     possiveisJogadas.add(possibilidade);
                 }
             }
@@ -277,8 +307,6 @@ public class JogoDaVelha5 extends Jogo {
         return verificaVitoria(PECA_BRANCA, tabuleiro) || verificaVitoria(PECA_PRETA, tabuleiro);
     }
     
-    
-
     public int numeroDeAlinhamentos(int corPeca, int[][] tabuleiro) {
         int contagem = 0;
         boolean encontrouPecaLinha;
@@ -540,28 +568,17 @@ public class JogoDaVelha5 extends Jogo {
     }
 
     private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        //ArvoreDeJogadas j = new ArvoreDeJogadas();
-        //return j.geraPontosAleatorios();
         float pontosTripla = (float)minPontos;
         if(tentaAcharTripla(corPeca, tabuleiro)) {
             pontosTripla = (float)maxPontos;
         }
         float pontosDuplas = normalizaPontuacao(0.0f, 8.0f, (float)minPontos, (float)maxPontos, (float)contaDuplas(corPeca,tabuleiro));
         float pontosAlinhamentos = normalizaPontuacao(0.0f, 16.0f, (float)minPontos, (float)maxPontos, (float)numeroDeAlinhamentosComVazios(corPeca,tabuleiro));
-        //float pontosMaximoAlinhado = normalizaPontuacao(0.0f, 4.0f, (float)minPontos, (float)maxPontos, (float)maximoAlinhado(corPeca,tabuleiro));
         return pontosAlinhamentos*0.5f + pontosDuplas*0.2f + pontosTripla*0.3f;
     }
 
     @Override
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        //boolean tripla = tentaAcharTripla(corPeca,tabuleiro);
-        //boolean triplaInimigo = tentaAcharTripla(invertePeca(corPeca),tabuleiro);
-        //if(verificaVitoria(corPeca, tabuleiro)||(tripla && !triplaInimigo)) {
-        //    return maxPontos;
-        //}
-        //else if(verificaVitoria(invertePeca(corPeca), tabuleiro)||(triplaInimigo && !tripla)) {
-        //    return minPontos;
-        //}
         if(verificaVitoria(corPeca, tabuleiro)) {
             return maxPontos;
         }
@@ -573,132 +590,34 @@ public class JogoDaVelha5 extends Jogo {
         }        
     }
 
-    private ArrayList<Integer> minimizaDanos(int corPeca) {
+    @Override
+    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas(0);
-        jogadas.setDificulty(3);
-        ArrayList<ArrayList<Integer>> possiveisJogadas = listaPossiveisJogadas(invertePeca(corPeca), getTabuleiro());
+        ArrayList<Jogada> possiveisJogadas = listaPossiveisJogadas(invertePeca(corPeca), getTabuleiro());
         Collections.shuffle(possiveisJogadas);
         int pontuacaoMaxima = Integer.MIN_VALUE;
         int pontuacao;
-        ArrayList<Integer> melhorJogada = new ArrayList<Integer>();
+        Jogada melhorJogada = possiveisJogadas.get(0);
+        melhorJogada.setCorPeca(corPeca);
         for(int i=0; i < possiveisJogadas.size(); i++) {
             int[][] novoTabuleiro = criaCopiaTabuleiro(getTabuleiro());
-            novoTabuleiro = fazJogada(possiveisJogadas.get(i), novoTabuleiro);
-            pontuacao = (int)geraCusto(invertePeca(corPeca), novoTabuleiro, jogadas.getMinPontos(), jogadas.getMaxPontos());
+            fazJogada(possiveisJogadas.get(i), novoTabuleiro);
+            pontuacao = (int)geraCusto(invertePeca(corPeca), novoTabuleiro, jogadas.MIN_PONTOS, jogadas.MAX_PONTOS);
             if(pontuacao > pontuacaoMaxima) {
-                possiveisJogadas.get(i).set(2, corPeca);
+                possiveisJogadas.get(i).setCorPeca(corPeca);
                 melhorJogada = possiveisJogadas.get(i);
                 pontuacaoMaxima = pontuacao;
             }
         }
         return melhorJogada;
     }
+
     @Override
-    public ArrayList<Integer> jogadaDaMaquina(int corPeca, int profundidade) {
-        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, MAXIMO_JOGADAS);
-        Collections.shuffle(jogadas.getFilhos());
-        jogadas.minimaxAlphaBeta();
-
-        int pontuacaoMaxima = Integer.MIN_VALUE;
-        int profundidadeMinima = Integer.MAX_VALUE;
-        ArrayList<Integer> melhorJogada = jogadas.getFilho(0).getJogada();
-        for(int i=0; i < jogadas.getFilhos().size(); i++) {
-            if(jogadas.getFilho(i).isAcessado()) {
-                if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
-                    melhorJogada = jogadas.getFilho(i).getJogada();
-                    pontuacaoMaxima = jogadas.getFilho(i).getPontos();
-                    if(pontuacaoMaxima == jogadas.getMaxPontos()) {
-                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
-                    }
-                }
-                else if(jogadas.getFilho(i).getPontos() == jogadas.getMaxPontos()) {
-                    if(jogadas.getFilho(i).getProfundidade() < profundidadeMinima) {
-                        melhorJogada = jogadas.getFilho(i).getJogada();
-                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
-                    }
-                }
-            }
-        }
-        if(pontuacaoMaxima == jogadas.getMinPontos()) {
-            melhorJogada =  minimizaDanos(corPeca);
-        }
-        float chance = normalizaPontuacao(jogadas.getMinPontos(), jogadas.getMaxPontos(), 0, 100, (float)pontuacaoMaxima);
-        System.out.println("Chance de vitória: "+chance+"%");
-        return melhorJogada;    
-    }
-
-    public class EventosMouse extends MouseAdapter {
-        private int[] posClick;
-        public int[] getPosClick() {
-            return posClick;
-        }
-        public void setPosClick(int[] posClick) {
-            this.posClick = posClick;
-        }
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            int[] pos = {e.getX(), e.getY()};
-            setPosClick(pos);
-            if(isVezDoPlayer()) {
-                int[] posJogada = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
-                                 (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
-                if(verificaJogada(posJogada[0], posJogada[1], getTabuleiro())) {
-                    ArrayList<Integer> jogada = new ArrayList<Integer>(List.of(posJogada[0], posJogada[1], getPecaPlayer()));
-                    setJogadaDoPlayer(jogada);
-                    setVezDoPlayer(false);
-                }
-            }
+    public void interpretaJogadaPlayer(int[] posClick) {
+        if(verificaJogada(posClick[0], posClick[1], getTabuleiro())) {
+            Jogada jogada = new Jogada(getPecaPlayer(), posClick);
+            setJogadaDoPlayer(jogada);
+            setVezDoPlayer(false);
         }
     }
-
-    public boolean verificaSimetriaVertical(int tabuleiro [][]){
-        for (int x = 0; x < 2; x++){
-            for(int y = 0; y < 5; y++){
-                if (tabuleiro[x][y] != tabuleiro[4-x][y]) return false;
-            }
-        }
-        //System.out.println("Simetria Vertical");
-        return true;
-    }
-
-    public boolean verificaSimetriaHorizontal(int tabuleiro [][]){
-        for (int y = 0; y < 2; y++){
-            for(int x = 0; x < 5; x++){
-                if (tabuleiro[x][y] != tabuleiro[x][4-y]) return false;
-            }
-        }
-        //System.out.println("Simetria Horizontal");
-        return true;
-    }
-
-    public boolean verificaSimetriaDiagonal(int tabuleiro [][]){
-        if (tabuleiro[0][1] != tabuleiro[1][0]) return false;
-        if (tabuleiro[0][2] != tabuleiro[2][0]) return false;
-        if (tabuleiro[0][3] != tabuleiro[3][0]) return false;
-        if (tabuleiro[0][4] != tabuleiro[4][0]) return false;
-        if (tabuleiro[1][2] != tabuleiro[2][1]) return false;
-        if (tabuleiro[1][3] != tabuleiro[3][1]) return false;
-        if (tabuleiro[1][4] != tabuleiro[4][1]) return false;
-        if (tabuleiro[2][3] != tabuleiro[3][2]) return false;
-        if (tabuleiro[2][4] != tabuleiro[4][2]) return false;
-        if (tabuleiro[3][4] != tabuleiro[4][3]) return false;
-        //System.out.println("Simetria Diagonal");
-        return true;
-    }
-
-    public boolean verificaSimetriaOutraDiagonal(int tabuleiro [][]){
-        if (tabuleiro[0][0] != tabuleiro[4][4]) return false;
-        if (tabuleiro[0][1] != tabuleiro[3][4]) return false;
-        if (tabuleiro[0][2] != tabuleiro[2][4]) return false;
-        if (tabuleiro[0][3] != tabuleiro[1][4]) return false;
-        if (tabuleiro[1][0] != tabuleiro[4][3]) return false;
-        if (tabuleiro[1][1] != tabuleiro[3][3]) return false;
-        if (tabuleiro[1][2] != tabuleiro[2][3]) return false;
-        if (tabuleiro[2][0] != tabuleiro[4][2]) return false;
-        if (tabuleiro[2][1] != tabuleiro[3][2]) return false;
-        if (tabuleiro[3][0] != tabuleiro[4][1]) return false;
-        //System.out.println("Simetria Outra Diagonal");
-        return true;
-    }
-
 }

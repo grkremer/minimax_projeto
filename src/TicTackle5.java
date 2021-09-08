@@ -1,16 +1,11 @@
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class TicTackle5 extends Jogo {
     TicTackle5() {
         super();
         setNome("Tic Tackle 5");
         setProfundidade(5);
-        addMouseListener(new EventosMouse());
     }
 
     @Override
@@ -37,46 +32,7 @@ public class TicTackle5 extends Jogo {
             } 
         }
     }
-    @Override
-    public int[][] fazMovimento(ArrayList<Integer> jogada, int[][] tabuleiro) {
-        int xInicial = jogada.get(0);
-        int yInicial = jogada.get(1);
-        int xFinal = jogada.get(2);
-        int yFinal = jogada.get(3);
-        tabuleiro[xFinal][yFinal] = tabuleiro[xInicial][yInicial];
-        tabuleiro[xInicial][yInicial] = SEM_PECA;
-        return tabuleiro;
-    } 
 
-    public boolean verificaJogada(int xInicial, int yInicial, int xFinal, int yFinal) {
-        if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
-            if (getTabuleiro()[xFinal][yFinal] == SEM_PECA && getTabuleiro()[xInicial][yInicial] != SEM_PECA) {
-                //Se quer se mover na diagonal
-                if((Math.abs(xInicial - xFinal) == 1 ) && (Math.abs(yInicial - yFinal) == 1)) {
-                    //Se x e y têm a mesma paridade
-                    if(((xInicial % 2 == 0) && (yInicial % 2 == 0)) || ((xInicial % 2 == 1) && (yInicial % 2 == 1))) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                //Se quer se mover na vertical/horizontal
-                else if((Math.abs(xInicial - xFinal) <= 1 ) && (Math.abs(yInicial - yFinal) <= 1)) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return false;
-        }
-    }
     public boolean verificaJogada(int xInicial, int yInicial, int xFinal, int yFinal, int[][] tabuleiro) {
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
@@ -108,8 +64,8 @@ public class TicTackle5 extends Jogo {
     }
 
     @Override
-    public ArrayList<ArrayList<Integer>> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
-        ArrayList<ArrayList<Integer>> possiveisJogadas = new ArrayList<ArrayList<Integer>>();
+    public ArrayList<Jogada> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
+        ArrayList<Jogada> possiveisJogadas = new ArrayList<Jogada>();
         int[][] regioes = {{1,0},{0,1},{1,1},{-1,-1},{-1,1},{1,-1},{-1,0},{0,-1}};
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
@@ -118,7 +74,9 @@ public class TicTackle5 extends Jogo {
                         int novoX = x+regioes[i][0];
                         int novoY = y+regioes[i][1];
                         if(verificaJogada(x,y,novoX,novoY,tabuleiro)) {
-                            ArrayList<Integer> possibilidade = new ArrayList<Integer>(List.of(x, y, novoX, novoY));
+                            int[] posicaoInicial = {x, y};
+                            int[] posicaoFinal = {novoX, novoY};
+                            Jogada possibilidade = new Jogada(corPeca, posicaoInicial, posicaoFinal);
                             possiveisJogadas.add(possibilidade);
                         }
                     }
@@ -252,8 +210,6 @@ public class TicTackle5 extends Jogo {
         return verificaVitoria(PECA_BRANCA, tabuleiro) || verificaVitoria(PECA_PRETA, tabuleiro);
     }
     
-
-    
     private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         float maxAlinhado =  (float)maximoAlinhado(corPeca, tabuleiro);
         float maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
@@ -272,61 +228,15 @@ public class TicTackle5 extends Jogo {
 
     @Override
     public float geraCusto(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        if(corPeca == PECA_PRETA) {
-            if(verificaVitoria(PECA_PRETA, tabuleiro)) {
-                return maxPontos;
-            }
-            else if(verificaVitoria(PECA_BRANCA, tabuleiro)) {
-                return minPontos;
-            }
-            else{
-                return geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*-0.7f;
-            }
-            //ArvoreDeJogadas j = new ArvoreDeJogadas();
-            //return j.geraPontosAleatorios();
+        if(verificaVitoria(corPeca, tabuleiro)) {
+            return maxPontos;
         }
-        else {
-            if(verificaVitoria(PECA_BRANCA, tabuleiro)) {
-                return maxPontos;
-            }
-            else if(verificaVitoria(PECA_PRETA, tabuleiro)) {
-                return minPontos;
-            }
-            else{
-                return geraCustoPeca(PECA_BRANCA, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(PECA_PRETA, tabuleiro, minPontos, maxPontos)*-0.7f;
-            }
+        else if(verificaVitoria(invertePeca(corPeca), tabuleiro)) {
+            return minPontos;
         }
-        
-    }
-    @Override
-    public ArrayList<Integer> jogadaDaMaquina(int corPeca, int profundidade) {
-        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade);
-        Collections.shuffle(jogadas.getFilhos());
-        jogadas.minimaxAlphaBeta();
-
-        int pontuacaoMaxima = Integer.MIN_VALUE;
-        int profundidadeMinima = Integer.MAX_VALUE;
-        ArrayList<Integer> melhorJogada = jogadas.getFilho(0).getJogada();
-        for(int i=0; i < jogadas.getFilhos().size(); i++) {
-            if(jogadas.getFilho(i).isAcessado()) {
-                if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
-                    melhorJogada = jogadas.getFilho(i).getJogada();
-                    pontuacaoMaxima = jogadas.getFilho(i).getPontos();
-                    if(pontuacaoMaxima == jogadas.getMaxPontos()) {
-                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
-                    }
-                }
-                else if(jogadas.getFilho(i).getPontos() == jogadas.getMaxPontos()) {
-                    if(jogadas.getFilho(i).getProfundidade() < profundidadeMinima) {
-                        melhorJogada = jogadas.getFilho(i).getJogada();
-                        profundidadeMinima = jogadas.getFilho(i).getProfundidade();
-                    }
-                }
-            }
+        else{
+            return geraCustoPeca(corPeca, tabuleiro, minPontos, maxPontos)*0.3f + geraCustoPeca(invertePeca(corPeca), tabuleiro, minPontos, maxPontos)*-0.7f;
         }
-        float chance = normalizaPontuacao(jogadas.getMinPontos(), jogadas.getMaxPontos(), 0, 100, (float)pontuacaoMaxima);
-        System.out.println("Chance de vitória: "+chance+"%");
-        return melhorJogada;
     }
 
     public float geraMaiorDistanciaMenor(int corPeca, int tabuleiro[][]) {
@@ -396,43 +306,26 @@ public class TicTackle5 extends Jogo {
         
     }
 
-    public class EventosMouse extends MouseAdapter {
-        private int[] posClick;
-        public int[] getPosClick() {
-            return posClick;
+    @Override
+    public void interpretaJogadaPlayer(int[] posClick) {
+        if(!isSelecionado()) {
+            setPosSelecionado(posClick);
+            if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
+                setSelecionado(true);
+            }
         }
-        public void setPosClick(int[] posClick) {
-            this.posClick = posClick;
-        }
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            int[] pos = {e.getX(), e.getY()};
-            setPosClick(pos);
-            if(isVezDoPlayer()) {
-                if(!isSelecionado()) {
-                    int[] posPeca = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
-                                    (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
-                    setPosSelecionado(posPeca);
-                    if(getTabuleiro()[posPeca[0]][posPeca[1]] == PECA_BRANCA) {
-                        setSelecionado(true);
-                    }
-                }
-                else {
-                    int[] posJogada = {(int)(getPosClick()[0]*LARGURA_TABULEIRO)/LARGURA_TELA,
-                                    (int)(getPosClick()[1]*ALTURA_TABULEIRO)/ALTURA_TELA};
-                    if(verificaJogada(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1])) {
-                        ArrayList<Integer> jogada = new ArrayList<Integer>(List.of(getPosSelecionado()[0], getPosSelecionado()[1], posJogada[0], posJogada[1]));
-                        setJogadaDoPlayer(jogada);
-                        setVezDoPlayer(false);
-                        setSelecionado(false);
-                    }
-                    else if(getTabuleiro()[posJogada[0]][posJogada[1]] == PECA_BRANCA) {
-                        setPosSelecionado(posJogada);
-                    }
-                    else {
-                        setSelecionado(false);
-                    }
-                }
+        else {
+            if(verificaJogada(getPosSelecionado()[0], getPosSelecionado()[1], posClick[0], posClick[1], getTabuleiro())) {
+                Jogada jogada = new Jogada(getPecaPlayer(), getPosSelecionado(), posClick);
+                setJogadaDoPlayer(jogada);
+                setVezDoPlayer(false);
+                setSelecionado(false);
+            }
+            else if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
+                setPosSelecionado(posClick);
+            }
+            else {
+                setSelecionado(false);
             }
         }
     }
