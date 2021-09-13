@@ -374,6 +374,12 @@ public class Jogo extends JPanel implements ActionListener {
     }
 
     //  funções específicas (para implementar com override)
+    public boolean verificaJogada(Jogada jogada, int[][] tabuleiro) {
+        return false;
+    }
+    public boolean verificaMovimento(int[][] movimento, int[][] tabuleiro) {
+        return false;
+    }
     public ArrayList<Jogada> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {     
         return new ArrayList<Jogada>();
     }

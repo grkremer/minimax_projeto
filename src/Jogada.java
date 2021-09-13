@@ -35,9 +35,8 @@ public class Jogada {
         setPosicao(posicao);
         setCorPeca(corPeca);
     }
-    Jogada(int corPeca, int[] posicaoInicial, int[] posicaoFinal) {
+    Jogada(int corPeca, int[][] movimento) {
         setCorPeca(corPeca);
-        int[][] movimento = {posicaoInicial, posicaoFinal};
         getMovimentos().add(movimento);
     }
     Jogada(int corPeca, ArrayList<int[][]> movimentos, ArrayList<int[]> pecasEliminadas) {

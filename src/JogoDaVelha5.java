@@ -18,7 +18,10 @@ public class JogoDaVelha5 extends Jogo {
         }
     }
     
-    public boolean verificaJogada(int x, int y, int[][] tabuleiro) {
+    @Override
+    public boolean verificaJogada(Jogada jogada, int[][] tabuleiro) {
+        int x = jogada.getPosicao()[0];
+        int y = jogada.getPosicao()[1];
         if (estaNosLimites(x, y) && tabuleiro[x][y] == SEM_PECA) {
             return true;
         }
@@ -73,7 +76,7 @@ public class JogoDaVelha5 extends Jogo {
         return true;
     }
 
-    private boolean condicaoLoopSimetria(int larguraMax, boolean temDiagonal, boolean temOutraDiagonal, int x, int y) {
+    public boolean condicaoLoopSimetria(int larguraMax, boolean temDiagonal, boolean temOutraDiagonal, int x, int y) {
         boolean condicaoLargura = x < larguraMax;
         boolean condicaoDiagonal = true;
         boolean condicaoOutraDiagonal = true;
@@ -104,9 +107,9 @@ public class JogoDaVelha5 extends Jogo {
         }
         for(int y=0; y < alturaMax; y++) {
             for(int x=0; condicaoLoopSimetria(larguraMax,diagonal,outraDiagonal,x,y); x++) {
-                if(verificaJogada(x,y,tabuleiro)) {
-                    int[] posJogada = {x, y};
-                    Jogada possibilidade = new Jogada(corPeca, posJogada);
+                int[] posJogada = {x, y};
+                Jogada possibilidade = new Jogada(corPeca, posJogada);
+                if(verificaJogada(possibilidade, tabuleiro)) {
                     possiveisJogadas.add(possibilidade);
                 }
             }
@@ -567,7 +570,7 @@ public class JogoDaVelha5 extends Jogo {
         return pontos;
     }
 
-    private float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
+    public float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         float pontosTripla = (float)minPontos;
         if(tentaAcharTripla(corPeca, tabuleiro)) {
             pontosTripla = (float)maxPontos;
@@ -614,8 +617,8 @@ public class JogoDaVelha5 extends Jogo {
 
     @Override
     public void interpretaJogadaPlayer(int[] posClick) {
-        if(verificaJogada(posClick[0], posClick[1], getTabuleiro())) {
-            Jogada jogada = new Jogada(getPecaPlayer(), posClick);
+        Jogada jogada = new Jogada(getPecaPlayer(), posClick);
+        if(verificaJogada(jogada, getTabuleiro())) {
             setJogadaDoPlayer(jogada);
             setVezDoPlayer(false);
         }

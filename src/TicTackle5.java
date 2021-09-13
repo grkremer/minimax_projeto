@@ -32,8 +32,12 @@ public class TicTackle5 extends Jogo {
             } 
         }
     }
-
-    public boolean verificaJogada(int xInicial, int yInicial, int xFinal, int yFinal, int[][] tabuleiro) {
+    @Override
+    public boolean verificaMovimento(int[][] movimento, int[][] tabuleiro) {
+        int xInicial = movimento[0][0];
+        int yInicial = movimento[0][1];
+        int xFinal = movimento[1][0];
+        int yFinal = movimento[1][1];
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
                 //Se quer se mover na diagonal
@@ -73,10 +77,9 @@ public class TicTackle5 extends Jogo {
                     for(int i=0; i < regioes.length; i++) {
                         int novoX = x+regioes[i][0];
                         int novoY = y+regioes[i][1];
-                        if(verificaJogada(x,y,novoX,novoY,tabuleiro)) {
-                            int[] posicaoInicial = {x, y};
-                            int[] posicaoFinal = {novoX, novoY};
-                            Jogada possibilidade = new Jogada(corPeca, posicaoInicial, posicaoFinal);
+                        int[][] movimento = {{x, y}, {novoX, novoY}};
+                        if(verificaMovimento(movimento, tabuleiro)) {
+                            Jogada possibilidade = new Jogada(corPeca, movimento);
                             possiveisJogadas.add(possibilidade);
                         }
                     }
@@ -315,8 +318,9 @@ public class TicTackle5 extends Jogo {
             }
         }
         else {
-            if(verificaJogada(getPosSelecionado()[0], getPosSelecionado()[1], posClick[0], posClick[1], getTabuleiro())) {
-                Jogada jogada = new Jogada(getPecaPlayer(), getPosSelecionado(), posClick);
+            int[][] movimento = {getPosSelecionado(), posClick};
+            if(verificaMovimento(movimento, getTabuleiro())) {
+                Jogada jogada = new Jogada(getPecaPlayer(), movimento);
                 setJogadaDoPlayer(jogada);
                 setVezDoPlayer(false);
                 setSelecionado(false);

@@ -75,7 +75,12 @@ public class Alquerque extends Jogo {
             }
         }
     }
-    public boolean verificaJogada(int xInicial, int yInicial, int xFinal, int yFinal, int[][] tabuleiro) {
+    @Override
+    public boolean verificaMovimento(int[][] movimento, int[][] tabuleiro) {
+        int xInicial = movimento[0][0];
+        int yInicial = movimento[0][1];
+        int xFinal = movimento[1][0];
+        int yFinal = movimento[1][1];
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
                 //Se quer se mover na diagonal
@@ -130,8 +135,8 @@ public class Alquerque extends Jogo {
         for(int i=0; i < regioes.length; i++) {
             int novoX = x+regioes[i][0];
             int novoY = y+regioes[i][1];
-            if(verificaJogada(x,y,novoX,novoY,tabuleiro)) {
-                int[][] movimento = {{x, y}, {novoX, novoY}};
+            int[][] movimento = {{x, y}, {novoX, novoY}};
+            if(verificaMovimento(movimento, tabuleiro)) {
                 ArrayList<int[][]> possibilidade = new ArrayList<int[][]>();
                 possibilidade.add(movimento);
                 if(regiao == 2) {
