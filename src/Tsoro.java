@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class JogoDaVelha5Variante extends JogoDaVelha5{
-
-    JogoDaVelha5Variante() {
+public class Tsoro extends JogoDaVelha4{
+    private final int MAX_PECAS = 4;
+    
+    Tsoro() {
         super();
     }
     @Override
@@ -89,7 +90,7 @@ public class JogoDaVelha5Variante extends JogoDaVelha5{
     }
     @Override
     public ArrayList<Jogada> listaPossiveisJogadas(int corPeca, int[][] tabuleiro) {
-        if(contaPecas(corPeca, tabuleiro) < 5) 
+        if(contaPecas(corPeca, tabuleiro) < MAX_PECAS) 
             return listaPossiveisJogadasInsercao(corPeca, tabuleiro);
         else 
             return listaPossiveisJogadasMovimento(corPeca, tabuleiro);
@@ -209,7 +210,7 @@ public class JogoDaVelha5Variante extends JogoDaVelha5{
     }
     @Override
     public void interpretaJogadaPlayer(int[] posClick) {
-        if(contaPecas(getPecaPlayer(), getTabuleiro()) < 5) 
+        if(contaPecas(getPecaPlayer(), getTabuleiro()) < MAX_PECAS) 
             interpretaJogadaPlayerInsercao(posClick);
         else 
             interpretaJogadaPlayerMovimento(posClick);

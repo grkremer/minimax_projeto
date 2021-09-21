@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -32,6 +34,7 @@ public class Jogo extends JPanel implements ActionListener {
     private Jogada jogadaDoPlayer;
     private boolean selecionado = false;
     private int[] posSelecionado = {0, 0};
+    private ArrayList<Jogada> historicoJogadas;
 
     Jogo() {
         setPreferredSize(new Dimension(LARGURA_TELA,ALTURA_TELA));
@@ -101,6 +104,12 @@ public class Jogo extends JPanel implements ActionListener {
     }
     public void setMaximoJogadas(int maximoJogadas) {
         this.maximoJogadas = maximoJogadas;
+    }
+    public ArrayList<Jogada> getHistoricoJogadas() {
+        return historicoJogadas;
+    }
+    public void setHistoricoJogadas(ArrayList<Jogada> historicoJogadas) {
+        this.historicoJogadas = historicoJogadas;
     }
 
     //  funções da engine
@@ -268,7 +277,8 @@ public class Jogo extends JPanel implements ActionListener {
             }
             retiraPecas(jogada.getPecasEliminadas(), getTabuleiro());
         }
-        jogada.print();
+        jogada.printLog();
+        getHistoricoJogadas().add(jogada);
         Thread.sleep(DELAY_JOGADA);
     } 
     public void fazJogada(Jogada jogada, int[][] tabuleiro) {
@@ -337,7 +347,19 @@ public class Jogo extends JPanel implements ActionListener {
         }
         fazJogada(getJogadaDoPlayer());
     }
+    private void salvaLogPartida() {
+        try {
+            PrintWriter arquivo = new PrintWriter("log.txt");
+            for(Jogada jogada : getHistoricoJogadas()) {
+                arquivo.println(jogada.getLog());
+            }
+            arquivo.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     public void partidaBotXPlayer() throws InterruptedException {
+        setHistoricoJogadas(new ArrayList<Jogada>());
         inicializaTabuleiro();
         iniciaTimer();
         while(!verificaFimDeJogo(getTabuleiro())) {
@@ -358,8 +380,10 @@ public class Jogo extends JPanel implements ActionListener {
             }
         }
         paraTimer();
+        salvaLogPartida();
     }
     public void partidaBotXBot() throws InterruptedException {
+        setHistoricoJogadas(new ArrayList<Jogada>());
         inicializaTabuleiro();
         iniciaTimer();
         while(!verificaFimDeJogo(getTabuleiro())) {
@@ -371,6 +395,7 @@ public class Jogo extends JPanel implements ActionListener {
             }
         }
         paraTimer();
+        salvaLogPartida();
     }
 
     //  funções específicas (para implementar com override)

@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class JogoDaVelha5 extends Jogo {
-    JogoDaVelha5() {
+public class JogoDaVelha4 extends Jogo {
+    JogoDaVelha4() {
         super();
-        setNome("Jogo da Velha 5");
+        setNome("Jogo da Velha 4");
         setProfundidade(5);
         setMaximoJogadas(15000000);
     }
