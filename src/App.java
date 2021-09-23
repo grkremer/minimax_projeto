@@ -4,5 +4,6 @@ public class App {
         new JanelaJogo(jogo);
         
         jogo.partidaBotXPlayer();
+        jogo.replayHistoricoJogadas();
     }
 }

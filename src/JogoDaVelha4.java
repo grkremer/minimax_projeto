@@ -307,7 +307,7 @@ public class JogoDaVelha4 extends Jogo {
     }
     @Override
     public boolean verificaFimDeJogo(int[][] tabuleiro) {
-        return verificaVitoria(PECA_BRANCA, tabuleiro) || verificaVitoria(PECA_PRETA, tabuleiro);
+        return verificaVitoria(PECA_BRANCA, tabuleiro) || verificaVitoria(PECA_PRETA, tabuleiro) || contaPecas(SEM_PECA, tabuleiro) == 0;
     }
     
     public int numeroDeAlinhamentos(int corPeca, int[][] tabuleiro) {

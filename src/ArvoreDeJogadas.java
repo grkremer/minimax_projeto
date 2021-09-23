@@ -199,6 +199,6 @@ public class ArvoreDeJogadas {
         return getPontos();
     }
     public void minimaxAlphaBeta() {
-        minimaxAlphaBeta(true,Integer.MIN_VALUE,Integer.MAX_VALUE);
+        minimaxAlphaBeta(true, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 }

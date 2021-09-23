@@ -3,13 +3,14 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -23,7 +24,7 @@ public class Jogo extends JPanel implements ActionListener {
     public static final int PECA_PRETA = 2;
     private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*LARGURA_TABULEIRO);
     private static final int DELAY_TIMER = 75;
-    public static final int DELAY_JOGADA = 750;
+    public static final int DELAY_JOGADA = 500;
     private Timer timer;
     private String nome;
     private int[][] tabuleiro;
@@ -35,13 +36,17 @@ public class Jogo extends JPanel implements ActionListener {
     private boolean selecionado = false;
     private int[] posSelecionado = {0, 0};
     private ArrayList<Jogada> historicoJogadas;
+    private boolean assistindoReplay = false;
+    private boolean proximaJogadaReplay = false;
+    private boolean jogadaAnteriorReplay = false;
 
     Jogo() {
-        setPreferredSize(new Dimension(LARGURA_TELA,ALTURA_TELA));
+        setPreferredSize(new Dimension(LARGURA_TELA, ALTURA_TELA));
         setFocusable(true);
         setTabuleiro(new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO]);
         setBackground(Color.white);
         addMouseListener(new EventosMouse());
+        addKeyListener(new EventosTeclado());
     }
 
     //  getters e setters
@@ -81,7 +86,11 @@ public class Jogo extends JPanel implements ActionListener {
     public void setPosSelecionado(int[] posSelecionado) {
         this.posSelecionado = posSelecionado;
     }
-    public Jogada getJogadaDoPlayer() {
+    public Jogada getJogadaDoPlayer() throws InterruptedException {
+        setVezDoPlayer(true);
+        while(isVezDoPlayer()) {
+            Thread.sleep(1);
+        }
         return jogadaDoPlayer;
     }
     public void setJogadaDoPlayer(Jogada jogadaDoPlayer) {
@@ -110,6 +119,24 @@ public class Jogo extends JPanel implements ActionListener {
     }
     public void setHistoricoJogadas(ArrayList<Jogada> historicoJogadas) {
         this.historicoJogadas = historicoJogadas;
+    }
+    public boolean isAssistindoReplay() {
+        return assistindoReplay;
+    }
+    public void setAssistindoReplay(boolean assistindoReplay) {
+        this.assistindoReplay = assistindoReplay;
+    }
+    public boolean isProximaJogadaReplay() {
+        return proximaJogadaReplay;
+    }
+    public void setProximaJogadaReplay(boolean proximaJogadaReplay) {
+        this.proximaJogadaReplay = proximaJogadaReplay;
+    }
+    public boolean isJogadaAnteriorReplay() {
+        return jogadaAnteriorReplay;
+    }
+    public void setJogadaAnteriorReplay(boolean jogadaAnteriorReplay) {
+        this.jogadaAnteriorReplay = jogadaAnteriorReplay;
     }
 
     //  funções da engine
@@ -234,12 +261,12 @@ public class Jogo extends JPanel implements ActionListener {
     static public String pecaParaString(int peca) {
         switch(peca) {
             case PECA_BRANCA:
-                return "PEÇA BRANCA";
+                return "B";
             case PECA_PRETA:
-                return "PEÇA PRETA";
+                return "P";
             case SEM_PECA:
             default:
-                return "SEM PEÇA"; 
+                return "_"; 
         }
     }
     public int invertePeca(int peca) {
@@ -277,8 +304,6 @@ public class Jogo extends JPanel implements ActionListener {
             }
             retiraPecas(jogada.getPecasEliminadas(), getTabuleiro());
         }
-        jogada.printLog();
-        getHistoricoJogadas().add(jogada);
         Thread.sleep(DELAY_JOGADA);
     } 
     public void fazJogada(Jogada jogada, int[][] tabuleiro) {
@@ -340,13 +365,6 @@ public class Jogo extends JPanel implements ActionListener {
         System.out.println("Chance de vitória: "+chance+"%");
         return melhorJogada;    
     }
-    private void playerFazJogada() throws InterruptedException {
-        setVezDoPlayer(true);
-        while(isVezDoPlayer()) {
-            Thread.sleep(1);
-        }
-        fazJogada(getJogadaDoPlayer());
-    }
     private void salvaLogPartida() {
         try {
             PrintWriter arquivo = new PrintWriter("log.txt");
@@ -358,6 +376,23 @@ public class Jogo extends JPanel implements ActionListener {
             e.printStackTrace();
         }
     }
+    private void playerFazJogada() throws InterruptedException {
+        Jogada jogada = getJogadaDoPlayer();
+        fazJogada(jogada);  
+        jogada.printLog();   
+        getHistoricoJogadas().add(jogada);
+    }
+    private void botFazJogada(int peca, boolean ehContraPlayer) throws InterruptedException {
+        Jogada jogada = jogadaDaMaquina(peca, getProfundidade());
+        if(ehContraPlayer) {
+            fazJogada(jogada); 
+            jogada.printLog();
+        }
+        else {
+            fazJogada(jogada, getTabuleiro());
+        }
+        getHistoricoJogadas().add(jogada);
+    }
     public void partidaBotXPlayer() throws InterruptedException {
         setHistoricoJogadas(new ArrayList<Jogada>());
         inicializaTabuleiro();
@@ -366,14 +401,14 @@ public class Jogo extends JPanel implements ActionListener {
             System.out.println("Vez das peças brancas");
             if(getPecaPlayer() == PECA_BRANCA) {
                 playerFazJogada();
-                if(!verificaVitoria(PECA_BRANCA, getTabuleiro())) {
+                if(!verificaFimDeJogo(getTabuleiro())) {
                     System.out.println("Vez das peças pretas");
-                    fazJogada(jogadaDaMaquina(PECA_PRETA, getProfundidade()));
+                    botFazJogada(PECA_PRETA, true);
                 }
             }
             else {
-                fazJogada(jogadaDaMaquina(PECA_BRANCA, getProfundidade()));
-                if(!verificaVitoria(PECA_BRANCA, getTabuleiro())) {
+                botFazJogada(PECA_BRANCA, true);
+                if(!verificaFimDeJogo(getTabuleiro())) {
                     System.out.println("Vez das peças pretas");
                     playerFazJogada();
                 }
@@ -388,14 +423,67 @@ public class Jogo extends JPanel implements ActionListener {
         iniciaTimer();
         while(!verificaFimDeJogo(getTabuleiro())) {
             System.out.println("Vez das peças brancas");
-            fazJogada(jogadaDaMaquina(PECA_BRANCA, getProfundidade()), getTabuleiro());     
-            if(!verificaVitoria(PECA_BRANCA, getTabuleiro())) {
+            botFazJogada(PECA_BRANCA, false);
+            if(!verificaFimDeJogo(getTabuleiro())) {
                 System.out.println("Vez das peças pretas");
-                fazJogada(jogadaDaMaquina(PECA_PRETA, getProfundidade()), getTabuleiro());
+                botFazJogada(PECA_PRETA, false);
             }
         }
         paraTimer();
         salvaLogPartida();
+    }
+    public void removePeca(int[] posicao, int[][] tabuleiro) {
+        tabuleiro[posicao[0]][posicao[1]] = SEM_PECA;
+    }
+    public void devolvePecas(ArrayList<int[]> pecasEliminadas, int corPecasEliminadas, int[][] tabuleiro) {
+        for(int[] peca : pecasEliminadas) {
+            tabuleiro[peca[0]][peca[1]] = corPecasEliminadas;
+        }
+    }
+    public void desfazMovimento(int[][] movimento, int[][] tabuleiro) {
+        int xInicial = movimento[0][0];
+        int yInicial = movimento[0][1];
+        int xFinal = movimento[1][0];
+        int yFinal = movimento[1][1];
+        tabuleiro[xInicial][yInicial] = tabuleiro[xFinal][yFinal];
+        tabuleiro[xFinal][yFinal] = SEM_PECA;
+    } 
+    public void desfazJogada(Jogada jogada) throws InterruptedException {
+        if(jogada.getMovimentos().isEmpty()) {
+            removePeca(jogada.getPosicao(), getTabuleiro());
+        }
+        else {
+            devolvePecas(jogada.getPecasEliminadas(), invertePeca(jogada.getCorPeca()), getTabuleiro());
+            for(int i=jogada.getMovimentos().size()-1; i >= 0; i--){
+                Thread.sleep(DELAY_JOGADA);
+                desfazMovimento(jogada.getMovimentos().get(i), getTabuleiro());
+            }
+        }
+        Thread.sleep(DELAY_JOGADA);
+    } 
+    public void replayHistoricoJogadas() throws InterruptedException {
+        setAssistindoReplay(true);
+        inicializaTabuleiro();
+        iniciaTimer();
+        int posicaoReplay = -1;
+        while(isAssistindoReplay()) {
+            if(isProximaJogadaReplay()) {
+                if(posicaoReplay < getHistoricoJogadas().size()-1) {
+                    posicaoReplay++;
+                    fazJogada(getHistoricoJogadas().get(posicaoReplay));
+                }
+                setProximaJogadaReplay(false);
+            }
+            if(isJogadaAnteriorReplay()) {
+                if(posicaoReplay >= 0) {
+                    desfazJogada(getHistoricoJogadas().get(posicaoReplay));
+                    posicaoReplay--;
+                }
+                setJogadaAnteriorReplay(false);
+            }
+            Thread.sleep(1);
+        }
+        paraTimer();
     }
 
     //  funções específicas (para implementar com override)
@@ -434,6 +522,27 @@ public class Jogo extends JPanel implements ActionListener {
             int[] posClick = {(int)(e.getX()*LARGURA_TABULEIRO)/LARGURA_TELA, (int)(e.getY()*ALTURA_TABULEIRO)/ALTURA_TELA};
             if(isVezDoPlayer()) {
                 interpretaJogadaPlayer(posClick);
+            }
+        }
+    }
+
+    public class EventosTeclado extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch(e.getKeyCode()) {
+                case KeyEvent.VK_LEFT:
+                    if(isAssistindoReplay())
+                        setJogadaAnteriorReplay(true);
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if(isAssistindoReplay())
+                        setProximaJogadaReplay(true);
+                    break;
+                case KeyEvent.VK_ESCAPE:
+                    setAssistindoReplay(false);
+                    break;
+                default:
+                    break;
             }
         }
     }

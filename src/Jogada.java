@@ -58,16 +58,14 @@ public class Jogada {
     private String logPosicao() {
         return Jogo.pecaParaString(getCorPeca()) + ": (" + getPosicao()[0] + ", " + getPosicao()[1] + ")";
     }
-
     private String logMovimentos() {
         String log;
         log = Jogo.pecaParaString(getCorPeca()) + ":";
         for(int[][] movimento : getMovimentos()) {
-            log += " ("+ movimento[0][0] + ", " + movimento[0][1] + ") → (" + movimento[1][0] + ", " + movimento[1][1] + ") ";
+            log += " ("+ movimento[0][0] + ", " + movimento[0][1] + ")→(" + movimento[1][0] + ", " + movimento[1][1] + ")";
         }
         return log;
     }
-
     public void printLog() {
         System.out.println(getLog());
     }
