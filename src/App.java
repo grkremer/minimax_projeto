@@ -1,9 +1,10 @@
 public class App {
     public static void main(String[] args) throws Exception {
-        Jogo jogo = new Alquerque();
+        Jogo jogo = new JogoDaVelha4();
+        //jogo.partidaBotXBot();
+
         new JanelaJogo(jogo);
-        
-        jogo.partidaBotXPlayer();
+        jogo.carregaLog("log.txt");
         jogo.replayHistoricoJogadas();
     }
 }

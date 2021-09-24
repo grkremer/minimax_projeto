@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class JogoDaVelha4 extends Jogo {
     JogoDaVelha4() {
@@ -596,23 +595,20 @@ public class JogoDaVelha4 extends Jogo {
     @Override
     public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas(0);
-        ArrayList<Jogada> possiveisJogadas = listaPossiveisJogadas(invertePeca(corPeca), getTabuleiro());
-        Collections.shuffle(possiveisJogadas);
-        int pontuacaoMaxima = Integer.MIN_VALUE;
-        int pontuacao;
-        Jogada melhorJogada = possiveisJogadas.get(0);
-        melhorJogada.setCorPeca(corPeca);
-        for(int i=0; i < possiveisJogadas.size(); i++) {
+        ArrayList<Jogada> possiveisJogadasAdversario = listaPossiveisJogadas(invertePeca(corPeca), getTabuleiro());
+        int pontuacaoAdversario;
+        int maiorPontuacaoAdversario = Integer.MIN_VALUE;
+        Jogada melhorJogadaAdversario = possiveisJogadasAdversario.get(0);
+        for(Jogada possivelJogada : possiveisJogadasAdversario) {
             int[][] novoTabuleiro = criaCopiaTabuleiro(getTabuleiro());
-            fazJogada(possiveisJogadas.get(i), novoTabuleiro);
-            pontuacao = (int)geraCusto(invertePeca(corPeca), novoTabuleiro, jogadas.MIN_PONTOS, jogadas.MAX_PONTOS);
-            if(pontuacao > pontuacaoMaxima) {
-                possiveisJogadas.get(i).setCorPeca(corPeca);
-                melhorJogada = possiveisJogadas.get(i);
-                pontuacaoMaxima = pontuacao;
+            fazJogada(possivelJogada, novoTabuleiro);
+            pontuacaoAdversario = (int)geraCusto(invertePeca(corPeca), novoTabuleiro, jogadas.MIN_PONTOS, jogadas.MAX_PONTOS);
+            if(pontuacaoAdversario > maiorPontuacaoAdversario) {
+                melhorJogadaAdversario = possivelJogada;
+                maiorPontuacaoAdversario = pontuacaoAdversario;
             }
         }
-        return melhorJogada;
+        return new Jogada(corPeca, melhorJogadaAdversario.getPosicao());
     }
 
     @Override

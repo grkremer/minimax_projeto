@@ -54,19 +54,76 @@ public class Jogada {
         setPecasEliminadas(pecasEliminadas);
         setLog(logMovimentos());
     }
+    Jogada(String textoJogada) {
+        setCorPeca(stringParaPeca(textoJogada.substring(0, 1)));
+        textoJogada = textoJogada.substring(3);
+        String[] particoesTextoJogada = textoJogada.split(" ");
+        if(textoJogada.contains("→")) {
+            for(String textoMovimento : particoesTextoJogada) {
+                int[][] movimento = stringParaMovimento(textoMovimento);
+                getMovimentos().add(movimento);
+                if(Jogo.comeuPeca(movimento)) {
+                    int [] posPecaEliminada = Jogo.posPecaEliminada(movimento);
+                    getPecasEliminadas().add(posPecaEliminada);
+                }
+            }
+        }
+        else {
+            int[] posicao = stringParaPosicao(particoesTextoJogada[0]);
+            setPosicao(posicao);
+        }
+    }
 
+    private String pecaParaString(int peca) {
+        switch(peca) {
+            case Jogo.PECA_BRANCA:
+                return "B";
+            case Jogo.PECA_PRETA:
+                return "P";
+            case Jogo.SEM_PECA:
+            default:
+                return "_"; 
+        }
+    }
     private String logPosicao() {
-        return Jogo.pecaParaString(getCorPeca()) + ": (" + getPosicao()[0] + ", " + getPosicao()[1] + ")";
+        return pecaParaString(getCorPeca()) + ": (" + getPosicao()[0] + "," + getPosicao()[1] + ")";
     }
     private String logMovimentos() {
         String log;
-        log = Jogo.pecaParaString(getCorPeca()) + ":";
+        log = pecaParaString(getCorPeca()) + ":";
         for(int[][] movimento : getMovimentos()) {
-            log += " ("+ movimento[0][0] + ", " + movimento[0][1] + ")→(" + movimento[1][0] + ", " + movimento[1][1] + ")";
+            log += " ("+ movimento[0][0] + "," + movimento[0][1] + ")→(" + movimento[1][0] + "," + movimento[1][1] + ")";
         }
         return log;
     }
     public void printLog() {
         System.out.println(getLog());
     }
+
+    private int stringParaPeca(String siglaPeca) {
+        switch(siglaPeca) {
+            case "B":
+                return Jogo.PECA_BRANCA;
+            case "P":
+                return Jogo.PECA_PRETA;
+            case "_":
+            default:
+                return Jogo.SEM_PECA; 
+        }
+    }
+    private int[] stringParaPosicao(String textoPosicao) {
+        int[] posicao = new int[2];
+        posicao[0] = Character.getNumericValue(textoPosicao.charAt(1));
+        posicao[1] = Character.getNumericValue(textoPosicao.charAt(3));
+        return posicao;
+    }
+    private int[][] stringParaMovimento(String textoMovimento) {
+        int[][] movimento = new int[2][2];
+        movimento[0][0] = Character.getNumericValue(textoMovimento.charAt(1));
+        movimento[0][1] = Character.getNumericValue(textoMovimento.charAt(3));
+        movimento[1][0] = Character.getNumericValue(textoMovimento.charAt(7));
+        movimento[1][1] = Character.getNumericValue(textoMovimento.charAt(9));
+        return movimento;
+    }
+
 }

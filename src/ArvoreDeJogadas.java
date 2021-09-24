@@ -173,7 +173,7 @@ public class ArvoreDeJogadas {
                     pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
                     alpha = Math.max(alpha, pontuacaoFilho);
                     if(beta <= alpha) {
-                        setFilhos(getFilhos().subList(0, i));
+                        setFilhos(getFilhos().subList(0, i+1));
                         break;
                     }
                 }
@@ -188,7 +188,7 @@ public class ArvoreDeJogadas {
                     pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);
                     beta = Math.min(beta, pontuacaoFilho);
                     if(beta <= alpha) {
-                        setFilhos(getFilhos().subList(0, i));
+                        setFilhos(getFilhos().subList(0, i+1));
                         break;
                     }
                 }

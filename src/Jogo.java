@@ -7,10 +7,15 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -258,17 +263,6 @@ public class Jogo extends JPanel implements ActionListener {
         }
         return novoTabuleiro;
     }
-    static public String pecaParaString(int peca) {
-        switch(peca) {
-            case PECA_BRANCA:
-                return "B";
-            case PECA_PRETA:
-                return "P";
-            case SEM_PECA:
-            default:
-                return "_"; 
-        }
-    }
     public int invertePeca(int peca) {
         if(peca == PECA_BRANCA) {
             return PECA_PRETA;
@@ -279,6 +273,36 @@ public class Jogo extends JPanel implements ActionListener {
     }
     public void inserePeca(int[] posicao, int corPeca, int[][] tabuleiro) {
         tabuleiro[posicao[0]][posicao[1]] = corPeca;
+    }
+    public int pecaEntrePecas(int x1, int y1, int x2, int y2, int[][] tabuleiro) {
+        int[] posNovo = posPecaEntrePecas(x1, y1, x2, y2);
+        return tabuleiro[posNovo[0]][posNovo[1]];
+    }
+    public static int[] posPecaEntrePecas(int x1, int y1, int x2, int y2) {
+        int xNovo, yNovo;
+        int[] posNovo = new int[2];
+
+        if(x1 > x2) xNovo = x2 + 1;
+        else if(x2 > x1) xNovo = x1 + 1;
+        else xNovo = x1;
+
+        if(y1 > y2) yNovo = y2 + 1;
+        else if(y2 > y1) yNovo = y1 + 1;
+        else yNovo = y1;
+
+        posNovo[0] = xNovo;
+        posNovo[1] = yNovo;
+        return posNovo;
+    }
+    public static int[] posPecaEliminada(int[][] movimento) {
+        return posPecaEntrePecas(movimento[0][0], movimento[0][1], movimento[1][0], movimento[1][1]);
+    }
+    public static boolean comeuPeca(int[][] movimento) {
+        int xInicial = movimento[0][0];
+        int yInicial = movimento[0][1];
+        int xFinal = movimento[1][0];
+        int yFinal = movimento[1][1];
+        return Math.abs(xFinal - xInicial) == 2 || Math.abs(yFinal - yInicial) == 2;
     }
     public void fazMovimento(int[][] movimento, int[][] tabuleiro) {
         int xInicial = movimento[0][0];
@@ -484,6 +508,23 @@ public class Jogo extends JPanel implements ActionListener {
             Thread.sleep(1);
         }
         paraTimer();
+    }
+    public void carregaLog(String caminho) {
+        try {
+            File arquivo = new File(caminho);
+            FileReader leitorDeArquivo = new FileReader(arquivo);
+            BufferedReader leitorDeBuffer = new BufferedReader(leitorDeArquivo);   
+            String textoJogada;  
+            setHistoricoJogadas(new ArrayList<Jogada>());
+            while((textoJogada = leitorDeBuffer.readLine()) != null) {
+                Jogada jogada = new Jogada(textoJogada);
+                getHistoricoJogadas().add(jogada);
+            }
+            leitorDeBuffer.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //  funções específicas (para implementar com override)

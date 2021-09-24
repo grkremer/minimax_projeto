@@ -29,34 +29,6 @@ public class Alquerque extends Jogo {
         }
     }
     
-    private boolean comeuPeca(int[][] movimento) {
-        int xInicial = movimento[0][0];
-        int yInicial = movimento[0][1];
-        int xFinal = movimento[1][0];
-        int yFinal = movimento[1][1];
-        return Math.abs(xFinal - xInicial) == 2 || Math.abs(yFinal - yInicial) == 2;
-    }
-    
-    private int pecaEntrePecas(int x1, int y1, int x2, int y2, int[][] tabuleiro) {
-        int[] posNovo = posPecaEntrePecas(x1, y1, x2, y2);
-        return tabuleiro[posNovo[0]][posNovo[1]];
-    }
-    private int[] posPecaEntrePecas(int x1, int y1, int x2, int y2) {
-        int xNovo, yNovo;
-        int[] posNovo = new int[2];
-
-        if(x1 > x2) xNovo = x2 + 1;
-        else if(x2 > x1) xNovo = x1 + 1;
-        else xNovo = x1;
-
-        if(y1 > y2) yNovo = y2 + 1;
-        else if(y2 > y1) yNovo = y1 + 1;
-        else yNovo = y1;
-
-        posNovo[0] = xNovo;
-        posNovo[1] = yNovo;
-        return posNovo;
-    }
     private boolean andandoPraTras(int yInicial, int yFinal, int corPeca) {
         if(corPeca == PECA_PRETA) {
             if(yFinal < yInicial) {
@@ -143,7 +115,7 @@ public class Alquerque extends Jogo {
                     int[][] novoTabuleiro = criaCopiaTabuleiro(tabuleiro);
                     fazMovimento(movimento, novoTabuleiro);
                     ArrayList<int[]> pecasEliminadas = new ArrayList<int[]>();
-                    pecasEliminadas.add(posPecaEntrePecas(movimento[0][0], movimento[0][1], movimento[1][0], movimento[1][1]));
+                    pecasEliminadas.add(posPecaEliminada(movimento));
                     retiraPecas(pecasEliminadas, novoTabuleiro);
                     ArrayList<ArrayList<int[][]>> novosPossiveisMovimentos = listaPossiveisMovimentosPeca(novoX, novoY, 2, novoTabuleiro);
 
@@ -180,7 +152,7 @@ public class Alquerque extends Jogo {
             ArrayList<int[]> pecasEliminadas = new ArrayList<int[]>();
             for(int[][] movimento : movimentos) {
                 if(comeuPeca(movimento)) {
-                    pecasEliminadas.add(posPecaEntrePecas(movimento[0][0], movimento[0][1], movimento[1][0], movimento[1][1]));
+                    pecasEliminadas.add(posPecaEliminada(movimento));
                 }
             }
             possiveisJogadas.add(new Jogada(corPeca, movimentos, pecasEliminadas));
