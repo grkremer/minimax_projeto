@@ -1,10 +1,11 @@
 public class App {
     public static void main(String[] args) throws Exception {
-        Jogo jogo = new JogoDaVelha4();
-        //jogo.partidaBotXBot();
-
+        Jogo jogo = new TicTackle5();
         new JanelaJogo(jogo);
-        jogo.carregaLog("log.txt");
-        jogo.replayHistoricoJogadas();
+        jogo.partidaBotXBot();
+
+        
+        //jogo.carregaLog("logs/logFalhaTicTackle.txt");
+        //jogo.replayHistoricoJogadas();
     }
 }

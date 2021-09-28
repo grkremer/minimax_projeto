@@ -5,7 +5,7 @@ public class TicTackle5 extends Jogo {
     TicTackle5() {
         super();
         setNome("Tic Tackle 5");
-        setProfundidade(5);
+        setProfundidade(6);
     }
 
     @Override

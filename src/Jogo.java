@@ -360,9 +360,11 @@ public class Jogo extends JPanel implements ActionListener {
         return cont;
     }
     public Jogada jogadaDaMaquina(int corPeca, int profundidade) {
+        LogArvoreJogo log = new LogArvoreJogo();
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());
         Collections.shuffle(jogadas.getFilhos());
-        jogadas.minimaxAlphaBeta();
+        jogadas.minimax();
+        log.AvaliaArvore(jogadas);
 
         int pontuacaoMaxima = Integer.MIN_VALUE;
         int profundidadeMinima = Integer.MAX_VALUE;
@@ -387,6 +389,7 @@ public class Jogo extends JPanel implements ActionListener {
         }
         float chance = normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0, 100, (float)pontuacaoMaxima);
         System.out.println("Chance de vitória: "+chance+"%");
+        System.out.println(log.toString());
         return melhorJogada;    
     }
     private void salvaLogPartida() {
