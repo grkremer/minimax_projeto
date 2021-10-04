@@ -5,14 +5,16 @@ public class Tsoro extends JogoDaVelha4{
     private final int MAX_PECAS = 4;
     
     Tsoro() {
-        super();
+        setNome("Tsoro");
+        setProfundidade(5);
     }
+
     @Override
-    public boolean verificaMovimento(int[][] movimento, int[][] tabuleiro) {
-        int xInicial = movimento[0][0];
-        int yInicial = movimento[0][1];
-        int xFinal = movimento[1][0];
-        int yFinal = movimento[1][1];
+    public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {
+        int xInicial = movimento.getPosicao1()[0];
+        int yInicial = movimento.getPosicao1()[1];
+        int xFinal = movimento.getPosicao2()[0];
+        int yFinal = movimento.getPosicao2()[1];
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
                 //Se quer se mover na diagonal
@@ -77,9 +79,10 @@ public class Tsoro extends JogoDaVelha4{
                     for(int i=0; i < regioes.length; i++) {
                         int novoX = x+regioes[i][0];
                         int novoY = y+regioes[i][1];
-                        int[][] movimento = {{x, y}, {novoX, novoY}};
+                        int[][] posicoes = {{x, y}, {novoX, novoY}};
+                        Movimento movimento = new Movimento(corPeca, posicoes[0], posicoes[1], Movimento.Acao.MOVE);
                         if(verificaMovimento(movimento, tabuleiro)) {
-                            Jogada possibilidade = new Jogada(corPeca, movimento);
+                            Jogada possibilidade = new Jogada(movimento);
                             possiveisJogadas.add(possibilidade);
                         }
                     }
@@ -178,45 +181,16 @@ public class Tsoro extends JogoDaVelha4{
         return custo;
     }
 
-    public void interpretaJogadaPlayerInsercao(int[] posClick) {
-        Jogada jogada = new Jogada(getPecaPlayer(), posClick);
-        if(verificaJogada(jogada, getTabuleiro())) {
-            setJogadaDoPlayer(jogada);
-            setVezDoPlayer(false);
-        }
-    }
-    public void interpretaJogadaPlayerMovimento(int[] posClick) {
-        if(!isSelecionado()) {
-            setPosSelecionado(posClick);
-            if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
-                setSelecionado(true);
-            }
-        }
-        else {
-            int[][] movimento = {getPosSelecionado(), posClick};
-            if(verificaMovimento(movimento, getTabuleiro())) {
-                Jogada jogada = new Jogada(getPecaPlayer(), movimento);
-                setJogadaDoPlayer(jogada);
-                setVezDoPlayer(false);
-                setSelecionado(false);
-            }
-            else if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
-                setPosSelecionado(posClick);
-            }
-            else {
-                setSelecionado(false);
-            }
-        }
-    }
-    @Override
-    public void interpretaJogadaPlayer(int[] posClick) {
-        if(contaPecas(getPecaPlayer(), getTabuleiro()) < MAX_PECAS) 
-            interpretaJogadaPlayerInsercao(posClick);
-        else 
-            interpretaJogadaPlayerMovimento(posClick);
-    }
     @Override
     public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
         return antigaMelhorJogada;
+    }
+
+    @Override
+    public Movimento.Acao proximaAcao(int corPeca, int[][] tabuleiro) {
+        if(contaPecas(corPeca, tabuleiro) < MAX_PECAS) 
+            return Movimento.Acao.INSERE;
+        else
+            return Movimento.Acao.MOVE;
     }
 }

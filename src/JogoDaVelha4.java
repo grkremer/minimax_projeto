@@ -2,7 +2,6 @@ import java.util.ArrayList;
 
 public class JogoDaVelha4 extends Jogo {
     JogoDaVelha4() {
-        super();
         setNome("Jogo da Velha 4");
         setProfundidade(5);
         setMaximoJogadas(15000000);
@@ -18,9 +17,9 @@ public class JogoDaVelha4 extends Jogo {
     }
     
     @Override
-    public boolean verificaJogada(Jogada jogada, int[][] tabuleiro) {
-        int x = jogada.getPosicao()[0];
-        int y = jogada.getPosicao()[1];
+    public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {
+        int x = movimento.getPosicao1()[0];
+        int y = movimento.getPosicao1()[1];
         if (estaNosLimites(x, y) && tabuleiro[x][y] == SEM_PECA) {
             return true;
         }
@@ -608,15 +607,11 @@ public class JogoDaVelha4 extends Jogo {
                 maiorPontuacaoAdversario = pontuacaoAdversario;
             }
         }
-        return new Jogada(corPeca, melhorJogadaAdversario.getPosicao());
+        return new Jogada(corPeca, melhorJogadaAdversario.getMovimentos().get(0).getPosicao1());
     }
 
     @Override
-    public void interpretaJogadaPlayer(int[] posClick) {
-        Jogada jogada = new Jogada(getPecaPlayer(), posClick);
-        if(verificaJogada(jogada, getTabuleiro())) {
-            setJogadaDoPlayer(jogada);
-            setVezDoPlayer(false);
-        }
+    public Movimento.Acao proximaAcao(int corPeca, int[][] tabuleiro) {
+        return Movimento.Acao.INSERE;
     }
 }

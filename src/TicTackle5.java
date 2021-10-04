@@ -3,9 +3,8 @@ import java.util.Arrays;
 
 public class TicTackle5 extends Jogo {
     TicTackle5() {
-        super();
         setNome("Tic Tackle 5");
-        setProfundidade(6);
+        setProfundidade(5);
     }
 
     @Override
@@ -33,11 +32,11 @@ public class TicTackle5 extends Jogo {
         }
     }
     @Override
-    public boolean verificaMovimento(int[][] movimento, int[][] tabuleiro) {
-        int xInicial = movimento[0][0];
-        int yInicial = movimento[0][1];
-        int xFinal = movimento[1][0];
-        int yFinal = movimento[1][1];
+    public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {
+        int xInicial = movimento.getPosicao1()[0];
+        int yInicial = movimento.getPosicao1()[1];
+        int xFinal = movimento.getPosicao2()[0];
+        int yFinal = movimento.getPosicao2()[1];
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
                 //Se quer se mover na diagonal
@@ -77,9 +76,10 @@ public class TicTackle5 extends Jogo {
                     for(int i=0; i < regioes.length; i++) {
                         int novoX = x+regioes[i][0];
                         int novoY = y+regioes[i][1];
-                        int[][] movimento = {{x, y}, {novoX, novoY}};
+                        int[][] posicoes = {{x, y}, {novoX, novoY}};
+                        Movimento movimento = new Movimento(corPeca, posicoes[0], posicoes[1], Movimento.Acao.MOVE);
                         if(verificaMovimento(movimento, tabuleiro)) {
-                            Jogada possibilidade = new Jogada(corPeca, movimento);
+                            Jogada possibilidade = new Jogada(movimento);
                             possiveisJogadas.add(possibilidade);
                         }
                     }
@@ -310,28 +310,8 @@ public class TicTackle5 extends Jogo {
     }
 
     @Override
-    public void interpretaJogadaPlayer(int[] posClick) {
-        if(!isSelecionado()) {
-            setPosSelecionado(posClick);
-            if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
-                setSelecionado(true);
-            }
-        }
-        else {
-            int[][] movimento = {getPosSelecionado(), posClick};
-            if(verificaMovimento(movimento, getTabuleiro())) {
-                Jogada jogada = new Jogada(getPecaPlayer(), movimento);
-                setJogadaDoPlayer(jogada);
-                setVezDoPlayer(false);
-                setSelecionado(false);
-            }
-            else if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
-                setPosSelecionado(posClick);
-            }
-            else {
-                setSelecionado(false);
-            }
-        }
+    public Movimento.Acao proximaAcao(int corPeca, int[][] tabuleiro) {
+        return Movimento.Acao.MOVE;
     }
 }
     

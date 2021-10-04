@@ -1,59 +1,82 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
 public class ArvoreMonteCarlo {
     
     int maxSimulacoes;
-    double valorExploracao;
+    double coeficienteExploracao;
+    Nodo raiz;
+    Jogo jogo;
 
-    public ArvoreMonteCarlo(int maxSimulacoes, double valorExploracao){
+    public ArvoreMonteCarlo(Jogo jogo, int maxSimulacoes, double coeficienteExploracao){
         this.maxSimulacoes = maxSimulacoes;
-        this.valorExploracao = valorExploracao;
+        this.coeficienteExploracao = coeficienteExploracao;
+        this.jogo = jogo;
     }
 
-    /*
-    public Jogada Movimentar(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int maximoJogadas) {
+    public Jogada Movimentar(Estado estadoInicial) {
         
-        Nodo raiz = new Nodo(tabuleiro, jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro));
-        Jogada movimento = BuscaArvoreMonteCarlo(jogo, tabuleiro, raiz, corPecaJogador, corPecaAtual);
+        raiz = new Nodo(estadoInicial, null , null, jogo.listaPossiveisJogadas(estadoInicial.getTurnoJogador(), estadoInicial.getTabuleiro()));
+        Jogada movimento = BuscaArvoreMonteCarlo();
         return movimento;
     
     }
 
-    private Jogada BuscaArvoreMonteCarlo(Jogo jogo, int[][] tabuleiro, Nodo raiz, int corPecaJogador, int corPecaAtual){ 
+    private Jogada BuscaArvoreMonteCarlo(){ 
+        
         for(int it = 0; Condicional(it); it++){
-            Nodo nodo = selecionaNodo(raiz);
-            //Nodo novoNodo = expandeNodo(nodo);
+            Nodo novoNodo = selecionaNodo(jogo, raiz);
             double recompensa = simulaJogo(novoNodo);
-            propagaResultado(nodo, recompensa);
+            propagaResultado(novoNodo, recompensa);
+
         }
-        return new Jogada();
+        return escolheMelhorJogada();
     }
 
-  
-    //TODO: olhar o método de seleção
-    private Nodo selecionaNodo(Nodo raiz){
+
+    private Nodo selecionaNodo(Jogo jogo, Nodo raiz){
         Nodo nodo = raiz;
+        //enquanto o nodo não for uma folha
         while(!nodo.filhosIsEmpty()){
             
-            ArrayList<Jogada> acoes = nodo.getJogadas();
-            
+            Nodo aux = politicaCaminhamento(nodo);
 
-            if( nodo.quantidadeJogadas() > 0){
-                Jogada proximaJogada = escolherJogada(acoes);
-                //instanciar novo nodo
-                return Expande(nodo, proximaJogada);
+            //se a politica retornar um nodo vazio, cria um novo filho pro nodo 
+            if(aux.getAction() == null)
+            {
+                return expandeNodo(jogo, nodo);
+            }else{ //caso contrário, retorna o filho selecionado
+                //return aux; //flat
+                nodo = aux; //não flat
             }
-            
-            return melhorFilho(nodo);
+        
         }
-        return melhorFilho(nodo);
+                
+        return expandeNodo(jogo, nodo);
     }
 
-    private Nodo melhorFilho(Nodo nodo){
-        double maxUCB = 0;
-        Nodo maxNodo = nodo; //null
-        for(Nodo n : nodo.getFilhos()){
+
+    // calcula UCB1 de todos os nodos filhos
+    private Nodo politicaCaminhamento(Nodo nodo){
+        
+        Nodo novaAcao = null;
+        double maxUCB = -100;
+        Nodo maxNodo = null;
+
+        //se ainda for possivel fazer um novo movimento no nodo,
+        // avalia o valor de ucb de uma nova acao
+        if(!nodo.possiveisMovimentosIsEmpty())
+        {
+            //da valor UCB para aplicar uma nova acao
+            novaAcao = new Nodo(null, nodo, null, null);
+            novaAcao.UpdateValorN();
+            maxUCB = calculaUCB(novaAcao);
+            maxNodo = novaAcao; //null
+        }
+        
+
+        for(Nodo n : (nodo.getFilhos()).values()){
             double newUCB  = calculaUCB(n);
             if(maxUCB < newUCB){
                 maxNodo = n;
@@ -64,49 +87,140 @@ public class ArvoreMonteCarlo {
     }
 
     //expande um nodo
-    private Nodo expandeNodo(Nodo nodoPai, Jogada acao){ 
-        //int[][] estado, Nodo pai,  Jogada acao, List<Jogada> possiveisMovimentos
-        int[][] novoEstado = Jogo.fazJogada(nodoPai.getCopiaEstado(), acao);
-        List<Jogada> possiveisMovimentos = Jogo.PossiveisJogadas();
-        nodoPai.removePossivelAcao(jogada);
+    private Nodo expandeNodo(Jogo jogo, Nodo nodoPai){ 
         
-        Nodo novoNodo = new Nodo(nodoPai, novoEstado, acao);
-        nodoPai.insereNovoFilho(novoNodo);
+
+        ArrayList<Jogada> movimentos = nodoPai.getPossiveisMovimentos();
+        if(movimentos.isEmpty())
+            return nodoPai;
+
+        Collections.shuffle(movimentos);
+        Jogada movimento = movimentos.get(0);
+        
+        Estado estadoPai = nodoPai.getEstado();
+        Estado novoEstado = novoEstado(estadoPai, movimento);
+        
+        ArrayList<Jogada> possiveisMovimentos = jogo.listaPossiveisJogadas(novoEstado.getTurnoJogador(), novoEstado.getTabuleiro());
+        nodoPai.removePossivelAcao(movimento);
+        
+        Nodo novoNodo = new Nodo(novoEstado, nodoPai, movimento, possiveisMovimentos);
+        nodoPai.insereNovoFilho(movimento, novoNodo);
         
         return novoNodo;
     }
     
+    //simula partida ate encontrar fim de jogo *nao adiciona nada arvore
+    // * talvez não instanciar Estado durante a simulação
     private double simulaJogo(Nodo inicio){
-        int[][] estado = inicio.getCopiaEstado();
-        while(!fimDeJogo(estado))
-        {
-            ArrayList<Jogada> jogadas = jogo.getPossiveisJogadas(estado);
-            Collections.shuffle(jogadas);
-            Jogada j = jogadas.get(0);
-            int[][] estado = jogo.fazJogada(j);
+        Estado estadoSimulado = inicio.getEstado();
+        
+        //só o proximo movimento com heuristica
+        ArrayList<Jogada> movimentos = jogo.listaPossiveisJogadas(estadoSimulado.getTurnoJogador(), estadoSimulado.getCopiaTabuleiro());
+        
+        if(movimentos.isEmpty())
+            return valorUtilidade(inicio.getEstado()); //TODO: pensar aqui
 
+        Collections.shuffle(movimentos);
+        Jogada movimento = movimentos.get(0);
+        estadoSimulado = novoEstado(estadoSimulado, movimento); 
+
+        int it = 0;
+        while(!estadoSimulado.isFimJogo() && it < 1000)
+        {
+            it++;
+            movimentos = jogo.listaPossiveisJogadas(estadoSimulado.getTurnoJogador(), estadoSimulado.getCopiaTabuleiro());
+            if(movimentos.isEmpty())
+                return valorUtilidade(estadoSimulado);
+            Collections.shuffle(movimentos);
+            movimento = movimentos.get(0);
+
+            estadoSimulado = novoEstado(estadoSimulado, movimento); 
         }
 
-        return valorUtilidade(estado);
+        return valorUtilidade(estadoSimulado);
     }
 
-    private void propagaResultados(Nodo n, double recompensa)
+    // atualiza arvore
+    private void propagaResultado(Nodo n, double recompensa)
     {
         Nodo bn = n;
-        while(bn != raiz){
+        while(!(bn == null)){
             bn.UpdateValorN();
-            bn.UpdateValorQ(valorQ, recompensa);
-            bn = n.GetPai(); 
+            bn.UpdateValorQ(recompensa);
+            bn = bn.getPai(); 
         }
     }
 
-    private float calculaUCB(Nodo n) {
-        return 0;
+    private double calculaUCB(Nodo n) {
+        double recompensa = n.getValorQ()/n.getValorN();
+        double exploracao = coeficienteExploracao * Math.sqrt( (2*Math.log(n.getPai().getValorN()))/n.getValorN() );
+        return recompensa + exploracao;
     }
     
     private boolean Condicional(int iteracoes){
         return iteracoes < maxSimulacoes;
     }
-    */
+
+
+    //escolhe movimento a ser executado no tabuleiro
+    private Jogada escolheMelhorJogada(){
+        double bestReward = Double.NEGATIVE_INFINITY;
+        Jogada j = null;
+        for(Map.Entry<Jogada,Nodo> n: (raiz.getFilhos()).entrySet()){
+            Nodo aux = n.getValue();
+            double rw = (aux.getValorQ()/aux.getValorN()) - coeficienteExploracao * Math.sqrt( (2*Math.log(aux.getPai().getValorN()))/aux.getValorN() );
+            
+            if(rw > bestReward){
+                bestReward = rw;
+                j = n.getKey();
+            }
+        }
+        return j;
+    }
+
+    private float valorUtilidade(Estado s){  // 1 * 0  ** 1 * 1 
+        if(s.getMarcaAgente() == s.getVencedor())
+            return 1;
+        else if(jogo.invertePeca(s.getMarcaAgente()) == s.getVencedor())
+            return -1;
+        else
+            return 0;
+    }
+
+    private Estado novoEstado(Estado estadoAtual, Jogada novoMovimento){
+        int[][] novoTabuleiro = estadoAtual.getCopiaTabuleiro();
+        jogo.fazJogada(novoMovimento, novoTabuleiro);
+        int turnoJogador = jogo.invertePeca(estadoAtual.getTurnoJogador());
+        Boolean fimJogo = jogo.verificaFimDeJogo(novoTabuleiro);
+        int jogadorVencedor = 0;
+        if(fimJogo){
+            if(jogo.verificaVitoria(turnoJogador, novoTabuleiro))
+                jogadorVencedor = turnoJogador; //ver isso
+            else
+                jogadorVencedor = estadoAtual.getTurnoJogador();
+        }
+        return new Estado(novoTabuleiro, turnoJogador, fimJogo, jogadorVencedor, estadoAtual.getMarcaAgente());
+
+    }
+
+ // *pode ser usada para melhorar desempenho
+    private Jogada avaliaMovimentos(ArrayList<Jogada> movimentos, Estado atual){
+        
+        float max = -100;
+        Jogada mov = null;
+        for(Jogada m: movimentos){
+            int[][] novoTabuleiro = atual.getCopiaTabuleiro();
+            jogo.fazJogada(m, novoTabuleiro);
+            float aux = (float)jogo.geraCusto(atual.getTurnoJogador(), novoTabuleiro, -100, 100);
+            if(aux > max){
+                max = aux;
+                mov = m;
+            }
+        }
+        return mov;
+    }
+
+    public Nodo getRaiz(){return raiz;}
+    
 }
 

@@ -8,7 +8,10 @@ public class ArvoreDeJogadas {
     private List<ArvoreDeJogadas> filhos;
     public final int MAX_PONTOS = 100;
     public final int MIN_PONTOS = -100;
-   
+    
+
+
+
     public Jogada getJogada() {
         return jogada;
     }

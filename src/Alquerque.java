@@ -1,9 +1,7 @@
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class Alquerque extends Jogo {
     Alquerque() {
-        super();
         setNome("Alquerque");
         setProfundidade(6);
     }
@@ -48,11 +46,11 @@ public class Alquerque extends Jogo {
         }
     }
     @Override
-    public boolean verificaMovimento(int[][] movimento, int[][] tabuleiro) {
-        int xInicial = movimento[0][0];
-        int yInicial = movimento[0][1];
-        int xFinal = movimento[1][0];
-        int yFinal = movimento[1][1];
+    public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {
+        int xInicial = movimento.getPosicao1()[0];
+        int yInicial = movimento.getPosicao1()[1];
+        int xFinal = movimento.getPosicao2()[0];
+        int yFinal = movimento.getPosicao2()[1];
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
                 //Se quer se mover na diagonal
@@ -95,8 +93,8 @@ public class Alquerque extends Jogo {
             return false;
         }
     }
-    private ArrayList<ArrayList<int[][]>> listaPossiveisMovimentosPeca(int x, int y, int regiao, int[][] tabuleiro) {
-        ArrayList<ArrayList<int[][]>> possiveisMovimentos = new ArrayList<ArrayList<int[][]>>();
+    private ArrayList<ArrayList<Movimento>> listaPossiveisMovimentosPeca(int x, int y, int regiao, int[][] tabuleiro) {
+        ArrayList<ArrayList<Movimento>> possiveisSequenciasDeMovimentos = new ArrayList<ArrayList<Movimento>>();
         int[][] regioes = {{1,0},{0,1},{1,1},{-1,-1},{-1,1},{1,-1},{-1,0},{0,-1}};
         if(regiao == 2) {
             for(int i=0; i < regioes.length; i++)
@@ -107,55 +105,60 @@ public class Alquerque extends Jogo {
         for(int i=0; i < regioes.length; i++) {
             int novoX = x+regioes[i][0];
             int novoY = y+regioes[i][1];
-            int[][] movimento = {{x, y}, {novoX, novoY}};
+            int[] posInicial = {x, y};
+            int[] posFinal = {novoX, novoY};
+            Movimento movimento = new Movimento(tabuleiro[x][y], posInicial, posFinal, Movimento.Acao.MOVE);
             if(verificaMovimento(movimento, tabuleiro)) {
-                ArrayList<int[][]> possibilidade = new ArrayList<int[][]>();
+                ArrayList<Movimento> possibilidade = new ArrayList<Movimento>();
                 possibilidade.add(movimento);
                 if(regiao == 2) {
                     int[][] novoTabuleiro = criaCopiaTabuleiro(tabuleiro);
-                    fazMovimento(movimento, novoTabuleiro);
+                    movePeca(posInicial, posFinal, novoTabuleiro);
                     ArrayList<int[]> pecasEliminadas = new ArrayList<int[]>();
-                    pecasEliminadas.add(posPecaEliminada(movimento));
-                    retiraPecas(pecasEliminadas, novoTabuleiro);
-                    ArrayList<ArrayList<int[][]>> novosPossiveisMovimentos = listaPossiveisMovimentosPeca(novoX, novoY, 2, novoTabuleiro);
+                    pecasEliminadas.add(posPecaEliminada(posInicial, posFinal));
+                    removePecas(pecasEliminadas, novoTabuleiro);
+                    ArrayList<ArrayList<Movimento>> novasPossiveisSequencias = listaPossiveisMovimentosPeca(novoX, novoY, 2, novoTabuleiro);
 
-                    if(novosPossiveisMovimentos.isEmpty()) {
-                        possiveisMovimentos.add(possibilidade);
+                    if(novasPossiveisSequencias.isEmpty()) {
+                        possiveisSequenciasDeMovimentos.add(possibilidade);
                     }
                     else {
-                        for(int j=0; j<novosPossiveisMovimentos.size(); j++) {
-                            ArrayList<int[][]> novaPossibilidade = new ArrayList<int[][]>();
+                        for(int j=0; j<novasPossiveisSequencias.size(); j++) {
+                            ArrayList<Movimento> novaPossibilidade = new ArrayList<Movimento>();
                             novaPossibilidade.addAll(possibilidade);
-                            novaPossibilidade.addAll(novosPossiveisMovimentos.get(j));
-                            possiveisMovimentos.add(novaPossibilidade);
+                            novaPossibilidade.addAll(novasPossiveisSequencias.get(j));
+                            possiveisSequenciasDeMovimentos.add(novaPossibilidade);
                         }
                     }
                 }
                 else {
-                    possiveisMovimentos.add(possibilidade);
+                    possiveisSequenciasDeMovimentos.add(possibilidade);
                 }
             }
         }
-        return possiveisMovimentos;
+        return possiveisSequenciasDeMovimentos;
     }
     private ArrayList<Jogada> listaPossiveisJogadasRegiao(int corPeca, int regiao, int[][] tabuleiro) {
-        ArrayList<ArrayList<int[][]>> possiveisMovimentos = new ArrayList<ArrayList<int[][]>>();
+        ArrayList<ArrayList<Movimento>> possiveisSequenciasDeMovimentos = new ArrayList<ArrayList<Movimento>>();
         ArrayList<Jogada> possiveisJogadas = new ArrayList<Jogada>();
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
             for(int x=0; x < LARGURA_TABULEIRO; x++) {
                 if(tabuleiro[x][y] == corPeca) {
-                    possiveisMovimentos.addAll(listaPossiveisMovimentosPeca(x, y, regiao, tabuleiro));
+                    possiveisSequenciasDeMovimentos.addAll(listaPossiveisMovimentosPeca(x, y, regiao, tabuleiro));
                 }
             }
         }
-        for(ArrayList<int[][]> movimentos : possiveisMovimentos) {
-            ArrayList<int[]> pecasEliminadas = new ArrayList<int[]>();
-            for(int[][] movimento : movimentos) {
-                if(comeuPeca(movimento)) {
-                    pecasEliminadas.add(posPecaEliminada(movimento));
+        
+        for(ArrayList<Movimento> movimentos : possiveisSequenciasDeMovimentos) {
+            ArrayList<Movimento> eliminacoes = new ArrayList<Movimento>();
+            for(Movimento movimento : movimentos) {
+                if(comeuPeca(movimento.getPosicao1(), movimento.getPosicao2())) {
+                    int[] posicaoEliminacao = posPecaEliminada(movimento.getPosicao1(), movimento.getPosicao2());
+                    eliminacoes.add(new Movimento(corPeca, posicaoEliminacao, posicaoEliminacao, Movimento.Acao.REMOVE));
                 }
             }
-            possiveisJogadas.add(new Jogada(corPeca, movimentos, pecasEliminadas));
+            movimentos.addAll(eliminacoes);
+            possiveisJogadas.add(new Jogada(movimentos));
         }
         return possiveisJogadas;
     }
@@ -202,40 +205,9 @@ public class Alquerque extends Jogo {
         }  
     }
     
-    private Jogada jogadaDaLista(int xInicial, int yInicial, int xFinal, int yFinal, ArrayList<Jogada> possiveisJogadas) {
-        for(int i=0; i< possiveisJogadas.size(); i++) {
-            if(possiveisJogadas.get(i).getMovimentos().get(0)[0][0] == xInicial && 
-            possiveisJogadas.get(i).getMovimentos().get(0)[0][1] == yInicial && 
-            possiveisJogadas.get(i).getMovimentos().get(possiveisJogadas.get(i).getMovimentos().size()-1)[1][0] == xFinal && 
-            possiveisJogadas.get(i).getMovimentos().get(possiveisJogadas.get(i).getMovimentos().size()-1)[1][1] == yFinal) {
-                return possiveisJogadas.get(i);
-            }
-        }
-        return null;
-    }
     @Override
-    public void interpretaJogadaPlayer(int[] posClick) {
-        if(!isSelecionado()) {
-            setPosSelecionado(posClick);
-            if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
-                setSelecionado(true);
-            }
-        }
-        else {
-            ArrayList<Jogada> possiveisJogadas = listaPossiveisJogadas(getPecaPlayer(), getTabuleiro());
-            Jogada jogada = jogadaDaLista(getPosSelecionado()[0], getPosSelecionado()[1], posClick[0], posClick[1], possiveisJogadas);
-            if(!Objects.isNull(jogada)) {
-                setJogadaDoPlayer(jogada);
-                setVezDoPlayer(false);
-                setSelecionado(false);
-            }
-            else if(getTabuleiro()[posClick[0]][posClick[1]] == getPecaPlayer()) {
-                setPosSelecionado(posClick);
-            }
-            else {
-                setSelecionado(false);
-            }
-        }
+    public Movimento.Acao proximaAcao(int corPeca, int[][] tabuleiro) {
+        return Movimento.Acao.MOVE;
     }
 }
     
