@@ -47,8 +47,8 @@ public class ArvoreMonteCarlo {
             {
                 return expandeNodo(jogo, nodo);
             }else{ //caso contrário, retorna o filho selecionado
-                //return aux; //flat
-                nodo = aux; //não flat
+                return aux; //flat
+                //nodo = aux; //não flat
             }
         
         }

@@ -171,8 +171,42 @@ public class Jogo {
     public Jogada jogadaDaMaquina(int corPeca, int profundidade) {
         LogArvoreJogo log = new LogArvoreJogo();
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());
-        Collections.shuffle(jogadas.getFilhos());
-        jogadas.minimaxAlphaBeta();
+        //Collections.shuffle(jogadas.getFilhos());
+        jogadas.minimax();
+        log.AvaliaArvore(jogadas);
+
+        int pontuacaoMaxima = Integer.MIN_VALUE;
+        int profundidadeMinima = Integer.MAX_VALUE;
+        Jogada melhorJogada = jogadas.getFilho(0).getJogada();
+        for(int i=0; i < jogadas.getFilhos().size(); i++) {
+            if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
+                melhorJogada = jogadas.getFilho(i).getJogada();
+                pontuacaoMaxima = jogadas.getFilho(i).getPontos();
+                if(pontuacaoMaxima == jogadas.MAX_PONTOS) {
+                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
+                }
+            }
+            else if(jogadas.getFilho(i).getPontos() == jogadas.MAX_PONTOS) {
+                if(jogadas.getFilho(i).calculaProfundidade() < profundidadeMinima) {
+                    melhorJogada = jogadas.getFilho(i).getJogada();
+                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
+                }
+            }
+        }
+        if(pontuacaoMaxima == jogadas.MIN_PONTOS) {
+            melhorJogada = jogadaDanoMinimo(melhorJogada, corPeca);
+        }
+        float chance = normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0, 100, (float)pontuacaoMaxima);
+        System.out.println("Chance de vitória: "+chance+"%");
+        System.out.println(log.toString());
+        return melhorJogada;    
+    }
+    public Jogada jogadaDaMaquina2(int corPeca, int profundidade) {
+        LogArvoreJogo log = new LogArvoreJogo();
+        //ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());
+        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, 5, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        //Collections.shuffle(jogadas.getFilhos());
+        //jogadas.minimaxAlphaBeta();
         log.AvaliaArvore(jogadas);
 
         int pontuacaoMaxima = Integer.MIN_VALUE;
@@ -218,9 +252,14 @@ public class Jogo {
         fazJogada(jogada, getTabuleiro());
         getHistoricoJogadas().add(jogada);
     }
+    private void minimaxABFazJogada(int peca) {
+        Jogada jogada = jogadaDaMaquina2(peca, getProfundidade());
+        fazJogada(jogada, getTabuleiro());
+        getHistoricoJogadas().add(jogada);
+    }
     private void monteCarloFazJogada(int peca) {
         LogArvoreMonteCarlo log = new LogArvoreMonteCarlo();
-        ArvoreMonteCarlo arvore = new ArvoreMonteCarlo(this, 50000, 1);
+        ArvoreMonteCarlo arvore = new ArvoreMonteCarlo(this, 1000, 1);
         Jogada jogada = arvore.Movimentar(new Estado(getTabuleiro(), peca, false, 0, peca));
         log.AvaliaArvore(arvore.getRaiz());
         System.out.println(log);
@@ -234,11 +273,27 @@ public class Jogo {
         while(!verificaFimDeJogo(getTabuleiro())) {
             System.out.println("Vez das peças brancas");
             monteCarloFazJogada(PECA_BRANCA);
-            Thread.sleep(4000);
+            //Thread.sleep(4000);
             if(!verificaFimDeJogo(getTabuleiro())) {
                 System.out.println("Vez das peças pretas");
                 minimaxFazJogada(PECA_PRETA);
-                Thread.sleep(4000);
+                //Thread.sleep(4000);
+            }
+        }
+        salvaLogPartida();
+    }
+
+    public void monteMinimaxXMinimax() throws InterruptedException {
+        setHistoricoJogadas(new ArrayList<Jogada>());
+        inicializaTabuleiro();
+        while(!verificaFimDeJogo(getTabuleiro())) {
+            System.out.println("Vez das peças brancas");
+            minimaxFazJogada(PECA_BRANCA);
+            //Thread.sleep(4000);
+            if(!verificaFimDeJogo(getTabuleiro())) {
+                System.out.println("Vez das peças pretas");
+                minimaxABFazJogada(PECA_PRETA);
+                //Thread.sleep(4000);
             }
         }
         salvaLogPartida();

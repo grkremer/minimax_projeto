@@ -9,9 +9,6 @@ public class ArvoreDeJogadas {
     public final int MAX_PONTOS = 100;
     public final int MIN_PONTOS = -100;
     
-
-
-
     public Jogada getJogada() {
         return jogada;
     }
@@ -54,6 +51,106 @@ public class ArvoreDeJogadas {
                 ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, maximoProximasJogadas);
                 proximasJogadas.setJogada(possiveisJogadas.get(i));
                 this.addFilho(proximasJogadas);
+            }
+        }
+    }
+
+
+    /*Jogada ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax){
+        int max = Integer.MIN_VALUE;;
+        Jogada melhorJogada;
+        float alpha = Float.NEGATIVE_INFINITY; 
+        float beta  = Float.POSITIVE_INFINITY;
+        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
+            int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
+            jogo.fazJogada(jogada, novoTabuleiro);
+            int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta);
+            if(valor > max)
+            {
+                melhorJogada = j;
+                max = valor;
+            }
+        }
+        return melhorJogada;
+    }
+
+    public float Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, float alpha, float beta){
+        
+        if(profundidadeMax == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
+            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS)
+        }
+        
+        int max = Integer.MIN_VALUE;
+        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
+            int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
+            jogo.fazJogada(jogada, novoTabuleiro);
+            
+            int valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta));
+            if(valor >= beta) return valor;
+            alpha = Math.max(alpha, valor);
+        }
+        return valor;
+    }
+
+    public float Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, float alpha, float beta){
+        
+        if(profundidadeMax == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
+            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS)
+        }
+        
+        int min = Integer.MAX_VALUE;
+        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
+            int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
+            jogo.fazJogada(jogada, novoTabuleiro);
+            
+            int valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta));
+            if(valor <= alpha) return valor;
+            beta = Math.min(beta, valor);
+        }
+        return valor;
+    }*/
+
+    public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, boolean estaMaximizando, float alpha, float beta) {
+        setFilhos(new ArrayList<ArvoreDeJogadas>());
+        ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || jogo.verificaFimDeJogo(tabuleiro)) {
+            setPontos((int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS));
+        }
+        else {
+            if(estaMaximizando) {
+                int pontuacaoMaxima = Integer.MIN_VALUE;
+                int pontuacaoFilho;
+                for(Jogada jogada : possiveisJogadas) {
+                    int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
+                    jogo.fazJogada(jogada, novoTabuleiro);
+                    ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, false, alpha, beta);
+                    proximasJogadas.setJogada(jogada);
+                    this.addFilho(proximasJogadas);
+                    pontuacaoFilho = proximasJogadas.getPontos();
+                    pontuacaoMaxima = Math.max(pontuacaoMaxima, pontuacaoFilho);
+                    if(pontuacaoMaxima >= beta)
+                        break;
+                    alpha = Math.max(alpha, pontuacaoMaxima);
+                }
+                setPontos(pontuacaoMaxima);
+            }
+            else {
+                int pontuacaoMinima = Integer.MAX_VALUE;
+                int pontuacaoFilho;
+                for(Jogada jogada : possiveisJogadas) {
+                    int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
+                    jogo.fazJogada(jogada, novoTabuleiro);
+                    ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, true, alpha, beta);
+                    proximasJogadas.setJogada(jogada);
+                    this.addFilho(proximasJogadas);
+
+                    pontuacaoFilho = proximasJogadas.getPontos();
+                    pontuacaoMinima = Math.min(pontuacaoMinima, pontuacaoFilho);
+                    if(pontuacaoMinima <= alpha) 
+                        break;
+                    beta = Math.min(beta, pontuacaoMinima);
+                }
+                setPontos(pontuacaoMinima);
             }
         }
     }

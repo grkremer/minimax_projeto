@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Alquerque extends Jogo {
     Alquerque() {
         setNome("Alquerque");
-        setProfundidade(6);
+        setProfundidade(5);
     }
 
     @Override
@@ -27,24 +27,6 @@ public class Alquerque extends Jogo {
         }
     }
     
-    private boolean andandoPraTras(int yInicial, int yFinal, int corPeca) {
-        if(corPeca == PECA_PRETA) {
-            if(yFinal < yInicial) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            if(yFinal > yInicial) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
     @Override
     public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {
         int xInicial = movimento.getPosicao1()[0];
@@ -54,7 +36,7 @@ public class Alquerque extends Jogo {
         if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
             if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
                 //Se quer se mover na diagonal
-                if((Math.abs(xInicial - xFinal) == 1 ) && (Math.abs(yInicial - yFinal) == 1) && !andandoPraTras(yInicial, yFinal, tabuleiro[xInicial][yInicial])) {
+                if((Math.abs(xInicial - xFinal) == 1 ) && (Math.abs(yInicial - yFinal) == 1)) {
                     //Se x e y têm a mesma paridade
                     if(((xInicial % 2 == 0) && (yInicial % 2 == 0)) || ((xInicial % 2 == 1) && (yInicial % 2 == 1))) {
                         return true;
@@ -64,7 +46,7 @@ public class Alquerque extends Jogo {
                     }
                 }
                 //Se quer se mover na vertical/horizontal
-                else if((Math.abs(xInicial - xFinal) <= 1 ) && (Math.abs(yInicial - yFinal) <= 1) && !andandoPraTras(yInicial, yFinal, tabuleiro[xInicial][yInicial])) {
+                else if((Math.abs(xInicial - xFinal) <= 1 ) && (Math.abs(yInicial - yFinal) <= 1)) {
                     return true;
                 }
                 //Se quer se comer na diagonal
