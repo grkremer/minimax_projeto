@@ -179,12 +179,23 @@ public class ArvoreMonteCarlo {
     }
 
     private float valorUtilidade(Estado s){  // 1 * 0  ** 1 * 1 
+        float valorUt = 0;
+        
+        // 1 * (p^turnos)
+        // ganhador1: 2 turnos 0,984, 0,99| 4 turnos  0,96, 0,980 =  diferença 0,02
+        // ganhador2: 50 turnos 0,6, 0,94 | 100 turnos  0,33, 0,93 = diferença 0,3
+        
+        //float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
+        float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
+        
         if(s.getMarcaAgente() == s.getVencedor())
-            return 1;
+            valorUt = 1;
         else if(jogo.invertePeca(s.getMarcaAgente()) == s.getVencedor())
-            return -1;
+            valorUt = -1;
         else
-            return 0;
+            valorUt = 0;
+        
+        return valorUt * fatorDesconto;
     }
 
     private Estado novoEstado(Estado estadoAtual, Jogada novoMovimento){
@@ -199,7 +210,7 @@ public class ArvoreMonteCarlo {
             else
                 jogadorVencedor = estadoAtual.getTurnoJogador();
         }
-        return new Estado(novoTabuleiro, turnoJogador, fimJogo, jogadorVencedor, estadoAtual.getMarcaAgente());
+        return new Estado(novoTabuleiro, turnoJogador, fimJogo, jogadorVencedor, estadoAtual.getMarcaAgente(), estadoAtual.getTurnos()+1);
 
     }
 

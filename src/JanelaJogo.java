@@ -226,7 +226,8 @@ public class JanelaJogo extends JFrame {
         getJogo().getHistoricoJogadas().add(jogada);
     }
     private void botFazJogadaComDelay(int peca) throws InterruptedException {
-        Jogada jogada = getJogo().jogadaDaMaquina2(peca, getJogo().getProfundidade());
+        //Jogada jogada = getJogo().jogadaDaMaquina2(peca, getJogo().getProfundidade());
+        Jogada jogada = getJogo().monteCarlo(peca);
         fazJogadaComDelay(jogada); 
         System.out.println(jogada.toString());
         getJogo().getHistoricoJogadas().add(jogada);

@@ -55,60 +55,7 @@ public class ArvoreDeJogadas {
         }
     }
 
-
-    /*Jogada ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax){
-        int max = Integer.MIN_VALUE;;
-        Jogada melhorJogada;
-        float alpha = Float.NEGATIVE_INFINITY; 
-        float beta  = Float.POSITIVE_INFINITY;
-        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
-            int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-            jogo.fazJogada(jogada, novoTabuleiro);
-            int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta);
-            if(valor > max)
-            {
-                melhorJogada = j;
-                max = valor;
-            }
-        }
-        return melhorJogada;
-    }
-
-    public float Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, float alpha, float beta){
-        
-        if(profundidadeMax == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS)
-        }
-        
-        int max = Integer.MIN_VALUE;
-        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
-            int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-            jogo.fazJogada(jogada, novoTabuleiro);
-            
-            int valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta));
-            if(valor >= beta) return valor;
-            alpha = Math.max(alpha, valor);
-        }
-        return valor;
-    }
-
-    public float Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, float alpha, float beta){
-        
-        if(profundidadeMax == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS)
-        }
-        
-        int min = Integer.MAX_VALUE;
-        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
-            int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-            jogo.fazJogada(jogada, novoTabuleiro);
-            
-            int valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta));
-            if(valor <= alpha) return valor;
-            beta = Math.min(beta, valor);
-        }
-        return valor;
-    }*/
+    
 
     public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, boolean estaMaximizando, float alpha, float beta) {
         setFilhos(new ArrayList<ArvoreDeJogadas>());

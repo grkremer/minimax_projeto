@@ -4,15 +4,18 @@ public class Estado {
     private int turnoJogador;
     private int marcaAgente;
     private Boolean fimJogo;
+    int numeroTurnos;
 
-    public Estado(int[][] tabuleiro, int turnoJogador, Boolean fimJogo, int vencedor, int marcaAgente){
+    public Estado(int[][] tabuleiro, int turnoJogador, Boolean fimJogo, int vencedor, int marcaAgente, int turnos){
         this.tabuleiro = tabuleiro;
         this.vencedor = vencedor;
         this.fimJogo = fimJogo;
         this.marcaAgente = marcaAgente;
         this.turnoJogador = turnoJogador;
+        this.numeroTurnos = turnos;
     }
     
+    public int getTurnos(){ return numeroTurnos; } 
     public int[][] getTabuleiro(){ return tabuleiro; }
     public int getVencedor(){ return vencedor; }
     public int getTurnoJogador(){ return turnoJogador; }
