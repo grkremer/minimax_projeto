@@ -1,7 +1,9 @@
+
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
+
 
 public class Jogo {
     public static final int ALTURA_TABULEIRO = 5;
@@ -156,9 +158,7 @@ public class Jogo {
         else
             return false;
     }
-    public float normalizaPontuacao(float minimoAntigo, float maximoAntigo, float minimoNovo, float maximoNovo, float valor){
-        return ((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
-    }
+    
     public int contaPecas(int corPeca, int[][] tabuleiro) {
         int cont = 0;
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
@@ -169,75 +169,15 @@ public class Jogo {
         return cont;
     }
 
-    public Jogada jogadaDaMaquina(int corPeca, int profundidade) {
-        LogArvoreJogo log = new LogArvoreJogo();
-        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());
-        //Collections.shuffle(jogadas.getFilhos());
-        jogadas.minimax();
-        log.AvaliaArvore(jogadas);
 
-        int pontuacaoMaxima = Integer.MIN_VALUE;
-        int profundidadeMinima = Integer.MAX_VALUE;
-        Jogada melhorJogada = jogadas.getFilho(0).getJogada();
-        for(int i=0; i < jogadas.getFilhos().size(); i++) {
-            if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
-                melhorJogada = jogadas.getFilho(i).getJogada();
-                pontuacaoMaxima = jogadas.getFilho(i).getPontos();
-                if(pontuacaoMaxima == jogadas.MAX_PONTOS) {
-                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
-                }
-            }
-            else if(jogadas.getFilho(i).getPontos() == jogadas.MAX_PONTOS) {
-                if(jogadas.getFilho(i).calculaProfundidade() < profundidadeMinima) {
-                    melhorJogada = jogadas.getFilho(i).getJogada();
-                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
-                }
-            }
-        }
-        if(pontuacaoMaxima == jogadas.MIN_PONTOS) {
-            melhorJogada = jogadaDanoMinimo(melhorJogada, corPeca);
-        }
-        float chance = normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0, 100, (float)pontuacaoMaxima);
-        System.out.println("Chance de vitória: "+chance+"%");
-        System.out.println(log.toString());
-        return melhorJogada;    
+    
+    public float normalizaPontuacao(float minimoAntigo, float maximoAntigo, float minimoNovo, float maximoNovo, float valor){
+        return ((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
     }
-
-    public Jogada jogadaDaMaquina2(int corPeca, int profundidade) {
-        LogArvoreJogo log = new LogArvoreJogo();
-        //ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());
-        ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, 5, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        //Collections.shuffle(jogadas.getFilhos());
-        //jogadas.minimaxAlphaBeta();
-        log.AvaliaArvore(jogadas);
-
-        int pontuacaoMaxima = Integer.MIN_VALUE;
-        int profundidadeMinima = Integer.MAX_VALUE;
-        Jogada melhorJogada = jogadas.getFilho(0).getJogada();
-        for(int i=0; i < jogadas.getFilhos().size(); i++) {
-            if(pontuacaoMaxima < jogadas.getFilho(i).getPontos()) {
-                melhorJogada = jogadas.getFilho(i).getJogada();
-                pontuacaoMaxima = jogadas.getFilho(i).getPontos();
-                if(pontuacaoMaxima == jogadas.MAX_PONTOS) {
-                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
-                }
-            }
-            else if(jogadas.getFilho(i).getPontos() == jogadas.MAX_PONTOS) {
-                if(jogadas.getFilho(i).calculaProfundidade() < profundidadeMinima) {
-                    melhorJogada = jogadas.getFilho(i).getJogada();
-                    profundidadeMinima = jogadas.getFilho(i).calculaProfundidade();
-                }
-            }
-        }
-        if(pontuacaoMaxima == jogadas.MIN_PONTOS) {
-            melhorJogada = jogadaDanoMinimo(melhorJogada, corPeca);
-        }
-        float chance = normalizaPontuacao(jogadas.MIN_PONTOS, jogadas.MAX_PONTOS, 0, 100, (float)pontuacaoMaxima);
-        System.out.println("Chance de vitória: "+chance+"%");
-        System.out.println(log.toString());
-        return melhorJogada;    
+    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
+        return antigaMelhorJogada;
     }
-
+    
     public void salvaLogPartida() {
         try {
             PrintWriter arquivo = new PrintWriter("logs/log.txt");
@@ -250,88 +190,35 @@ public class Jogo {
         }
     }
     
-    private void minimaxFazJogada(int peca) {
-        
-        Jogada jogada = jogadaDaMaquina(peca, getProfundidade());
-        fazJogada(jogada, getTabuleiro());
-        getHistoricoJogadas().add(jogada);
-    }
-
-    private void podaFazJogada(int peca) {
-        Minimax ag = new Minimax(6);
-        //this, getTabuleiro(), corPeca, corPeca, 5, true, Integer.MIN_VALUE, Integer.MAX_VALUE
-        long startTime = System.currentTimeMillis();
-        Jogada jogada = ag.Poda(this, getTabuleiro(), peca, peca);//jogadaDaMaquina(peca, getProfundidade());
-        long endTime = System.currentTimeMillis();
-        float total = (endTime - startTime)/1000f;
-        System.out.println( ag );
-        System.out.println( total + "s");
-
-        fazJogada(jogada, getTabuleiro());
-        getHistoricoJogadas().add(jogada);
-    }
-
-
-    private void minimaxABFazJogada(int peca) {
-        Jogada jogada = jogadaDaMaquina2(peca, getProfundidade());
-        
-        fazJogada(jogada, getTabuleiro());
-        getHistoricoJogadas().add(jogada);
-    }
-    private void monteCarloFazJogada(int peca) {
-        LogArvoreMonteCarlo log = new LogArvoreMonteCarlo();
-        ArvoreMonteCarlo arvore = new ArvoreMonteCarlo(this, 10000, 1);
-        Jogada jogada = arvore.Movimentar(new Estado(getTabuleiro(), peca, false, 0, peca, 0));
-        log.AvaliaArvore(arvore.getRaiz());
-        System.out.println(log);
-        fazJogada(jogada, getTabuleiro());
-        getHistoricoJogadas().add(jogada);
-    }
-
-    public Jogada monteCarlo(int peca){
-        LogArvoreMonteCarlo log = new LogArvoreMonteCarlo();
-        ArvoreMonteCarlo arvore = new ArvoreMonteCarlo(this, 10000, 1);
-        Jogada jogada = arvore.Movimentar(new Estado(getTabuleiro(), peca, false, 0, peca, 0));
-        log.AvaliaArvore(arvore.getRaiz());
-        System.out.println(log);
-        return jogada;
-        //fazJogada(jogada, getTabuleiro());
-        //getHistoricoJogadas().add(jogada);
-    }
-    
-    public void monteCarloXMinimax() throws InterruptedException {
+    public void jogar(Agente jogador1, Agente jogador2) throws InterruptedException{
         setHistoricoJogadas(new ArrayList<Jogada>());
         inicializaTabuleiro();
+        
+        int rodada = PECA_BRANCA;
         while(!verificaFimDeJogo(getTabuleiro())) {
-            System.out.println("Vez das peças brancas");
-            monteCarloFazJogada(PECA_BRANCA);
-            //Thread.sleep(4000);
-            if(!verificaFimDeJogo(getTabuleiro())) {
-                System.out.println("Vez das peças pretas");
-                //minimaxFazJogada(PECA_PRETA);
-                podaFazJogada(PECA_PRETA);
-                //Thread.sleep(4000);
-            }
-        }
-        salvaLogPartida();
-    }
-
-    public void MinimaxXMinimax() throws InterruptedException {
-        setHistoricoJogadas(new ArrayList<Jogada>());
-        inicializaTabuleiro();
-        while(!verificaFimDeJogo(getTabuleiro())) {
-            System.out.println("Vez das peças brancas");
-            podaFazJogada(PECA_PRETA);
-                
-            Thread.sleep(1000);
-            if(!verificaFimDeJogo(getTabuleiro())) {
-                System.out.println("Vez das peças pretas");
-                minimaxFazJogada(PECA_BRANCA);
             
-                Thread.sleep(1000);
+            Jogada j = null;
+            //if(rodada == PECA_BRANCA)
+            if(jogador1.getCorPeca() == rodada)
+            {
+                System.out.println("Vez do jogador1");
+                j = jogador1.Mover(this, getTabuleiro());
+                System.out.println(jogador1);
+                
+            }else{
+                System.out.println("Vez do jogador2");
+                j = jogador2.Mover(this, getTabuleiro());
+                System.out.println(jogador2);
             }
+            fazJogada(j, getTabuleiro());
+            getHistoricoJogadas().add(j);
+            rodada = invertePeca(rodada);
+            //Thread.sleep(2000);
+
+            
         }
         salvaLogPartida();
+
     }
 
     public void moveAoContrarioPeca(int[] posInicial, int[] posFinal, int[][] tabuleiro) {
@@ -383,9 +270,7 @@ public class Jogo {
     public boolean verificaVitoria(int corPeca, int[][] tabuleiro) {
         return true;
     }
-    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
-        return antigaMelhorJogada;
-    }
+    
     public Movimento.Acao proximaAcao(int corPeca, int[][] tabuleiro) {
         return Movimento.Acao.MOVE;
     }

@@ -1,3 +1,4 @@
+
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
@@ -245,6 +246,7 @@ public class ArvoreDeJogadas {
         }
         return getPontos();
     }
+    
     public void minimaxAlphaBeta() {
         minimaxAlphaBeta(true, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }

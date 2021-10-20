@@ -1,19 +1,27 @@
+
 import java.util.HashMap;
-public class Minimax {
+
+
+public class Minimax implements Agente{
     int numeroNodos;
     HashMap<Integer, Integer> nodosPorNivel;
     int profundidadeMax;
     int cortes;
-
+    int COR_PECA;
     public final int MAX_PONTOS = 100;
     public final int MIN_PONTOS = -100;
     
-    public Minimax(int profundadeMax){
+    public Minimax(int COR_PECA, int profundadeMax){
         
         this.profundidadeMax = profundadeMax;
         numeroNodos = 0;
         cortes = 0;
         nodosPorNivel = new HashMap<Integer,Integer>();
+        this.COR_PECA = COR_PECA;
+    }
+
+    public Jogada Mover(Jogo jogo, int[][] tabuleiro){
+        return Poda(jogo, tabuleiro, COR_PECA, COR_PECA);
     }
 
     Jogada Poda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual){
@@ -39,7 +47,7 @@ public class Minimax {
         return melhorJogada;
     }
 
-    public int Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta){
+    private int Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta){
         numeroNodos+=1;
 
         if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
@@ -65,7 +73,7 @@ public class Minimax {
         return valor;
     }
 
-    public int Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta){
+    private int Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta){
         numeroNodos+=1;
         if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
         else nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
@@ -87,6 +95,10 @@ public class Minimax {
             beta = Math.min(beta, valor);
         }
         return valor;
+    }
+
+    public int getCorPeca(){
+        return COR_PECA;
     }
 
     @Override

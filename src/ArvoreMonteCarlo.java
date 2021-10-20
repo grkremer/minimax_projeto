@@ -1,33 +1,39 @@
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
-public class ArvoreMonteCarlo {
+public class ArvoreMonteCarlo implements Agente{
     
     int maxSimulacoes;
     double coeficienteExploracao;
     Nodo raiz;
-    Jogo jogo;
+    int COR_PECA;
+    LogArvoreMonteCarlo log;
 
-    public ArvoreMonteCarlo(Jogo jogo, int maxSimulacoes, double coeficienteExploracao){
+    public ArvoreMonteCarlo(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
         this.maxSimulacoes = maxSimulacoes;
         this.coeficienteExploracao = coeficienteExploracao;
-        this.jogo = jogo;
+        this.COR_PECA = COR_PECA;
     }
 
-    public Jogada Movimentar(Estado estadoInicial) {
+    public Jogada Mover(Jogo jogo, int[][] tabuleiro){
         
+        log = new LogArvoreMonteCarlo();
+        Estado estadoInicial = new Estado(tabuleiro, COR_PECA, false, 0, COR_PECA, 0);
         raiz = new Nodo(estadoInicial, null , null, jogo.listaPossiveisJogadas(estadoInicial.getTurnoJogador(), estadoInicial.getTabuleiro()));
-        Jogada movimento = BuscaArvoreMonteCarlo();
-        return movimento;
-    
+        Jogada j = BuscaArvoreMonteCarlo(jogo);
+        log.AvaliaArvore(raiz);
+        
+        return j;
+        
     }
 
-    private Jogada BuscaArvoreMonteCarlo(){ 
+   private Jogada BuscaArvoreMonteCarlo(Jogo jogo){ 
         
         for(int it = 0; Condicional(it); it++){
             Nodo novoNodo = selecionaNodo(jogo, raiz);
-            double recompensa = simulaJogo(novoNodo);
+            double recompensa = simulaJogo(jogo, novoNodo);
             propagaResultado(novoNodo, recompensa);
 
         }
@@ -98,7 +104,7 @@ public class ArvoreMonteCarlo {
         Jogada movimento = movimentos.get(0);
         
         Estado estadoPai = nodoPai.getEstado();
-        Estado novoEstado = novoEstado(estadoPai, movimento);
+        Estado novoEstado = novoEstado(jogo, estadoPai, movimento);
         
         ArrayList<Jogada> possiveisMovimentos = jogo.listaPossiveisJogadas(novoEstado.getTurnoJogador(), novoEstado.getTabuleiro());
         nodoPai.removePossivelAcao(movimento);
@@ -111,18 +117,18 @@ public class ArvoreMonteCarlo {
     
     //simula partida ate encontrar fim de jogo *nao adiciona nada arvore
     // * talvez não instanciar Estado durante a simulação
-    private double simulaJogo(Nodo inicio){
+    private double simulaJogo(Jogo jogo, Nodo inicio){
         Estado estadoSimulado = inicio.getEstado();
         
         //só o proximo movimento com heuristica
         ArrayList<Jogada> movimentos = jogo.listaPossiveisJogadas(estadoSimulado.getTurnoJogador(), estadoSimulado.getCopiaTabuleiro());
         
         if(movimentos.isEmpty())
-            return valorUtilidade(inicio.getEstado()); //TODO: pensar aqui
+            return valorUtilidade(jogo, inicio.getEstado()); //TODO: pensar aqui
 
         Collections.shuffle(movimentos);
         Jogada movimento = movimentos.get(0);
-        estadoSimulado = novoEstado(estadoSimulado, movimento); 
+        estadoSimulado = novoEstado(jogo, estadoSimulado, movimento); 
 
         int it = 0;
         while(!estadoSimulado.isFimJogo() && it < 1000)
@@ -130,14 +136,14 @@ public class ArvoreMonteCarlo {
             it++;
             movimentos = jogo.listaPossiveisJogadas(estadoSimulado.getTurnoJogador(), estadoSimulado.getCopiaTabuleiro());
             if(movimentos.isEmpty())
-                return valorUtilidade(estadoSimulado);
+                return valorUtilidade(jogo, estadoSimulado);
             Collections.shuffle(movimentos);
             movimento = movimentos.get(0);
 
-            estadoSimulado = novoEstado(estadoSimulado, movimento); 
+            estadoSimulado = novoEstado(jogo, estadoSimulado, movimento); 
         }
 
-        return valorUtilidade(estadoSimulado);
+        return valorUtilidade(jogo, estadoSimulado);
     }
 
     // atualiza arvore
@@ -178,7 +184,7 @@ public class ArvoreMonteCarlo {
         return j;
     }
 
-    private float valorUtilidade(Estado s){  // 1 * 0  ** 1 * 1 
+    private float valorUtilidade(Jogo jogo, Estado s){  // 1 * 0  ** 1 * 1 
         float valorUt = 0;
         
         // 1 * (p^turnos)
@@ -198,7 +204,7 @@ public class ArvoreMonteCarlo {
         return valorUt * fatorDesconto;
     }
 
-    private Estado novoEstado(Estado estadoAtual, Jogada novoMovimento){
+    private Estado novoEstado(Jogo jogo, Estado estadoAtual, Jogada novoMovimento){
         int[][] novoTabuleiro = estadoAtual.getCopiaTabuleiro();
         jogo.fazJogada(novoMovimento, novoTabuleiro);
         int turnoJogador = jogo.invertePeca(estadoAtual.getTurnoJogador());
@@ -215,7 +221,7 @@ public class ArvoreMonteCarlo {
     }
 
  // *pode ser usada para melhorar desempenho
-    private Jogada avaliaMovimentos(ArrayList<Jogada> movimentos, Estado atual){
+    private Jogada avaliaMovimentos(Jogo jogo, ArrayList<Jogada> movimentos, Estado atual){
         
         float max = -100;
         Jogada mov = null;
@@ -232,6 +238,13 @@ public class ArvoreMonteCarlo {
     }
 
     public Nodo getRaiz(){return raiz;}
-    
+    public int getCorPeca(){
+        return COR_PECA;
+    }
+    @Override
+    public String toString(){
+        return log.toString();
+    }
+
 }
 

@@ -217,7 +217,9 @@ public class JanelaJogo extends JFrame {
             getJogo().desfazMovimento(movimento, getJogo().getTabuleiro());
             Thread.sleep(DELAY_JOGADA);
         }
-    } 
+    }
+
+    /*
     private void playerFazJogada() throws InterruptedException {
         setAcaoDoPlayer(getJogo().proximaAcao(getJogo().getPecaPlayer(), getJogo().getTabuleiro()));
         Jogada jogada = getJogadaDoPlayer();
@@ -225,6 +227,21 @@ public class JanelaJogo extends JFrame {
         System.out.println(jogada.toString());  
         getJogo().getHistoricoJogadas().add(jogada);
     }
+    */
+
+    public Jogada playerFazMovimento(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException {
+        setAcaoDoPlayer(jogo.proximaAcao(corPecaJogador, tabuleiro));
+        return getJogadaDoPlayer();
+        
+        /* 
+        fazJogadaComDelay(jogada);  
+        System.out.println(jogada.toString());  
+        getJogo().getHistoricoJogadas().add(jogada);
+        */
+    
+    }
+
+    /** 
     private void botFazJogadaComDelay(int peca) throws InterruptedException {
         //Jogada jogada = getJogo().jogadaDaMaquina2(peca, getJogo().getProfundidade());
         Jogada jogada = getJogo().monteCarlo(peca);
@@ -254,7 +271,7 @@ public class JanelaJogo extends JFrame {
         }
         getJogo().salvaLogPartida();
     }
-    
+    */
     private Jogada jogadaDaLista(int xInicial, int yInicial, int xFinal, int yFinal, ArrayList<Jogada> possiveisJogadas) {
         for(Jogada jogada : possiveisJogadas) {
             if(jogada.getMovimentos().get(0).getPosicao1()[0] == xInicial && jogada.getMovimentos().get(0).getPosicao1()[1] == yInicial) {
@@ -295,6 +312,7 @@ public class JanelaJogo extends JFrame {
             }
         }
     }
+    
     public void interpretaIserePecaPlayer(int[] posClick) {
         Jogada jogada = new Jogada(getJogo().getPecaPlayer(), posClick);
         if(getJogo().verificaJogada(jogada, getJogo().getTabuleiro())) {
