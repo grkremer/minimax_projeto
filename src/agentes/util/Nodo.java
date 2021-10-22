@@ -1,4 +1,8 @@
+package agentes.util;
 import java.util.HashMap;
+
+import jogos.util.Jogada;
+
 import java.util.ArrayList;
 
 public class Nodo{
@@ -11,7 +15,7 @@ public class Nodo{
     ArrayList<Jogada> possiveisMovimentos; //todas as possibilidades de ação a partir desse estado
     private HashMap<Jogada, Nodo> filhos;
     
-    Nodo(Estado estado, Nodo pai,  Jogada acao, ArrayList<Jogada> possiveisMovimentos){
+    public Nodo(Estado estado, Nodo pai,  Jogada acao, ArrayList<Jogada> possiveisMovimentos){
         valorN = 0;
         valorQ = 0;
         filhos = new HashMap<Jogada, Nodo>();

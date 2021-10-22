@@ -1,8 +1,12 @@
+package jogos.util;
 
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import agentes.util.Agente;
 
 
 public class Jogo {
@@ -14,9 +18,7 @@ public class Jogo {
     
     private String nome;
     private int[][] tabuleiro = new int[LARGURA_TABULEIRO][ALTURA_TABULEIRO];
-    private int profundidade;
-    private int maximoJogadas = Integer.MAX_VALUE;
-    private int pecaPlayer = PECA_BRANCA;
+    private int delayJogada = 0;
     private ArrayList<Jogada> historicoJogadas;
 
     //  getters e setters
@@ -32,23 +34,11 @@ public class Jogo {
     public void setTabuleiro(int[][] tabuleiro) {
         this.tabuleiro = tabuleiro;
     }
-    public int getProfundidade() {
-        return profundidade;
+    public int getDelayJogada() {
+        return delayJogada;
     }
-    public void setProfundidade(int profundidade) {
-        this.profundidade = profundidade;
-    }
-    public int getMaximoJogadas() {
-        return maximoJogadas;
-    }
-    public void setMaximoJogadas(int maximoJogadas) {
-        this.maximoJogadas = maximoJogadas;
-    }
-    public int getPecaPlayer() {
-        return pecaPlayer;
-    }
-    public void setPecaPlayer(int pecaPlayer) {
-        this.pecaPlayer = pecaPlayer;
+    public void setDelayJogada(int delayJogada) {
+        this.delayJogada = delayJogada;
     }
     public ArrayList<Jogada> getHistoricoJogadas() {
         return historicoJogadas;
@@ -140,9 +130,11 @@ public class Jogo {
                 break;
         }
     }
-    public void fazJogada(Jogada jogada, int[][] tabuleiro) {
+    public void fazJogada(Jogada jogada, int[][] tabuleiro, boolean usaDelay) throws InterruptedException {
         for(Movimento movimento : jogada.getMovimentos()) {
             fazMovimento(movimento, tabuleiro);
+            if(usaDelay)
+                Thread.sleep(getDelayJogada());
         }
     } 
     public boolean verificaJogada(Jogada jogada, int[][] tabuleiro) {
@@ -174,7 +166,7 @@ public class Jogo {
     public float normalizaPontuacao(float minimoAntigo, float maximoAntigo, float minimoNovo, float maximoNovo, float valor){
         return ((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
     }
-    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
+    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) throws InterruptedException{
         return antigaMelhorJogada;
     }
     
@@ -210,7 +202,7 @@ public class Jogo {
                 j = jogador2.Mover(this, getTabuleiro());
                 System.out.println(jogador2);
             }
-            fazJogada(j, getTabuleiro());
+            fazJogada(j, getTabuleiro(), true);
             getHistoricoJogadas().add(j);
             rodada = invertePeca(rodada);
             //Thread.sleep(2000);
@@ -244,12 +236,91 @@ public class Jogo {
                 break;
         }
     }
-    public void desfazJogada(Jogada jogada) {
+    public void desfazJogada(Jogada jogada, boolean usaDelay) throws InterruptedException {
         for(int i=jogada.getMovimentos().size()-1; i>=0; i--) {
             Movimento movimento = jogada.getMovimentos().get(i);
             desfazMovimento(movimento, getTabuleiro());
+            if(usaDelay)
+                Thread.sleep(getDelayJogada());
         }
     }
+
+    private boolean selecionado = false;
+    private int[] posSelecionado = {0, 0};
+    public int[] getPosSelecionado() {
+        return posSelecionado;
+    }
+    public void setPosSelecionado(int[] posSelecionado) {
+        this.posSelecionado = posSelecionado;
+    }
+    public boolean isSelecionado() {
+        return selecionado;
+    }
+    public void setSelecionado(boolean selecionado) {
+        this.selecionado = selecionado;
+    }
+    
+    private Jogada jogadaDaLista(int xInicial, int yInicial, int xFinal, int yFinal, ArrayList<Jogada> possiveisJogadas) {
+        for(Jogada jogada : possiveisJogadas) {
+            if(jogada.getMovimentos().get(0).getPosicao1()[0] == xInicial && jogada.getMovimentos().get(0).getPosicao1()[1] == yInicial) {
+                int i=0;
+                boolean move = true;
+                while(move && i < jogada.getMovimentos().size()) {
+                    move = jogada.getMovimentos().get(i).getAcao() == Movimento.Acao.MOVE;
+                    if(move) i++;
+                }               
+                i--;
+                if(jogada.getMovimentos().get(i).getPosicao2()[0] == xFinal && jogada.getMovimentos().get(i).getPosicao2()[1] == yFinal) {
+                    return jogada;
+                }
+            }
+        }
+        return null;
+    }
+    private Jogada humanoMovePeca(int[] posClick, int corPeca) {
+        if(!isSelecionado()) {
+            setPosSelecionado(posClick);
+            if(getTabuleiro()[posClick[0]][posClick[1]] == corPeca) {
+                setSelecionado(true);
+            }
+            return null;
+        }
+        else {
+            ArrayList<Jogada> possiveisJogadas = listaPossiveisJogadas(corPeca, getTabuleiro());
+            Jogada jogada = jogadaDaLista(getPosSelecionado()[0], getPosSelecionado()[1], posClick[0], posClick[1], possiveisJogadas);
+            if(!Objects.isNull(jogada)) {
+                setSelecionado(false);
+                return jogada;
+            }
+            else if(getTabuleiro()[posClick[0]][posClick[1]] == corPeca) {
+                setPosSelecionado(posClick);
+                return null;
+            }
+            else {
+                setSelecionado(false);
+                return null;
+            }
+        }
+    }
+    
+    private Jogada humanoIserePeca(int[] posClick, int corPeca) {
+        Jogada jogada = new Jogada(corPeca, posClick);
+        if(verificaJogada(jogada, getTabuleiro())) {
+            return jogada;
+        }
+        return null;
+    }
+    public Jogada humanoFazJogada(int[] posClick, int corPeca) {
+        switch(proximaAcao(corPeca, getTabuleiro())) {
+            case MOVE:
+                return humanoMovePeca(posClick, corPeca);
+            case INSERE:
+                return humanoIserePeca(posClick, corPeca);
+            default:
+                return null;
+        }
+    }
+
     
     //  funções específicas (para implementar com override)  
     public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {

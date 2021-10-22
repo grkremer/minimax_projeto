@@ -1,3 +1,4 @@
+package agentes.util;
 public class Estado {
     private int[][] tabuleiro;
     private int vencedor;

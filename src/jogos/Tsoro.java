@@ -1,12 +1,14 @@
+package jogos;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import jogos.util.*;
 
 public class Tsoro extends JogoDaVelha4{
     private final int MAX_PECAS = 4;
     
     Tsoro() {
         setNome("Tsoro");
-        setProfundidade(5);
     }
 
     @Override

@@ -1,5 +1,10 @@
+package agentes;
 
 import java.util.HashMap;
+
+import agentes.util.Agente;
+import jogos.util.Jogada;
+import jogos.util.Jogo;
 
 
 public class Minimax implements Agente{
@@ -20,11 +25,11 @@ public class Minimax implements Agente{
         this.COR_PECA = COR_PECA;
     }
 
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro){
+    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
         return Poda(jogo, tabuleiro, COR_PECA, COR_PECA);
     }
 
-    Jogada Poda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual){
+    Jogada Poda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException{
         numeroNodos+=1;
         if(!nodosPorNivel.containsKey(profundidadeMax)) nodosPorNivel.put(profundidadeMax,1);
         else nodosPorNivel.put(profundidadeMax, nodosPorNivel.get(profundidadeMax)+1) ;
@@ -36,7 +41,7 @@ public class Minimax implements Agente{
         float beta  = Float.POSITIVE_INFINITY;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-            jogo.fazJogada(j, novoTabuleiro);
+            jogo.fazJogada(j, novoTabuleiro, false);
             int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax, alpha, beta);
             if(valor > max)
             {
@@ -47,7 +52,7 @@ public class Minimax implements Agente{
         return melhorJogada;
     }
 
-    private int Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta){
+    private int Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
         numeroNodos+=1;
 
         if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
@@ -61,7 +66,7 @@ public class Minimax implements Agente{
         int valor = Integer.MIN_VALUE;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-            jogo.fazJogada(j, novoTabuleiro);
+            jogo.fazJogada(j, novoTabuleiro, false);
             
             valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta));
             if(valor >= beta){ 
@@ -73,7 +78,7 @@ public class Minimax implements Agente{
         return valor;
     }
 
-    private int Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta){
+    private int Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
         numeroNodos+=1;
         if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
         else nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
@@ -85,7 +90,7 @@ public class Minimax implements Agente{
         int valor = Integer.MAX_VALUE;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-            jogo.fazJogada(j, novoTabuleiro);
+            jogo.fazJogada(j, novoTabuleiro, false);
             
             valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta));
             if(valor <= alpha) {

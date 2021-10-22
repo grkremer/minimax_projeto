@@ -1,14 +1,12 @@
+package jogos;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-
+import jogos.util.*;
 
 public class FiveFieldKono extends Jogo {
     
-    FiveFieldKono() {
-        setNome("Five Field Kono");
-        setProfundidade(5);
-       
+    public FiveFieldKono() {
+        setNome("Five Field Kono");       
     }
 
     @Override
@@ -139,9 +137,9 @@ public class FiveFieldKono extends Jogo {
         return Movimento.Acao.MOVE;
     }
 
-    public avaliaDistanciaObjetivo(){
+    //public avaliaDistanciaObjetivo(){
 
-    }
+    //}
 
 
 }

@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\MarcoAntonio\Documents\GitHub\minimax_projeto\dist\minimax_projeto.jar</jar>
-  <outfile>C:\Users\MarcoAntonio\Documents\GitHub\minimax_projeto\dist\TicTackle5.exe</outfile>
+  <outfile>Exemplo.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>

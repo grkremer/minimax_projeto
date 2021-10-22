@@ -1,7 +1,12 @@
-
+package agentes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+
+import agentes.util.*;
+import jogos.util.Jogada;
+import jogos.util.Jogo;
+import logging.LogArvoreMonteCarlo;
 
 public class ArvoreMonteCarlo implements Agente{
     
@@ -17,7 +22,7 @@ public class ArvoreMonteCarlo implements Agente{
         this.COR_PECA = COR_PECA;
     }
 
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro){
+    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
         
         log = new LogArvoreMonteCarlo();
         Estado estadoInicial = new Estado(tabuleiro, COR_PECA, false, 0, COR_PECA, 0);
@@ -29,7 +34,7 @@ public class ArvoreMonteCarlo implements Agente{
         
     }
 
-   private Jogada BuscaArvoreMonteCarlo(Jogo jogo){ 
+   private Jogada BuscaArvoreMonteCarlo(Jogo jogo) throws InterruptedException{ 
         
         for(int it = 0; Condicional(it); it++){
             Nodo novoNodo = selecionaNodo(jogo, raiz);
@@ -41,7 +46,7 @@ public class ArvoreMonteCarlo implements Agente{
     }
 
 
-    private Nodo selecionaNodo(Jogo jogo, Nodo raiz){
+    private Nodo selecionaNodo(Jogo jogo, Nodo raiz) throws InterruptedException{
         Nodo nodo = raiz;
         //enquanto o nodo não for uma folha
         while(!nodo.filhosIsEmpty()){
@@ -93,7 +98,7 @@ public class ArvoreMonteCarlo implements Agente{
     }
 
     //expande um nodo
-    private Nodo expandeNodo(Jogo jogo, Nodo nodoPai){ 
+    private Nodo expandeNodo(Jogo jogo, Nodo nodoPai) throws InterruptedException{ 
         
 
         ArrayList<Jogada> movimentos = nodoPai.getPossiveisMovimentos();
@@ -117,7 +122,7 @@ public class ArvoreMonteCarlo implements Agente{
     
     //simula partida ate encontrar fim de jogo *nao adiciona nada arvore
     // * talvez não instanciar Estado durante a simulação
-    private double simulaJogo(Jogo jogo, Nodo inicio){
+    private double simulaJogo(Jogo jogo, Nodo inicio) throws InterruptedException{
         Estado estadoSimulado = inicio.getEstado();
         
         //só o proximo movimento com heuristica
@@ -191,8 +196,8 @@ public class ArvoreMonteCarlo implements Agente{
         // ganhador1: 2 turnos 0,984, 0,99| 4 turnos  0,96, 0,980 =  diferença 0,02
         // ganhador2: 50 turnos 0,6, 0,94 | 100 turnos  0,33, 0,93 = diferença 0,3
         
-        //float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
-        float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
+        float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
+        //float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
         
         if(s.getMarcaAgente() == s.getVencedor())
             valorUt = 1;
@@ -204,9 +209,9 @@ public class ArvoreMonteCarlo implements Agente{
         return valorUt * fatorDesconto;
     }
 
-    private Estado novoEstado(Jogo jogo, Estado estadoAtual, Jogada novoMovimento){
+    private Estado novoEstado(Jogo jogo, Estado estadoAtual, Jogada novoMovimento) throws InterruptedException{
         int[][] novoTabuleiro = estadoAtual.getCopiaTabuleiro();
-        jogo.fazJogada(novoMovimento, novoTabuleiro);
+        jogo.fazJogada(novoMovimento, novoTabuleiro, false);
         int turnoJogador = jogo.invertePeca(estadoAtual.getTurnoJogador());
         Boolean fimJogo = jogo.verificaFimDeJogo(novoTabuleiro);
         int jogadorVencedor = 0;
@@ -221,13 +226,13 @@ public class ArvoreMonteCarlo implements Agente{
     }
 
  // *pode ser usada para melhorar desempenho
-    private Jogada avaliaMovimentos(Jogo jogo, ArrayList<Jogada> movimentos, Estado atual){
+    private Jogada avaliaMovimentos(Jogo jogo, ArrayList<Jogada> movimentos, Estado atual) throws InterruptedException{
         
         float max = -100;
         Jogada mov = null;
         for(Jogada m: movimentos){
             int[][] novoTabuleiro = atual.getCopiaTabuleiro();
-            jogo.fazJogada(m, novoTabuleiro);
+            jogo.fazJogada(m, novoTabuleiro, false);
             float aux = (float)jogo.geraCusto(atual.getTurnoJogador(), novoTabuleiro, -100, 100);
             if(aux > max){
                 max = aux;

@@ -1,10 +1,13 @@
+package logging;
 
 import java.util.HashMap;
+
+import agentes.util.Nodo;
 // número de nodos
 // número de nodos por filho (Média)
 // número máximo de filhos por nodo (Max)
 // tempo de execução
-public class LogArvoreJogo {
+public class LogArvoreMonteCarlo {
     int numeroNodos;
     int nodosInternos;
     int sumFilhos;
@@ -16,7 +19,7 @@ public class LogArvoreJogo {
     float tempoExecucao;
     long startTime;
     long endTime;
-    public LogArvoreJogo(){
+    public LogArvoreMonteCarlo(){
         //nodosPorNivel = new ArrayList<Integer>();
         nodosPorNivel = new HashMap<Integer,Integer>();
         numeroNodos = 0;
@@ -28,7 +31,7 @@ public class LogArvoreJogo {
         startTime = System.currentTimeMillis();
     };
 
-    public void AvaliaArvore(ArvoreDeJogadas raiz)
+    public void AvaliaArvore(Nodo raiz)
     {
         endTime = System.currentTimeMillis();
         ProcessarArvore(raiz, 0);
@@ -36,10 +39,14 @@ public class LogArvoreJogo {
         tempoExecucao = (endTime - startTime)/1000f;
     }
 
-    private void ProcessarArvore(ArvoreDeJogadas nodo, int profundidade)
+    private void ProcessarArvore(Nodo nodo, int profundidade)
     {
+        
         numeroNodos+=1;
+        
 
+        if(nodo == null) return;
+        
         Integer numeroFilhos = nodo.getFilhos().size();
         
         if(numeroFilhos>0){
@@ -55,7 +62,7 @@ public class LogArvoreJogo {
         if(!nodosPorNivel.containsKey(profundidade)) nodosPorNivel.put(profundidade,1);
         else nodosPorNivel.put(profundidade, nodosPorNivel.get(profundidade)+1) ;
         //pega os filhos
-        for (ArvoreDeJogadas filho : nodo.getFilhos()) ProcessarArvore(filho, profundidade+1);
+        for (Nodo filho : (nodo.getFilhos()).values()) ProcessarArvore(filho, profundidade+1);
         
     }
 
@@ -69,6 +76,6 @@ public class LogArvoreJogo {
             int n = nodosPorNivel.get(i);
             filhosPorNivel += "(nvl " + i + ":" +  n + ") ";
         }
-        return "\nMINIMAX\nnumero de nodos: " + numeroNodos + "\nmax filho: " + maxBranching + "\nmedia filhos: " + mediaBranching + "\n" + filhosPorNivel + "\n" + tempoExecucao + "s";
+        return "\nMONTE-CARLO\nnumero de nodos: " + numeroNodos + "\nmax filho: " + maxBranching + "\nmedia filhos: " + mediaBranching + "\n" + filhosPorNivel + "\n" + tempoExecucao + "s";
     }
 }

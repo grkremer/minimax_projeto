@@ -1,9 +1,11 @@
+package jogos;
 import java.util.ArrayList;
 
+import jogos.util.*;
+
 public class Alquerque extends Jogo {
-    Alquerque() {
+    public Alquerque() {
         setNome("Alquerque");
-        setProfundidade(5);
     }
 
     @Override

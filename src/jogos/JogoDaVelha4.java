@@ -1,10 +1,12 @@
+package jogos;
 import java.util.ArrayList;
+
+import agentes.ArvoreDeJogadas;
+import jogos.util.*;
 
 public class JogoDaVelha4 extends Jogo {
     JogoDaVelha4() {
         setNome("Jogo da Velha 4");
-        setProfundidade(5);
-        setMaximoJogadas(15000000);
     }
     
     @Override
@@ -592,7 +594,7 @@ public class JogoDaVelha4 extends Jogo {
     }
 
     @Override
-    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) {
+    public Jogada jogadaDanoMinimo(Jogada antigaMelhorJogada, int corPeca) throws InterruptedException {
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas(0);
         ArrayList<Jogada> possiveisJogadasAdversario = listaPossiveisJogadas(invertePeca(corPeca), getTabuleiro());
         int pontuacaoAdversario;
@@ -600,7 +602,7 @@ public class JogoDaVelha4 extends Jogo {
         Jogada melhorJogadaAdversario = possiveisJogadasAdversario.get(0);
         for(Jogada possivelJogada : possiveisJogadasAdversario) {
             int[][] novoTabuleiro = criaCopiaTabuleiro(getTabuleiro());
-            fazJogada(possivelJogada, novoTabuleiro);
+            fazJogada(possivelJogada, novoTabuleiro, false);
             pontuacaoAdversario = (int)geraCusto(invertePeca(corPeca), novoTabuleiro, jogadas.MIN_PONTOS, jogadas.MAX_PONTOS);
             if(pontuacaoAdversario > maiorPontuacaoAdversario) {
                 melhorJogadaAdversario = possivelJogada;

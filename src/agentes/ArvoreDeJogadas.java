@@ -1,5 +1,10 @@
+package agentes;
 
 import java.util.Random;
+
+import jogos.util.Jogada;
+import jogos.util.Jogo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +43,7 @@ public class ArvoreDeJogadas {
         this.filhos.add(filho);
     }
 
-    public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, int maximoJogadas) {
+    public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, int maximoJogadas) throws InterruptedException {
         setFilhos(new ArrayList<ArvoreDeJogadas>());
         ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
         if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || jogo.verificaFimDeJogo(tabuleiro) || maximoJogadas <= possiveisJogadas.size()) {
@@ -47,7 +52,7 @@ public class ArvoreDeJogadas {
         else {
             for(int i=0; i < possiveisJogadas.size(); i++) {
                 int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-                jogo.fazJogada(possiveisJogadas.get(i), novoTabuleiro);
+                jogo.fazJogada(possiveisJogadas.get(i), novoTabuleiro, false);
                 int maximoProximasJogadas = (int)(maximoJogadas-possiveisJogadas.size())/possiveisJogadas.size();
                 ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, maximoProximasJogadas);
                 proximasJogadas.setJogada(possiveisJogadas.get(i));
@@ -58,7 +63,7 @@ public class ArvoreDeJogadas {
 
     
 
-    public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, boolean estaMaximizando, float alpha, float beta) {
+    public ArvoreDeJogadas(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidadeMax, boolean estaMaximizando, float alpha, float beta) throws InterruptedException {
         setFilhos(new ArrayList<ArvoreDeJogadas>());
         ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
         if(profundidadeMax == 0 || possiveisJogadas.size() == 0 || jogo.verificaFimDeJogo(tabuleiro)) {
@@ -70,7 +75,7 @@ public class ArvoreDeJogadas {
                 int pontuacaoFilho;
                 for(Jogada jogada : possiveisJogadas) {
                     int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-                    jogo.fazJogada(jogada, novoTabuleiro);
+                    jogo.fazJogada(jogada, novoTabuleiro, false);
                     ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, false, alpha, beta);
                     proximasJogadas.setJogada(jogada);
                     this.addFilho(proximasJogadas);
@@ -87,7 +92,7 @@ public class ArvoreDeJogadas {
                 int pontuacaoFilho;
                 for(Jogada jogada : possiveisJogadas) {
                     int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
-                    jogo.fazJogada(jogada, novoTabuleiro);
+                    jogo.fazJogada(jogada, novoTabuleiro, false);
                     ArvoreDeJogadas proximasJogadas = new ArvoreDeJogadas(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, true, alpha, beta);
                     proximasJogadas.setJogada(jogada);
                     this.addFilho(proximasJogadas);

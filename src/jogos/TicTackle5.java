@@ -1,10 +1,12 @@
+package jogos;
     import java.util.ArrayList;
 import java.util.Arrays;
+
+import jogos.util.*;
 
 public class TicTackle5 extends Jogo {
     TicTackle5() {
         setNome("Tic Tackle 5");
-        setProfundidade(5);
     }
 
     @Override

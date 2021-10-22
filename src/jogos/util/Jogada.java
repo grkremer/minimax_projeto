@@ -1,4 +1,6 @@
+package jogos.util;
 import java.util.ArrayList;
+
 
 public class Jogada {
     private ArrayList<Movimento> movimentos = new ArrayList<Movimento>();
@@ -10,19 +12,19 @@ public class Jogada {
         this.movimentos = movimentos;
     }
 
-    Jogada(ArrayList<Movimento> movimentos) {
+    public Jogada(ArrayList<Movimento> movimentos) {
         setMovimentos(movimentos); 
     }
-    Jogada(Movimento movimento) {
+    public Jogada(Movimento movimento) {
         getMovimentos().add(movimento); 
     }
-    Jogada(int corPeca, int[] posicao) {
+    public Jogada(int corPeca, int[] posicao) {
         getMovimentos().add(new Movimento(corPeca, posicao, posicao, Movimento.Acao.INSERE)); 
     }
-    Jogada(int corPeca, int[][] posicoes) {
+    public Jogada(int corPeca, int[][] posicoes) {
         getMovimentos().add(new Movimento(corPeca, posicoes[0], posicoes[1], Movimento.Acao.MOVE)); 
     }
-    Jogada(int corPeca, ArrayList<int[][]> movimentos, ArrayList<int[]> pecasEliminadas) {
+    public Jogada(int corPeca, ArrayList<int[][]> movimentos, ArrayList<int[]> pecasEliminadas) {
         for(int[][] posicoes : movimentos) {
             getMovimentos().add(new Movimento(corPeca, posicoes[0], posicoes[1], Movimento.Acao.MOVE)); 
         }
@@ -30,7 +32,7 @@ public class Jogada {
             getMovimentos().add(new Movimento(corPeca, posicao, posicao, Movimento.Acao.REMOVE)); 
         }
     }
-    Jogada(String textoJogada) {
+    public Jogada(String textoJogada) {
         int corPeca = stringParaPeca(textoJogada.substring(0, 1));
         textoJogada = textoJogada.substring(3);
         String[] particoesTextoJogada = textoJogada.split(" ");

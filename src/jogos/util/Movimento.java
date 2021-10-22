@@ -1,3 +1,4 @@
+package jogos.util;
 public class Movimento {
     public enum Acao {
         INSERE, MOVE, REMOVE;
@@ -33,7 +34,7 @@ public class Movimento {
         this.acao = acao;
     }
 
-    Movimento(int corPeca, int[] posicao1, int[] posicao2, Acao acao) {
+    public Movimento(int corPeca, int[] posicao1, int[] posicao2, Acao acao) {
         setCorPeca(corPeca);
         setPosicao1(posicao1);
         setPosicao2(posicao2);

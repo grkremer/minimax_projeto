@@ -1,3 +1,5 @@
+package interfaces;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -18,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
+import jogos.util.*;
+
 public class JanelaJogo extends JFrame {
     private Jogo jogo;
     private JPanel telaJogo = new TelaJogo();
@@ -26,12 +30,11 @@ public class JanelaJogo extends JFrame {
     public static final int ALTURA_TELA = 600;
     private static final int TAMANHO_PECA = (int)LARGURA_TELA/(2*Jogo.LARGURA_TABULEIRO);
     private static final int DELAY_TIMER = 75;
-    public static final int DELAY_JOGADA = 500;
-    private boolean vezDoPlayer = false;
-    private Movimento.Acao acaoDoPlayer;
-    private Jogada jogadaDoPlayer;
-    private boolean selecionado = false;
-    private int[] posSelecionado = {0, 0};
+
+    private int corPecaHumano = Jogo.SEM_PECA;
+    private boolean humanoJogando = false;
+    private Jogada jogadaDoHumano = null;
+    
     private boolean assistindoReplay = false;
     private boolean proximaJogadaReplay = false;
     private boolean jogadaAnteriorReplay = false;
@@ -48,39 +51,23 @@ public class JanelaJogo extends JFrame {
     public void setTelaJogo(JPanel telaJogo) {
         this.telaJogo = telaJogo;
     }
-    public boolean isVezDoPlayer() {
-        return vezDoPlayer;
+    public int getCorPecaHumano() {
+        return corPecaHumano;
     }
-    public void setVezDoPlayer(boolean vezDoPlayer) {
-        this.vezDoPlayer = vezDoPlayer;
+    public void setCorPecaHumano(int corPecaHumano) {
+        this.corPecaHumano = corPecaHumano;
     }
-    public Movimento.Acao getAcaoDoPlayer() {
-        return acaoDoPlayer;
+    public boolean isHumanoJogando() {
+        return humanoJogando;
     }
-    public void setAcaoDoPlayer(Movimento.Acao acaoDoPlayer) {
-        this.acaoDoPlayer = acaoDoPlayer;
+    public void setHumanoJogando(boolean humanoJogando) {
+        this.humanoJogando = humanoJogando;
     }
-    public Jogada getJogadaDoPlayer() throws InterruptedException {
-        setVezDoPlayer(true);
-        while(isVezDoPlayer()) {
-            Thread.sleep(1);
-        }
-        return jogadaDoPlayer;
+    public Jogada getJogadaDoHumano() {
+        return jogadaDoHumano;
     }
-    public void setJogadaDoPlayer(Jogada jogadaDoPlayer) {
-        this.jogadaDoPlayer = jogadaDoPlayer;
-    }
-    public boolean isSelecionado() {
-        return selecionado;
-    }
-    public void setSelecionado(boolean selecionado) {
-        this.selecionado = selecionado;
-    }
-    public int[] getPosSelecionado() {
-        return posSelecionado;
-    }
-    public void setPosSelecionado(int[] posSelecionado) {
-        this.posSelecionado = posSelecionado;
+    public void setJogadaDoHumano(Jogada jogadaDoHumano) {
+        this.jogadaDoHumano = jogadaDoHumano;
     }
     public boolean isAssistindoReplay() {
         return assistindoReplay;
@@ -101,8 +88,9 @@ public class JanelaJogo extends JFrame {
         this.jogadaAnteriorReplay = jogadaAnteriorReplay;
     }
 
-    JanelaJogo(Jogo jogo) {
+    public JanelaJogo(Jogo jogo) {
         setJogo(jogo);
+        getJogo().setDelayJogada(500);
 
         this.add(getTelaJogo());
         this.setTitle(jogo.getNome());
@@ -133,7 +121,7 @@ public class JanelaJogo extends JFrame {
                         posicaoY = calculaPosicaoFila(y, TAMANHO_PECA, ALTURA_TELA, Jogo.ALTURA_TABULEIRO);
                         g.setColor(Color.white);
                         g.fillOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        if(isSelecionado() && getPosSelecionado()[0] == x && getPosSelecionado()[1] == y) {
+                        if(getJogo().isSelecionado() && getJogo().getPosSelecionado()[0] == x && getJogo().getPosSelecionado()[1] == y) {
                             g.setColor(Color.blue);
                             g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
                         }
@@ -147,7 +135,7 @@ public class JanelaJogo extends JFrame {
                         posicaoY = calculaPosicaoFila(y, TAMANHO_PECA, ALTURA_TELA, Jogo.ALTURA_TABULEIRO);
                         g.setColor(Color.black);
                         g.fillOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
-                        if(isSelecionado() && getPosSelecionado()[0] == x && getPosSelecionado()[1] == y) {
+                        if(getJogo().isSelecionado() && getJogo().getPosSelecionado()[0] == x && getJogo().getPosSelecionado()[1] == y) {
                             g.setColor(Color.blue);
                             g.drawOval(posicaoX, posicaoY, TAMANHO_PECA, TAMANHO_PECA);
                         }
@@ -205,134 +193,6 @@ public class JanelaJogo extends JFrame {
         desenhaPecas(g);
     }
 
-    public void fazJogadaComDelay(Jogada jogada) throws InterruptedException {
-        for(Movimento movimento : jogada.getMovimentos()) {
-            getJogo().fazMovimento(movimento, getJogo().getTabuleiro());
-            Thread.sleep(DELAY_JOGADA);
-        }
-    } 
-    public void desfazJogadaComDelay(Jogada jogada) throws InterruptedException {
-        for(int i=jogada.getMovimentos().size()-1; i>=0; i--) {
-            Movimento movimento = jogada.getMovimentos().get(i);
-            getJogo().desfazMovimento(movimento, getJogo().getTabuleiro());
-            Thread.sleep(DELAY_JOGADA);
-        }
-    }
-
-    /*
-    private void playerFazJogada() throws InterruptedException {
-        setAcaoDoPlayer(getJogo().proximaAcao(getJogo().getPecaPlayer(), getJogo().getTabuleiro()));
-        Jogada jogada = getJogadaDoPlayer();
-        fazJogadaComDelay(jogada);  
-        System.out.println(jogada.toString());  
-        getJogo().getHistoricoJogadas().add(jogada);
-    }
-    */
-
-    public Jogada playerFazMovimento(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException {
-        setAcaoDoPlayer(jogo.proximaAcao(corPecaJogador, tabuleiro));
-        return getJogadaDoPlayer();
-        
-        /* 
-        fazJogadaComDelay(jogada);  
-        System.out.println(jogada.toString());  
-        getJogo().getHistoricoJogadas().add(jogada);
-        */
-    
-    }
-
-    /** 
-    private void botFazJogadaComDelay(int peca) throws InterruptedException {
-        //Jogada jogada = getJogo().jogadaDaMaquina2(peca, getJogo().getProfundidade());
-        Jogada jogada = getJogo().monteCarlo(peca);
-        fazJogadaComDelay(jogada); 
-        System.out.println(jogada.toString());
-        getJogo().getHistoricoJogadas().add(jogada);
-    }
-    public void partidaBotXPlayer() throws InterruptedException {
-        getJogo().setHistoricoJogadas(new ArrayList<Jogada>());
-        getJogo().inicializaTabuleiro();
-        while(!getJogo().verificaFimDeJogo(getJogo().getTabuleiro())) {
-            System.out.println("Vez das peças brancas");
-            if(getJogo().getPecaPlayer() == Jogo.PECA_BRANCA) {
-                playerFazJogada();
-                if(!getJogo().verificaFimDeJogo(getJogo().getTabuleiro())) {
-                    System.out.println("Vez das peças pretas");
-                    botFazJogadaComDelay(Jogo.PECA_PRETA);
-                }
-            }
-            else {
-                botFazJogadaComDelay(Jogo.PECA_BRANCA);
-                if(!getJogo().verificaFimDeJogo(getJogo().getTabuleiro())) {
-                    System.out.println("Vez das peças pretas");
-                    playerFazJogada();
-                }
-            }
-        }
-        getJogo().salvaLogPartida();
-    }
-    */
-    private Jogada jogadaDaLista(int xInicial, int yInicial, int xFinal, int yFinal, ArrayList<Jogada> possiveisJogadas) {
-        for(Jogada jogada : possiveisJogadas) {
-            if(jogada.getMovimentos().get(0).getPosicao1()[0] == xInicial && jogada.getMovimentos().get(0).getPosicao1()[1] == yInicial) {
-                int i=0;
-                boolean move = true;
-                while(move && i < jogada.getMovimentos().size()) {
-                    move = jogada.getMovimentos().get(i).getAcao() == Movimento.Acao.MOVE;
-                    if(move) i++;
-                }               
-                i--;
-                if(jogada.getMovimentos().get(i).getPosicao2()[0] == xFinal && jogada.getMovimentos().get(i).getPosicao2()[1] == yFinal) {
-                    return jogada;
-                }
-            }
-        }
-        return null;
-    }
-    public void interpretaMovePecaPlayer(int[] posClick) {
-        if(!isSelecionado()) {
-            setPosSelecionado(posClick);
-            if(getJogo().getTabuleiro()[posClick[0]][posClick[1]] == getJogo().getPecaPlayer()) {
-                setSelecionado(true);
-            }
-        }
-        else {
-            ArrayList<Jogada> possiveisJogadas = getJogo().listaPossiveisJogadas(getJogo().getPecaPlayer(), getJogo().getTabuleiro());
-            Jogada jogada = jogadaDaLista(getPosSelecionado()[0], getPosSelecionado()[1], posClick[0], posClick[1], possiveisJogadas);
-            if(!Objects.isNull(jogada)) {
-                setJogadaDoPlayer(jogada);
-                setVezDoPlayer(false);
-                setSelecionado(false);
-            }
-            else if(getJogo().getTabuleiro()[posClick[0]][posClick[1]] == getJogo().getPecaPlayer()) {
-                setPosSelecionado(posClick);
-            }
-            else {
-                setSelecionado(false);
-            }
-        }
-    }
-    
-    public void interpretaIserePecaPlayer(int[] posClick) {
-        Jogada jogada = new Jogada(getJogo().getPecaPlayer(), posClick);
-        if(getJogo().verificaJogada(jogada, getJogo().getTabuleiro())) {
-            setJogadaDoPlayer(jogada);
-            setVezDoPlayer(false);
-        }
-    }
-    public void interpretaJogadaPlayer(int[] posClick) {
-        switch(getAcaoDoPlayer()) {
-            case MOVE:
-                interpretaMovePecaPlayer(posClick);
-                break;
-            case INSERE:
-                interpretaIserePecaPlayer(posClick);
-                break;
-            default:
-                break;
-        }
-    }
-
     public void replayHistoricoJogadas() throws InterruptedException {
         setAssistindoReplay(true);
         getJogo().inicializaTabuleiro();
@@ -341,13 +201,13 @@ public class JanelaJogo extends JFrame {
             if(isProximaJogadaReplay()) {
                 if(posicaoReplay < getJogo().getHistoricoJogadas().size()-1) {
                     posicaoReplay++;
-                    fazJogadaComDelay(getJogo().getHistoricoJogadas().get(posicaoReplay));
+                    getJogo().fazJogada(getJogo().getHistoricoJogadas().get(posicaoReplay), getJogo().getTabuleiro(), true);
                 }
                 setProximaJogadaReplay(false);
             }
             if(isJogadaAnteriorReplay()) {
                 if(posicaoReplay >= 0) {
-                    desfazJogadaComDelay(getJogo().getHistoricoJogadas().get(posicaoReplay));
+                    getJogo().desfazJogada(getJogo().getHistoricoJogadas().get(posicaoReplay), true);
                     posicaoReplay--;
                 }
                 setJogadaAnteriorReplay(false);
@@ -415,8 +275,10 @@ public class JanelaJogo extends JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             int[] posClick = {(int)(e.getX()*Jogo.LARGURA_TABULEIRO)/LARGURA_TELA, (int)(e.getY()*Jogo.ALTURA_TABULEIRO)/ALTURA_TELA};
-            if(isVezDoPlayer()) {
-                interpretaJogadaPlayer(posClick);
+            if(isHumanoJogando()) {
+                setJogadaDoHumano(getJogo().humanoFazJogada(posClick, getCorPecaHumano()));
+                if(!Objects.isNull(getJogadaDoHumano()))
+                    setHumanoJogando(false);
             }
         }
     }

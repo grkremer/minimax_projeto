@@ -1,9 +1,13 @@
+package interfaces;
+
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+
+import agentes.ArvoreDeJogadas;
 
 public class JanelaGrafo extends JFrame {
     private mxGraph grafo;

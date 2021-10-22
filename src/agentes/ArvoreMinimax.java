@@ -1,6 +1,11 @@
-
+package agentes;
 
 import java.util.Collections;
+
+import agentes.util.Agente;
+import jogos.util.Jogada;
+import jogos.util.Jogo;
+import logging.LogArvoreJogo;
 public class ArvoreMinimax implements Agente{
     int profundidade;
     int COR_PECA;
@@ -20,12 +25,12 @@ public class ArvoreMinimax implements Agente{
         this.COR_PECA = COR_PECA;
     }
     
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro){
+    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
         if(podaLigada){ return MoverComPoda(jogo, tabuleiro, COR_PECA, COR_PECA); }
         else return MoverSemPoda(jogo, tabuleiro, COR_PECA, COR_PECA);
     }
 
-    public Jogada MoverComPoda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual){
+    public Jogada MoverComPoda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException{
         log = new LogArvoreJogo();
         //ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());
         ArvoreDeJogadas jogadas = new ArvoreDeJogadas(jogo, tabuleiro, corPecaJogador, corPecaJogador, profundidade, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -59,7 +64,7 @@ public class ArvoreMinimax implements Agente{
         return melhorJogada;
     }
 
-    public Jogada MoverSemPoda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual)
+    public Jogada MoverSemPoda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException
     {
         log = new LogArvoreJogo();
         //ArvoreDeJogadas jogadas = new ArvoreDeJogadas(this, getTabuleiro(), corPeca, corPeca, profundidade, getMaximoJogadas());

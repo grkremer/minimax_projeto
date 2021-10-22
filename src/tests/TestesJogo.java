@@ -1,7 +1,10 @@
+package tests;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import jogos.util.Jogo;
 
 public class TestesJogo extends Jogo{
     @Test
