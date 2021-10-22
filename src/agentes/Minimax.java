@@ -1,5 +1,7 @@
 package agentes;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import agentes.util.Agente;
@@ -39,7 +41,9 @@ public class Minimax implements Agente{
         Jogada melhorJogada = null;
         float alpha = Float.NEGATIVE_INFINITY; 
         float beta  = Float.POSITIVE_INFINITY;
-        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
+        ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        Collections.shuffle(possiveisJogadas);
+        for(Jogada j:possiveisJogadas){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
             int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax, alpha, beta);
