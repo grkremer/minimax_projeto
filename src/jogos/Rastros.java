@@ -9,6 +9,12 @@ public class Rastros extends Jogo {
         setNome("Rastros");
     }
 
+    /* 
+    public Rastros(obj1 jogador1, obj2 jogador 2) {
+       
+    }
+    */
+
     @Override
     public void inicializaTabuleiro() {
         for(int x=0; x < LARGURA_TABULEIRO; x++) {
