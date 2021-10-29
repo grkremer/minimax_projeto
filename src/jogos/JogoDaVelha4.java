@@ -5,7 +5,7 @@ import agentes.ArvoreDeJogadas;
 import jogos.util.*;
 
 public class JogoDaVelha4 extends Jogo {
-    JogoDaVelha4() {
+    public JogoDaVelha4() {
         setNome("Jogo da Velha 4");
     }
     

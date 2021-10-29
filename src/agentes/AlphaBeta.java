@@ -33,9 +33,11 @@ public class AlphaBeta implements Agente{
 
     Jogada Poda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException{
         numeroNodos+=1;
-        if(!nodosPorNivel.containsKey(profundidadeMax)) nodosPorNivel.put(profundidadeMax,1);
-        else nodosPorNivel.put(profundidadeMax, nodosPorNivel.get(profundidadeMax)+1) ;
-        
+        //inicializar variaveis de log
+        for(int i = 0; i < profundidadeMax+1; i++){
+            nodosPorNivel.put(i,0);
+        }
+        nodosPorNivel.put(0, 1) ;
         
         int max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
@@ -46,21 +48,20 @@ public class AlphaBeta implements Agente{
         for(Jogada j:possiveisJogadas){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax, alpha, beta);
+            int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta);
             if(valor > max)
             {
                 melhorJogada = j;
                 max = valor;
             }
         }
+        
         return melhorJogada;
     }
 
     private int Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
         numeroNodos+=1;
-
-        if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
-        else nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
+        nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
         
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
@@ -84,8 +85,7 @@ public class AlphaBeta implements Agente{
 
     private int Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
         numeroNodos+=1;
-        if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
-        else nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
+        nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
             return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
@@ -120,6 +120,6 @@ public class AlphaBeta implements Agente{
             int n = nodosPorNivel.get(i);
             filhosPorNivel += "(nvl " + i + ":" +  n + ") ";
         }
-        return "\nMINIMAX\nnumero de nodos: " + numeroNodos + "\n" + filhosPorNivel + "\ncortes: " + cortes + "\n";
+        return "\nALPHABETA\nnumero de nodos: " + numeroNodos + "\n" + filhosPorNivel + "\ncortes: " + cortes + "\n";
     }
 }

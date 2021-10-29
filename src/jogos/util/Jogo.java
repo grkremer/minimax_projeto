@@ -193,21 +193,27 @@ public class Jogo {
             //if(rodada == PECA_BRANCA)
             if(jogador1.getCorPeca() == rodada)
             {
-                System.out.println("Vez do jogador1");
+                System.out.println("\n*****************************\nVez do jogador1");
                 j = jogador1.Mover(this, getTabuleiro());
                 System.out.println(jogador1);
                 
             }else{
-                System.out.println("Vez do jogador2");
+                System.out.println("\n*****************************\nVez do jogador2");
                 j = jogador2.Mover(this, getTabuleiro());
                 System.out.println(jogador2);
             }
             fazJogada(j, getTabuleiro(), true);
             getHistoricoJogadas().add(j);
             rodada = invertePeca(rodada);
-            //Thread.sleep(2000);
+            Thread.sleep(2000);
 
             
+        }
+
+        if(verificaVitoria(jogador1.getCorPeca(), tabuleiro)){
+            System.out.println("VITORIA jogador 1");
+        }else{
+            System.out.println("VITORIA jogador 2");
         }
         salvaLogPartida();
 

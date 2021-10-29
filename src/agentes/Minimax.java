@@ -32,58 +32,62 @@ public class Minimax implements Agente{
 
     Jogada Decide(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException{
         numeroNodos+=1;
-        if(!nodosPorNivel.containsKey(profundidadeMax)) nodosPorNivel.put(profundidadeMax,1);
-        else nodosPorNivel.put(profundidadeMax, nodosPorNivel.get(profundidadeMax)+1) ;
+        
+        //inicializar variaveis de log
+        for(int i = 0; i < profundidadeMax+1; i++){
+            nodosPorNivel.put(i,0);
+        }
+        nodosPorNivel.put(0, 1) ;
         
         
-        float max = Float.MIN_VALUE;;
+        float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
-        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
+        ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        //Collections.shuffle(possiveisJogadas);
+        for(Jogada j:possiveisJogadas){
+        
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            float valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax);
+            float valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1);
             if(valor > max)
             {
                 melhorJogada = j;
                 max = valor;
             }
         }
+        
         return melhorJogada;
     }
 
     private float Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade) throws InterruptedException{
         numeroNodos+=1;
-
-        if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
-        else nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
+        nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
         
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            float fatorDesconto = (float)Math.pow(0.99, profundidadeMax - profundidade); //TODO: GAMBIARRA BRABA MUDAR DEPOIS
-            return jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS) * fatorDesconto;
+            return jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS); //* fatorDesconto;
         }
         
-        float valor = Float.MIN_VALUE;
+        float valor = Integer.MIN_VALUE;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
             valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1));
             
         }
+
         return valor;
     }
 
     private float Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade) throws InterruptedException{
         numeroNodos+=1;
-        if(!nodosPorNivel.containsKey(profundidadeMax - profundidade)) nodosPorNivel.put(profundidadeMax - profundidade,1);
-        else nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
+        nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            float fatorDesconto = (float)Math.pow(0.99, profundidadeMax - profundidade); //TODO: GAMBIARRA BRABA MUDAR DEPOIS
-            return jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS) * fatorDesconto;
+            return jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS); //* fatorDesconto;
         }
         
-        float valor = Float.MAX_VALUE;
+        float valor = Integer.MAX_VALUE;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
