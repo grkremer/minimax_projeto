@@ -1,7 +1,6 @@
 package logging;
 
 import java.util.HashMap;
-
 import agentes.util.Nodo;
 // número de nodos
 // número de nodos por filho (Média)

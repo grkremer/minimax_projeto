@@ -13,7 +13,7 @@ public class App {
         
         //jogo.jogar(new ArvoreMonteCarlo(Jogo.PECA_BRANCA, 10000, 1), new Humano(Jogo.PECA_PRETA, janela));
         //jogo.jogar(new Humano(Jogo.PECA_BRANCA, janela), new MinimaxTree(Jogo.PECA_PRETA, 3));
-        jogo.jogar(new Humano(Jogo.PECA_BRANCA, janela), new Minimax(Jogo.PECA_PRETA, 3));
+        jogo.jogar(new Humano(Jogo.PECA_BRANCA, janela), new MinimaxTree(Jogo.PECA_PRETA, 4));
 
         //jogo.carregaLog("logs/log.txt");
         janela.replayHistoricoJogadas();

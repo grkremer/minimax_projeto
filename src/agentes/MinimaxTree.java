@@ -3,7 +3,7 @@ package agentes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-
+import logging.LogArvoreMinimax;
 import agentes.util.*;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
@@ -14,7 +14,7 @@ public class MinimaxTree implements Agente{
     NodoMinimax raiz;
     public final int MAX_PONTOS = 100;
     public final int MIN_PONTOS = -100;
-    
+    LogArvoreMinimax log;
     public MinimaxTree(int COR_PECA, int profundadeMax){
         
         this.profundidadeMax = profundadeMax;
@@ -22,7 +22,10 @@ public class MinimaxTree implements Agente{
     }
 
     public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
-        return Decide(jogo, tabuleiro, COR_PECA);
+        log = new LogArvoreMinimax();
+        Jogada j = Decide(jogo, tabuleiro, COR_PECA);
+        log.AvaliaArvore(raiz);
+        return j;
     }
 
     Jogada Decide(Jogo jogo, int[][] tabuleiro, int corPecaJogador) throws InterruptedException{
@@ -100,6 +103,6 @@ public class MinimaxTree implements Agente{
     @Override
     public String toString()
     {
-        return "";
+        return log.toString();
     }
 }

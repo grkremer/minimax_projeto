@@ -26,7 +26,8 @@ public class NodoMinimax{
         this.profundidadeNodo = profundidadeNodo;
         filhos = new HashMap<Jogada, NodoMinimax>();
     }
-
+    public HashMap<Jogada, NodoMinimax> getFilhos(){ return filhos; }
+    
     public int[][] getCopiaEstado(){ 
         int[][] cpy = new int[5][5];
         for(int i = 0; i < 5; i++){

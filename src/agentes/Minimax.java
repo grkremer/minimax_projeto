@@ -53,9 +53,7 @@ public class Minimax implements Agente{
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
             
-            String idNode = String.valueOf(profundidadeMax) + String.valueOf(profundidadeMax) + "." +counter.toString();
-            float valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, idNode);
-            
+            float valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1);
             graphBuilder.addEdge(tabuleiro, novoTabuleiro);
             counter++;
 
@@ -72,7 +70,7 @@ public class Minimax implements Agente{
         return melhorJogada;
     }
 
-    private float Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, String idNode) throws InterruptedException{
+    private float Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade) throws InterruptedException{
         numeroNodos+=1;
         nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
@@ -88,8 +86,7 @@ public class Minimax implements Agente{
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            String newIdNode = idNode + String.valueOf(profundidade) + "." + counter.toString();
-            float tmpValor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, newIdNode);
+            float tmpValor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1);
             valor = Math.max(valor, tmpValor);
             graphBuilder.addEdge(tabuleiro, novoTabuleiro);
             counter++;
@@ -100,7 +97,7 @@ public class Minimax implements Agente{
         return valor;
     }
 
-    private float Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, String idNode) throws InterruptedException{
+    private float Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade) throws InterruptedException{
         numeroNodos+=1;
         nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
@@ -115,8 +112,7 @@ public class Minimax implements Agente{
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            String newIdNode = idNode + String.valueOf(profundidade) + "." + counter.toString();
-            float tmpValor = Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1,newIdNode);
+            float tmpValor = Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1);
             valor = Math.min(valor, tmpValor);
             graphBuilder.addEdge(tabuleiro, novoTabuleiro);
             counter++;
