@@ -15,7 +15,6 @@ public class ArvoreMonteCarlo implements Agente{
     Nodo raiz;
     int COR_PECA;
     LogArvoreMonteCarlo log;
-
     public ArvoreMonteCarlo(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
         this.maxSimulacoes = maxSimulacoes;
         this.coeficienteExploracao = coeficienteExploracao;
@@ -29,7 +28,6 @@ public class ArvoreMonteCarlo implements Agente{
         raiz = new Nodo(estadoInicial, null , null, jogo.listaPossiveisJogadas(estadoInicial.getTurnoJogador(), estadoInicial.getTabuleiro()));
         Jogada j = BuscaArvoreMonteCarlo(jogo);
         log.AvaliaArvore(raiz);
-        
         return j;
         
     }
@@ -58,8 +56,9 @@ public class ArvoreMonteCarlo implements Agente{
             {
                 return expandeNodo(jogo, nodo);
             }else{ //caso contrário, retorna o filho selecionado
-                return aux; //flat
-                //nodo = aux; //não flat
+                nodo = aux; //não flat
+                //return aux; //flat
+                
             }
         
         }
@@ -155,10 +154,12 @@ public class ArvoreMonteCarlo implements Agente{
     private void propagaResultado(Nodo n, double recompensa)
     {
         Nodo bn = n;
+        double recompensaComDesconto = recompensa;
         while(!(bn == null)){
             bn.UpdateValorN();
-            bn.UpdateValorQ(recompensa);
+            bn.UpdateValorQ(recompensaComDesconto);
             bn = bn.getPai(); 
+            recompensaComDesconto*= 0.99;
         }
     }
 
@@ -196,8 +197,8 @@ public class ArvoreMonteCarlo implements Agente{
         // ganhador1: 2 turnos 0,984, 0,99| 4 turnos  0,96, 0,980 =  diferença 0,02
         // ganhador2: 50 turnos 0,6, 0,94 | 100 turnos  0,33, 0,93 = diferença 0,3
         
-        float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
-        //float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
+        //float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
+        float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
         
         if(s.getMarcaAgente() == s.getVencedor())
             valorUt = 1;

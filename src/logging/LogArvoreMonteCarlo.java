@@ -15,6 +15,8 @@ public class LogArvoreMonteCarlo {
     int maxBranching;
     //ArrayList<Integer> nodosPorNivel;
     HashMap<Integer, Integer> nodosPorNivel;
+    
+    graphvizStringBuilder graphBuilder =  new graphvizStringBuilder();
 
     float tempoExecucao;
     long startTime;
@@ -37,6 +39,7 @@ public class LogArvoreMonteCarlo {
         ProcessarArvore(raiz, 0);
         mediaBranching = sumFilhos/nodosInternos;
         tempoExecucao = (endTime - startTime)/1000f;
+        System.out.println(graphBuilder.output());
     }
 
     private void ProcessarArvore(Nodo nodo, int profundidade)
@@ -46,7 +49,7 @@ public class LogArvoreMonteCarlo {
         
 
         if(nodo == null) return;
-        
+        graphBuilder.addNode(nodo.getCopiaTabuleiro(), Float.toString((float)nodo.getValorQ()/nodo.getValorN()) + "<BR/> |" + Integer.toString(nodo.getValorN()) + "<BR/>");
         Integer numeroFilhos = nodo.getFilhos().size();
         
         if(numeroFilhos>0){
@@ -62,7 +65,10 @@ public class LogArvoreMonteCarlo {
         if(!nodosPorNivel.containsKey(profundidade)) nodosPorNivel.put(profundidade,1);
         else nodosPorNivel.put(profundidade, nodosPorNivel.get(profundidade)+1) ;
         //pega os filhos
-        for (Nodo filho : (nodo.getFilhos()).values()) ProcessarArvore(filho, profundidade+1);
+        for (Nodo filho : (nodo.getFilhos()).values()) {
+            graphBuilder.addEdge(nodo.getCopiaTabuleiro(), filho.getCopiaTabuleiro());
+            ProcessarArvore(filho, profundidade+1);
+        }
         
     }
 
