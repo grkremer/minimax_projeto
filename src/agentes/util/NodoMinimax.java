@@ -3,8 +3,6 @@ import java.util.HashMap;
 import java.util.Map;
 import jogos.util.Jogada;
 
-import java.util.ArrayList;
-
 public class NodoMinimax{
     private int[][] estado;
     private Jogada action;
@@ -27,6 +25,7 @@ public class NodoMinimax{
         filhos = new HashMap<Jogada, NodoMinimax>();
     }
 
+    public HashMap<Jogada, NodoMinimax> getFilhos(){ return filhos; }
     public int[][] getCopiaEstado(){ 
         int[][] cpy = new int[5][5];
         for(int i = 0; i < 5; i++){

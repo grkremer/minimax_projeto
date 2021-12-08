@@ -5,7 +5,7 @@ import java.util.Arrays;
 import jogos.util.*;
 
 public class TicTackle5 extends Jogo {
-    TicTackle5() {
+    public TicTackle5() {
         setNome("Tic Tackle 5");
     }
 

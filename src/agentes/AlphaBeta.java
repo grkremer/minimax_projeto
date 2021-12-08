@@ -1,7 +1,6 @@
 package agentes;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import agentes.util.Agente;
@@ -44,7 +43,7 @@ public class AlphaBeta implements Agente{
         float alpha = Float.NEGATIVE_INFINITY; 
         float beta  = Float.POSITIVE_INFINITY;
         ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
-        Collections.shuffle(possiveisJogadas);
+        
         for(Jogada j:possiveisJogadas){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
