@@ -7,7 +7,7 @@ import java.util.HashMap;
 import agentes.util.Agente;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
-
+import logging.graphvizStringBuilder;
 
 public class AlphaBeta implements Agente{
     int numeroNodos;
@@ -17,7 +17,8 @@ public class AlphaBeta implements Agente{
     int COR_PECA;
     public final int MAX_PONTOS = 100;
     public final int MIN_PONTOS = -100;
-    
+    graphvizStringBuilder graphBuilder =  new graphvizStringBuilder();
+
     public AlphaBeta(int COR_PECA, int profundadeMax){
         
         this.profundidadeMax = profundadeMax;
@@ -39,7 +40,7 @@ public class AlphaBeta implements Agente{
         }
         nodosPorNivel.put(0, 1) ;
         
-        int max = Integer.MIN_VALUE;;
+        float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
         float alpha = Float.NEGATIVE_INFINITY; 
         float beta  = Float.POSITIVE_INFINITY;
@@ -48,7 +49,9 @@ public class AlphaBeta implements Agente{
         for(Jogada j:possiveisJogadas){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta);
+            float valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta);
+            graphBuilder.addEdge(tabuleiro, novoTabuleiro);
+            
             if(valor > max)
             {
                 melhorJogada = j;
@@ -56,53 +59,74 @@ public class AlphaBeta implements Agente{
             }
         }
         
+        graphBuilder.addNode(tabuleiro, max);
+        System.out.println(graphBuilder.output());
+
         return melhorJogada;
     }
 
-    private int Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
+    private float Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
         numeroNodos+=1;
         nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
         
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            //return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            float custo = jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            graphBuilder.addNode(tabuleiro, custo);
+            return custo;
         }
         
-        int valor = Integer.MIN_VALUE;
+        float valor = Integer.MIN_VALUE;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
+            float tmpValor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta);
+            valor = Math.max(valor, tmpValor);
             
-            valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta));
+            graphBuilder.addEdge(tabuleiro, novoTabuleiro);
             if(valor >= beta){ 
                 cortes+=1;
+                graphBuilder.addNode(tabuleiro, valor);
                 return valor;
             }
+            
             alpha = Math.max(alpha, valor);
         }
+        
+        graphBuilder.addNode(tabuleiro, valor);
         return valor;
     }
 
-    private int Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
+    private float Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
         numeroNodos+=1;
         nodosPorNivel.put(profundidadeMax - profundidade, nodosPorNivel.get(profundidadeMax - profundidade)+1) ;
         
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            //return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            float custo = jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            graphBuilder.addNode(tabuleiro, custo);
+            return custo;//* fatorDesconto;
         }
         
-        int valor = Integer.MAX_VALUE;
+        float valor = Integer.MAX_VALUE;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
+            float tmpValor = Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta);
+            valor = Math.min(valor, tmpValor);
+            graphBuilder.addEdge(tabuleiro, novoTabuleiro);
             
-            valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta));
             if(valor <= alpha) {
                 cortes += 1;
+                graphBuilder.addNode(tabuleiro, valor);
+        
                 return valor;
             }
             beta = Math.min(beta, valor);
         }
+        
+        graphBuilder.addNode(tabuleiro, valor);
         return valor;
     }
 

@@ -47,7 +47,6 @@ public class Minimax implements Agente{
         ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
         //Collections.shuffle(possiveisJogadas);
         
-        Integer counter = 0;
         for(Jogada j:possiveisJogadas){
         
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
@@ -55,8 +54,6 @@ public class Minimax implements Agente{
             
             float valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1);
             graphBuilder.addEdge(tabuleiro, novoTabuleiro);
-            counter++;
-
             if(valor > max)
             {
                 melhorJogada = j;
@@ -82,18 +79,15 @@ public class Minimax implements Agente{
         }
         
         float valor = Integer.MIN_VALUE;
-        Integer counter = 0;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
             float tmpValor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1);
             valor = Math.max(valor, tmpValor);
             graphBuilder.addEdge(tabuleiro, novoTabuleiro);
-            counter++;
         }
 
         graphBuilder.addNode(tabuleiro, valor);
-        
         return valor;
     }
 
@@ -108,14 +102,12 @@ public class Minimax implements Agente{
         }
         
         float valor = Integer.MAX_VALUE;
-        Integer counter = 0;
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
             float tmpValor = Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1);
             valor = Math.min(valor, tmpValor);
             graphBuilder.addEdge(tabuleiro, novoTabuleiro);
-            counter++;
         }
         graphBuilder.addNode(tabuleiro, valor);
         return valor;

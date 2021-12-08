@@ -46,13 +46,14 @@ public class MinimaxTree implements Agente{
             Min(jogo, novoNodo);
             
         }
-        
+        raiz.setRecompensa(raiz.getMaiorRecompensaFilhos());
         return raiz.getMelhorJogada();
     }
 
     private void Max(Jogo jogo, NodoMinimax nodoAtual) throws InterruptedException{
         if(nodoAtual.getProfundidade() == profundidadeMax ||jogo.verificaFimDeJogo(nodoAtual.getEstado())){
-            float recompensa = jogo.geraCusto(nodoAtual.getCorPeca(), nodoAtual.getEstado(), MIN_PONTOS, MAX_PONTOS);
+            //float recompensa = jogo.geraCusto(nodoAtual.getCorPeca(), nodoAtual.getEstado(), MIN_PONTOS, MAX_PONTOS);
+            float recompensa = jogo.geraCusto(raiz.getCorPeca(), nodoAtual.getEstado(), MIN_PONTOS, MAX_PONTOS);
             nodoAtual.setRecompensa(recompensa);
             return;
         }
@@ -75,7 +76,8 @@ public class MinimaxTree implements Agente{
 
     private void Min(Jogo jogo, NodoMinimax nodoAtual) throws InterruptedException{
         if(nodoAtual.getProfundidade() == profundidadeMax ||jogo.verificaFimDeJogo(nodoAtual.getEstado())){
-            float recompensa = jogo.geraCusto(nodoAtual.getCorPeca(), nodoAtual.getEstado(), MIN_PONTOS, MAX_PONTOS);
+            //float recompensa = jogo.geraCusto(nodoAtual.getCorPeca(), nodoAtual.getEstado(), MIN_PONTOS, MAX_PONTOS);
+            float recompensa = jogo.geraCusto(raiz.getCorPeca(), nodoAtual.getEstado(), MIN_PONTOS, MAX_PONTOS);
             nodoAtual.setRecompensa(recompensa);
             return;
         }

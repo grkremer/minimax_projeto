@@ -68,13 +68,13 @@ public class graphvizStringBuilder {
     
     public String output(){
         try {
-            File myObj = new File("minimaxTree-4.dot");
+            File myObj = new File("alphabeta-3.dot");
             if (myObj.createNewFile()) {
               System.out.println("File created: " + myObj.getName());
             } else {
               System.out.println("File already exists.");
             }
-            FileWriter myWriter = new FileWriter("minimaxTree-4.dot");
+            FileWriter myWriter = new FileWriter("alphabeta-3.dot");
             myWriter.write("digraph{" + nodes + "\n" + edges + "}");
             myWriter.close();
             System.out.println("Successfully wrote to the file.");
