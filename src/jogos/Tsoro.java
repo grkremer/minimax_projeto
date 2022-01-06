@@ -7,7 +7,7 @@ import jogos.util.*;
 public class Tsoro extends JogoDaVelha4{
     private final int MAX_PECAS = 4;
     
-    Tsoro() {
+    public Tsoro() {
         setNome("Tsoro");
     }
 

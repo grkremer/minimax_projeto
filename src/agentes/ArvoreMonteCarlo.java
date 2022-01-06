@@ -58,8 +58,8 @@ public class ArvoreMonteCarlo implements Agente{
             {
                 return expandeNodo(jogo, nodo);
             }else{ //caso contrário, retorna o filho selecionado
-                return aux; //flat
-                //nodo = aux; //não flat
+                //return aux; //flat
+                nodo = aux; //não flat
             }
         
         }
@@ -155,10 +155,12 @@ public class ArvoreMonteCarlo implements Agente{
     private void propagaResultado(Nodo n, double recompensa)
     {
         Nodo bn = n;
+        double recompensaDescontada = recompensa;
         while(!(bn == null)){
             bn.UpdateValorN();
-            bn.UpdateValorQ(recompensa);
+            bn.UpdateValorQ(recompensaDescontada);
             bn = bn.getPai(); 
+            recompensaDescontada *= 0.9;
         }
     }
 

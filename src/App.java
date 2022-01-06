@@ -2,18 +2,18 @@ import jogos.*;
 import jogos.util.Jogo;
 import agentes.*;
 import interfaces.*;
-
+import tests.*;
 public class App {
     public static void main(String[] args) throws Exception {
-        //JanelaJogo janela = new JanelaJogo(new JogoDaVelha4());
         
-        Jogo jogo = new TicTackle5();  // new Rastros(obj player 1, obj player 2);
-        JanelaJogo janela = new JanelaJogo(jogo);
+        //Jogo jogo = new JogoDaVelha4();  // new Rastros(obj player 1, obj player 2);
+        //JanelaJogo janela = new JanelaJogo(jogo);
+        //jogo.jogar(new ABPruneTT(Jogo.PECA_PRETA, 6), new ABPrune(Jogo.PECA_BRANCA, 6));
         
-        //lembrete: atualmente alphabetaTree tem mais nodos que alphabeta
-        jogo.jogar(new Humano(Jogo.PECA_BRANCA, janela), new MinimaxTree(Jogo.PECA_PRETA, 5));
+        Simulador s = new Simulador("JOGODAVELHA4",new ABPruneTT(Jogo.PECA_BRANCA, 6), new ABPrune(Jogo.PECA_PRETA, 2));
+        s.Simular(10);
 
         //jogo.carregaLog("logs/log.txt");
-        janela.replayHistoricoJogadas();
+        //janela.replayHistoricoJogadas();
     }
 }

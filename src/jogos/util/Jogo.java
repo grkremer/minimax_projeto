@@ -31,6 +31,17 @@ public class Jogo {
     public int[][] getTabuleiro() {
         return tabuleiro;
     }
+
+    public int[][] getCopiaTabuleiro(){
+        int[][] copiaTabuleiro = new int[5][5];
+        for(int i = 0; i < 5; i++){
+            for(int j = 0; j < 5; j++){
+                copiaTabuleiro[i][j] = tabuleiro[i][j];
+            }
+        }
+        return copiaTabuleiro;
+    }
+
     public void setTabuleiro(int[][] tabuleiro) {
         this.tabuleiro = tabuleiro;
     }
@@ -190,7 +201,6 @@ public class Jogo {
         while(!verificaFimDeJogo(getTabuleiro())) {
             
             Jogada j = null;
-            //if(rodada == PECA_BRANCA)
             if(jogador1.getCorPeca() == rodada)
             {
                 System.out.println("\n*****************************\nVez do jogador1");

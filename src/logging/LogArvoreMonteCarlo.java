@@ -23,8 +23,8 @@ public class LogArvoreMonteCarlo {
         //nodosPorNivel = new ArrayList<Integer>();
         nodosPorNivel = new HashMap<Integer,Integer>();
         numeroNodos = 0;
-        nodosInternos = 0;
-        sumFilhos = 0;
+        nodosInternos = 1;
+        sumFilhos = 1;
         mediaBranching = 0;
         maxBranching = 0;
         tempoExecucao = 0;
@@ -50,8 +50,10 @@ public class LogArvoreMonteCarlo {
         Integer numeroFilhos = nodo.getFilhos().size();
         
         if(numeroFilhos>0){
-            nodosInternos += 1;
-            sumFilhos += numeroFilhos;
+            if(numeroFilhos > 1)
+            
+                nodosInternos += 1; //VER ISSO AQUI MONTE-CARLO TEM MUITOS NODOS COM APENAS 1 FILHO
+                sumFilhos += numeroFilhos;
         }
 
         //atualiza maxBranching

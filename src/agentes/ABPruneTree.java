@@ -7,14 +7,14 @@ import jogos.util.Jogada;
 import jogos.util.Jogo;
 import logging.LogMinimax;
 
-public class AlphabetaTree implements Agente{
+public class ABPruneTree implements Agente{
     int profundidadeMax;
     int COR_PECA;
     NodoMinimax raiz;
     public final int MAX_PONTOS = 100;
     public final int MIN_PONTOS = -100;
     LogMinimax log;
-    public AlphabetaTree(int COR_PECA, int profundadeMax){
+    public ABPruneTree(int COR_PECA, int profundadeMax){
         
         this.profundidadeMax = profundadeMax;
         this.COR_PECA = COR_PECA;
