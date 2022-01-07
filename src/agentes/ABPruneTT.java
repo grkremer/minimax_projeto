@@ -21,21 +21,18 @@ public class ABPruneTT implements Agente{
         this.maxDepth = profundidadeMax;
     }
     public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
-        totalNodes = 0; 
+        totalNodes = 1; 
         double max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
-        float alpha = -1000; //Float.NEGATIVE_INFINITY; 
-        float beta  = 1000; //Float.POSITIVE_INFINITY;
-        ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(COR_PECA, tabuleiro);
-        
-        for(Jogada j:possiveisJogadas){
+        int opponentPiece = jogo.invertePeca(COR_PECA);
+        for(Jogada j:jogo.listaPossiveisJogadas(COR_PECA, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            double valor = -1*Negamax(jogo, novoTabuleiro, jogo.invertePeca(COR_PECA), maxDepth-1, -beta, -alpha);
-            if(valor > max)
+            double value = -Negamax(jogo, novoTabuleiro, opponentPiece, maxDepth-1); 
+            if(value > max)
             {
                 melhorJogada = j;
-                max = valor;
+                max = value;
             }
         }
         
@@ -43,6 +40,23 @@ public class ABPruneTT implements Agente{
         
     }
     
+    public double Negamax(Jogo game, int[][] board, int currentPiece, int depth) throws InterruptedException{ 
+        totalNodes+=1;
+        if(depth == 0 ||game.verificaFimDeJogo(board)){
+            return game.geraCusto(currentPiece, board, -100, +100);
+        }
+        
+        double max = Integer.MIN_VALUE;
+        int opponentPiece = game.invertePeca(currentPiece);
+        for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
+            int[][] newBoard = game.criaCopiaTabuleiro(board);
+            game.fazJogada(j, newBoard, false);
+            max = Math.max(max, -Negamax(game, newBoard, opponentPiece, depth-1));
+        }
+        return max;
+    }
+
+    /*
     public double Negamax(Jogo game, int[][] board, int currentPiece, int depth, double alpha, double beta) throws InterruptedException{ 
         totalNodes+=1;
         if(depth == 0 ||game.verificaFimDeJogo(board)){
@@ -54,7 +68,7 @@ public class ABPruneTT implements Agente{
         for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
             int[][] newBoard = game.criaCopiaTabuleiro(board);
             game.fazJogada(j, newBoard, false);
-            double tmpValue = -1*Negamax(game, newBoard, game.invertePeca(currentPiece), depth-1, -beta, -alpha);
+            double tmpValue = -Negamax(game, newBoard, game.invertePeca(currentPiece), depth-1, -beta, -alpha);
             
             if(tmpValue > bestValue){ bestValue = tmpValue; }
             if(bestValue > alpha){ alpha = bestValue; }
@@ -66,6 +80,7 @@ public class ABPruneTT implements Agente{
         }
         return alpha;
     }
+    */
 
     /* 
     public double Negamax(Jogo game, int[][] board, int currentPiece, int depth, double alpha, double beta) throws InterruptedException{ 

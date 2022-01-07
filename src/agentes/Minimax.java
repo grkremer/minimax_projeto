@@ -28,12 +28,12 @@ public class Minimax implements Agente{
     Jogada Decide(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException{
         float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
-        
+        int opponentPiece = jogo.invertePeca(corPecaAtual);
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
         
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            float valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1);
+            float valor = Min(jogo, novoTabuleiro, corPecaJogador, opponentPiece, profundidadeMax-1);
             if(valor > max)
             {
                 melhorJogada = j;
@@ -50,10 +50,11 @@ public class Minimax implements Agente{
         }
         
         float valor = Integer.MIN_VALUE;
+        int opponentPiece = jogo.invertePeca(corPecaAtual);
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1));
+            valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, opponentPiece, profundidade-1));
             
         }
         return valor;
@@ -65,10 +66,11 @@ public class Minimax implements Agente{
         }
         
         float valor = Integer.MAX_VALUE;
+        int opponentPiece = jogo.invertePeca(corPecaAtual);
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1));
+            valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, opponentPiece, profundidade-1));
             
         }
         return valor;
