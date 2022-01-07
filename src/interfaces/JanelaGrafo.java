@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 
-import agentes.ArvoreDeJogadas;
+import agentes.backup.ArvoreDeJogadas;
 
 public class JanelaGrafo extends JFrame {
     private mxGraph grafo;

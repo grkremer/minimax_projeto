@@ -54,8 +54,8 @@ public class Minimax implements Agente{
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, opponentPiece, profundidade-1));
-            
+            valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, opponentPiece, profundidade-1) * 0.99f) ;
+             
         }
         return valor;
     }
@@ -70,8 +70,8 @@ public class Minimax implements Agente{
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, opponentPiece, profundidade-1));
-            
+            valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, opponentPiece, profundidade-1) * 0.99f);
+             
         }
         return valor;
     }

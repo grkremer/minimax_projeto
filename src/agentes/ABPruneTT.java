@@ -16,19 +16,20 @@ public class ABPruneTT implements Agente{
     int totalNodes = 0;
     int cutoffs = 0;
     public ABPruneTT (int COR_PECA, int profundidadeMax) {
-        transpositionTable = new HashMap<String, TTEntry>();
         this.COR_PECA = COR_PECA;
         this.maxDepth = profundidadeMax;
     }
     public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
         totalNodes = 1; 
-        double max = Integer.MIN_VALUE;;
+        transpositionTable = new HashMap<String, TTEntry>();
+        float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
         int opponentPiece = jogo.invertePeca(COR_PECA);
         for(Jogada j:jogo.listaPossiveisJogadas(COR_PECA, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            double value = -Negamax(jogo, novoTabuleiro, opponentPiece, maxDepth-1); 
+            //float value = -Negamax(jogo, novoTabuleiro, opponentPiece, maxDepth-1, -1); 
+            float value = -NegamaxTT(jogo, novoTabuleiro, opponentPiece, maxDepth-1, Integer.MIN_VALUE, Integer.MAX_VALUE, -1); 
             if(value > max)
             {
                 melhorJogada = j;
@@ -40,38 +41,36 @@ public class ABPruneTT implements Agente{
         
     }
     
-    public double Negamax(Jogo game, int[][] board, int currentPiece, int depth) throws InterruptedException{ 
+    public float Negamax(Jogo game, int[][] board, int currentPiece, int depth, int sign) throws InterruptedException{ 
         totalNodes+=1;
+        
         if(depth == 0 ||game.verificaFimDeJogo(board)){
-            return game.geraCusto(currentPiece, board, -100, +100);
+            return game.geraCusto(COR_PECA, board, -100, +100) * sign;
         }
         
-        double max = Integer.MIN_VALUE;
+        float max = Integer.MIN_VALUE;
         int opponentPiece = game.invertePeca(currentPiece);
         for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
             int[][] newBoard = game.criaCopiaTabuleiro(board);
             game.fazJogada(j, newBoard, false);
-            max = Math.max(max, -Negamax(game, newBoard, opponentPiece, depth-1));
+            max = Math.max(max, -Negamax(game, newBoard, opponentPiece, depth-1, sign*-1) * 0.99f);
         }
         return max;
     }
 
-    /*
-    public double Negamax(Jogo game, int[][] board, int currentPiece, int depth, double alpha, double beta) throws InterruptedException{ 
+    public float Negamax(Jogo game, int[][] board, int currentPiece, int depth, float alpha, float beta, int sign) throws InterruptedException{ 
         totalNodes+=1;
+        
         if(depth == 0 ||game.verificaFimDeJogo(board)){
-            
-            return (int)game.geraCusto(COR_PECA, board, -100, +100);
+            return game.geraCusto(COR_PECA, board, -100, +100) * sign;
         }
         
-        double bestValue = Integer.MIN_VALUE;
+        //float max = Integer.MIN_VALUE;
+        int opponentPiece = game.invertePeca(currentPiece);
         for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
             int[][] newBoard = game.criaCopiaTabuleiro(board);
             game.fazJogada(j, newBoard, false);
-            double tmpValue = -Negamax(game, newBoard, game.invertePeca(currentPiece), depth-1, -beta, -alpha);
-            
-            if(tmpValue > bestValue){ bestValue = tmpValue; }
-            if(bestValue > alpha){ alpha = bestValue; }
+            alpha = Math.max(alpha, -Negamax(game, newBoard, opponentPiece, depth-1, -beta, -alpha, sign*-1) * 0.99f);
             
             if (alpha >= beta) {
                 cutoffs++;
@@ -80,11 +79,9 @@ public class ABPruneTT implements Agente{
         }
         return alpha;
     }
-    */
 
-    /* 
-    public double Negamax(Jogo game, int[][] board, int currentPiece, int depth, double alpha, double beta) throws InterruptedException{ 
-        
+    public float NegamaxTT(Jogo game, int[][] board, int currentPiece, int depth, float alpha, float beta, int sign) throws InterruptedException{ 
+        totalNodes+=1;
         // Transposition Table Lookup; node is the lookup key for ttEntry 
         String boardHash = getHash(board);
         TTEntry ttEntry = transpositionTable.get(boardHash);
@@ -94,6 +91,7 @@ public class ABPruneTT implements Agente{
         if (ttEntry != null && ttEntry.depth >= depth){ 
             
             if(ttEntry.flag == Flag.EXACT){
+                transpositions++;
                 return ttEntry.value;
             }
         
@@ -107,32 +105,26 @@ public class ABPruneTT implements Agente{
         }
 
         if(alpha >= beta){
-            transpositions++;
+            cutoffs++;
             return ttEntry.value;
         }
 
-        // negasearch
         if(depth == 0 ||game.verificaFimDeJogo(board)){
-            
-            return (int)game.geraCusto(COR_PECA, board, -100, +100);
+            return game.geraCusto(COR_PECA, board, -100, +100) * sign;
         }
         
-        double value = Integer.MIN_VALUE;
-         
-        
-        
+        float value = Integer.MIN_VALUE;
+        int opponentPiece = game.invertePeca(currentPiece);
         for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
             int[][] newBoard = game.criaCopiaTabuleiro(board);
             game.fazJogada(j, newBoard, false);
-            double tmp = -Negamax(game, newBoard, game.invertePeca(currentPiece), depth-1, -beta, -alpha);
-            value = Math.max(value, tmp);
+            value = Math.max(alpha, -NegamaxTT(game, newBoard, opponentPiece, depth-1, -beta, -alpha, sign*-1) * 0.99f);
             alpha = Math.max(alpha, value);
             if (alpha >= beta) {
+                cutoffs++;
                 break;
             }
         }
-        
-    
 
         // Transposition Table Store; node is the lookup key for ttEntry 
         if(ttEntry == null)
@@ -142,7 +134,7 @@ public class ABPruneTT implements Agente{
         if(value <= alphaOrig) {
             ttEntry.flag = Flag.UPPERBOUND;
         }
-        else if(value >= beta){
+        else if(alpha >= beta){
             ttEntry.flag = Flag.LOWERBOUND;
         }
         else{
@@ -153,9 +145,8 @@ public class ABPruneTT implements Agente{
 
         return value;
     }
-    */
 
-    public int getProfundidade(){ return maxDepth; }
+   public int getProfundidade(){ return maxDepth; }
     public int getCorPeca(){ return COR_PECA; }
     private String getHash(int[][] board){
         String hash = "";

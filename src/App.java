@@ -10,7 +10,7 @@ public class App {
         //JanelaJogo janela = new JanelaJogo(jogo);
         //jogo.jogar(new ABPruneTT(Jogo.PECA_PRETA, 6), new ABPrune(Jogo.PECA_BRANCA, 6));
         
-        Simulador s = new Simulador("JOGODAVELHA4",new ABPruneTT(Jogo.PECA_BRANCA, 5), new Minimax(Jogo.PECA_PRETA, 3));
+        Simulador s = new Simulador("JOGODAVELHA4",new ABPruneTT(Jogo.PECA_BRANCA, 5), new ABPrune(Jogo.PECA_PRETA, 5));
         s.Simular(10);
 
         //jogo.carregaLog("logs/log.txt");

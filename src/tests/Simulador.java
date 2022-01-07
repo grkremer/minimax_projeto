@@ -76,7 +76,7 @@ public class Simulador {
                     }else{
                         System.out.println(agente1);
                     }
-                    
+                    //System.out.println(agente1);
                 }else{
                     
                     
@@ -87,11 +87,12 @@ public class Simulador {
                     }else{
                         System.out.println(agente2);
                     }
+                    //System.out.println(agente2);
                     
                 }
                 jogo.fazJogada(j, jogo.getTabuleiro(), true);
                 rodada = jogo.invertePeca(rodada);
-               
+                //Thread.sleep(2000);
             }
             if(jogo.verificaVitoria(agente1.getCorPeca(), jogo.getTabuleiro())){
                 System.out.println("VITORIA jogador 1");

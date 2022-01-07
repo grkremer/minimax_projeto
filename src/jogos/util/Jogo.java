@@ -215,7 +215,7 @@ public class Jogo {
             fazJogada(j, getTabuleiro(), true);
             getHistoricoJogadas().add(j);
             rodada = invertePeca(rodada);
-            Thread.sleep(2000);
+            //Thread.sleep(2000);
 
             
         }

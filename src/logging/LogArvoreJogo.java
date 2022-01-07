@@ -2,7 +2,7 @@ package logging;
 
 import java.util.HashMap;
 
-import agentes.ArvoreDeJogadas;
+import agentes.backup.ArvoreDeJogadas;
 // número de nodos
 // número de nodos por filho (Média)
 // número máximo de filhos por nodo (Max)

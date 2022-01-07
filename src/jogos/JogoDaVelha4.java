@@ -1,7 +1,7 @@
 package jogos;
 import java.util.ArrayList;
 
-import agentes.ArvoreDeJogadas;
+import agentes.backup.ArvoreDeJogadas;
 import jogos.util.*;
 
 public class JogoDaVelha4 extends Jogo {
