@@ -5,6 +5,7 @@ import jogos.*;
 import jogos.util.Jogo;
 import jogos.util.Jogada;
 import agentes.*;
+import agentes.backup.ArvoreMinimax;
 import interfaces.*;
 public class Simulador {
     String IDJogo;
@@ -70,29 +71,29 @@ public class Simulador {
                     j = agente1.Mover(jogo, jogo.getTabuleiro());
                     
                     
-                    if(!(agente1 instanceof ArvoreMonteCarlo)){
+                    if(!(agente1 instanceof MonteCarloTree)){
                         //agenteLog1.Mover(jogo, jogo.getTabuleiro());
                         //System.out.println(agenteLog1);
                     }else{
-                        System.out.println(agente1);
+                        //System.out.println(agente1);
                     }
-                    //System.out.println(agente1);
+                    System.out.println(agente1);
                 }else{
                     
                     
                     j = agente2.Mover(jogo, jogo.getTabuleiro());
-                    if(!(agente2 instanceof ArvoreMonteCarlo)){
-                        //agenteLog2.Mover(jogo, jogo.getTabuleiro());
-                        //System.out.println(agenteLog2);
+                    if(!(agente2 instanceof MonteCarloTree)){
+                        agenteLog2.Mover(jogo, jogo.getTabuleiro());
+                        System.out.println(agenteLog2);
                     }else{
                         System.out.println(agente2);
                     }
-                    //System.out.println(agente2);
+                    System.out.println(agente2);
                     
                 }
                 jogo.fazJogada(j, jogo.getTabuleiro(), true);
                 rodada = jogo.invertePeca(rodada);
-                //Thread.sleep(2000);
+                //Thread.sleep(1000);
             }
             if(jogo.verificaVitoria(agente1.getCorPeca(), jogo.getTabuleiro())){
                 System.out.println("VITORIA jogador 1");

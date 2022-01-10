@@ -117,6 +117,40 @@ public class JogoDaVelha4 extends Jogo {
         return possiveisJogadas;
     }
     
+
+    public Boolean maximoAlinhado(int corPeca, int[][] tabuleiro){
+    
+        int lineSequence = 0;
+        int columnSequence = 0;
+        int dpSequence = 0; //diagonal principal
+        int dsSequence = 0; //diagonal secundaria
+
+        //testa 4 alinhamentos
+        for(int i = 0; i < 4; i++){
+            //diagonal princial
+            if ( (tabuleiro[i][i] == corPeca) && (tabuleiro[i + 1][i + 1] == corPeca)) { dpSequence++; }
+            //diagonal secundária
+            if ( (tabuleiro[i][4 - i] == corPeca) && tabuleiro[i + 1][4 - (i + 1)] == corPeca) { dsSequence++; }
+
+            for (int j = 0; j < 4; j++)
+            {
+                //em linha
+                if ((tabuleiro[j][i]== corPeca) && (tabuleiro[j+1][i] == corPeca)) { lineSequence++; }
+                //em coluna
+                if ( (tabuleiro[i][j] == corPeca) && (tabuleiro[i][j+1] == corPeca)) { columnSequence++; }
+                
+            }
+
+            if(lineSequence > 2 || columnSequence > 2) return true;
+            lineSequence = 0;
+            columnSequence = 0;
+        }
+        if(dpSequence > 2 || dsSequence > 2) return true;
+        else return false;
+
+    }
+
+/* BACKUP
     public int maximoAlinhado(int corPeca, int[][] tabuleiro) {
         int maximo = 0;
         int contagem;
@@ -227,7 +261,7 @@ public class JogoDaVelha4 extends Jogo {
         }
         return maximo;
     }
-
+*/
     public boolean tentaAcharTripla(int corPeca, int[][] tabuleiro) {
 
         for(int y=0; y < ALTURA_TABULEIRO; y++) //horizontal
@@ -298,12 +332,15 @@ public class JogoDaVelha4 extends Jogo {
 
     @Override
     public boolean verificaVitoria(int corPeca, int[][] tabuleiro) {
+        return maximoAlinhado(corPeca, tabuleiro);
+        /* 
         if(maximoAlinhado(corPeca, tabuleiro) >= 4) {
             return true;
         }
         else {
             return false;
         }
+        */
     }
     @Override
     public boolean verificaFimDeJogo(int[][] tabuleiro) {

@@ -8,7 +8,7 @@ import jogos.util.Jogada;
 import jogos.util.Jogo;
 import logging.LogArvoreMonteCarlo;
 
-public class ArvoreMonteCarlo implements Agente{
+public class MonteCarloTree implements Agente{
     
     int maxSimulacoes;
     double coeficienteExploracao;
@@ -16,7 +16,7 @@ public class ArvoreMonteCarlo implements Agente{
     int COR_PECA;
     LogArvoreMonteCarlo log;
 
-    public ArvoreMonteCarlo(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
+    public MonteCarloTree(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
         this.maxSimulacoes = maxSimulacoes;
         this.coeficienteExploracao = coeficienteExploracao;
         this.COR_PECA = COR_PECA;
@@ -109,11 +109,10 @@ public class ArvoreMonteCarlo implements Agente{
         Jogada movimento = movimentos.get(0);
         
         Estado estadoPai = nodoPai.getEstado();
-        Estado novoEstado = novoEstado(jogo, estadoPai, movimento);
         
+        Estado novoEstado = novoEstado(jogo, estadoPai, movimento);
         ArrayList<Jogada> possiveisMovimentos = jogo.listaPossiveisJogadas(novoEstado.getTurnoJogador(), novoEstado.getTabuleiro());
         nodoPai.removePossivelAcao(movimento);
-        
         Nodo novoNodo = new Nodo(novoEstado, nodoPai, movimento, possiveisMovimentos);
         nodoPai.insereNovoFilho(movimento, novoNodo);
         
@@ -159,6 +158,7 @@ public class ArvoreMonteCarlo implements Agente{
         while(!(bn == null)){
             bn.UpdateValorN();
             bn.UpdateValorQ(recompensaDescontada);
+            //bn.Learn(recompensaDescontada);
             bn = bn.getPai(); 
             recompensaDescontada *= 0.9;
         }
@@ -166,6 +166,7 @@ public class ArvoreMonteCarlo implements Agente{
 
     private double calculaUCB(Nodo n) {
         double recompensa = n.getValorQ()/n.getValorN();
+        //double recompensa = n.getValorQ();
         double exploracao = coeficienteExploracao * Math.sqrt( (2*Math.log(n.getPai().getValorN()))/n.getValorN() );
         return recompensa + exploracao;
     }
@@ -198,8 +199,8 @@ public class ArvoreMonteCarlo implements Agente{
         // ganhador1: 2 turnos 0,984, 0,99| 4 turnos  0,96, 0,980 =  diferença 0,02
         // ganhador2: 50 turnos 0,6, 0,94 | 100 turnos  0,33, 0,93 = diferença 0,3
         
-        float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
-        //float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
+        //float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
+        float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
         
         if(s.getMarcaAgente() == s.getVencedor())
             valorUt = 1;
@@ -227,24 +228,10 @@ public class ArvoreMonteCarlo implements Agente{
 
     }
 
- // *pode ser usada para melhorar desempenho
-    private Jogada avaliaMovimentos(Jogo jogo, ArrayList<Jogada> movimentos, Estado atual) throws InterruptedException{
-        
-        float max = -100;
-        Jogada mov = null;
-        for(Jogada m: movimentos){
-            int[][] novoTabuleiro = atual.getCopiaTabuleiro();
-            jogo.fazJogada(m, novoTabuleiro, false);
-            float aux = (float)jogo.geraCusto(atual.getTurnoJogador(), novoTabuleiro, -100, 100);
-            if(aux > max){
-                max = aux;
-                mov = m;
-            }
-        }
-        return mov;
+    public Nodo getRaiz(){
+        return raiz;
     }
 
-    public Nodo getRaiz(){return raiz;}
     public int getCorPeca(){
         return COR_PECA;
     }

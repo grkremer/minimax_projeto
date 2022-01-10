@@ -15,28 +15,37 @@ public class ABPruneTT implements Agente{
     int transpositions = 0;
     int totalNodes = 0;
     int cutoffs = 0;
+    float tempoExecucao;
+    long startTime;
+    long endTime;
+    
     public ABPruneTT (int COR_PECA, int profundidadeMax) {
         this.COR_PECA = COR_PECA;
         this.maxDepth = profundidadeMax;
     }
+    
     public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
         totalNodes = 1; 
-        transpositionTable = new HashMap<String, TTEntry>();
+        tempoExecucao = 0;
+        startTime = System.currentTimeMillis();
+        this.transpositionTable = new HashMap<String, TTEntry>();
         float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
         int opponentPiece = jogo.invertePeca(COR_PECA);
+        
         for(Jogada j:jogo.listaPossiveisJogadas(COR_PECA, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            //float value = -Negamax(jogo, novoTabuleiro, opponentPiece, maxDepth-1, -1); 
-            float value = -NegamaxTT(jogo, novoTabuleiro, opponentPiece, maxDepth-1, Integer.MIN_VALUE, Integer.MAX_VALUE, -1); 
+            float value = -NegamaxTT(jogo, novoTabuleiro, opponentPiece, maxDepth-1, -1); 
+            //float value = -NegamaxTT(jogo, novoTabuleiro, opponentPiece, maxDepth-1, Integer.MIN_VALUE, Integer.MAX_VALUE, -1); 
             if(value > max)
             {
                 melhorJogada = j;
                 max = value;
             }
         }
-        
+        endTime = System.currentTimeMillis();
+        tempoExecucao = (endTime - startTime)/1000f;
         return melhorJogada;
         
     }
@@ -80,13 +89,47 @@ public class ABPruneTT implements Agente{
         return alpha;
     }
 
+    public float NegamaxTT(Jogo game, int[][] board, int currentPiece, int depth, int sign) throws InterruptedException{ 
+        totalNodes++;
+        
+        // Transposition Table Lookup; node is the lookup key for ttEntry 
+        String boardHash = getHash(board);
+        TTEntry ttEntry = transpositionTable.get(boardHash);
+        
+        //para usar o valor da tabela ela deve ser igual ou mais profunda que a avaliação atual
+        if (ttEntry != null && ttEntry.depth >= depth){ 
+            transpositions++;
+            return ttEntry.value;
+            
+        }
+
+        if(depth == 0 || game.verificaFimDeJogo(board)){
+            return game.geraCusto(COR_PECA, board, -100, +100) * sign;
+        }
+        
+        float max = Integer.MIN_VALUE;
+        int opponentPiece = game.invertePeca(currentPiece);
+        for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
+            int[][] newBoard = game.criaCopiaTabuleiro(board);
+            game.fazJogada(j, newBoard, false);
+            max = Math.max(max, -NegamaxTT(game, newBoard, opponentPiece, depth-1, sign*-1) * 0.99f);
+        }
+
+        ttEntry = new TTEntry();
+        ttEntry.value = max;
+        ttEntry.depth = depth;
+        transpositionTable.put(boardHash, ttEntry);
+
+        return max;
+    }
+
     public float NegamaxTT(Jogo game, int[][] board, int currentPiece, int depth, float alpha, float beta, int sign) throws InterruptedException{ 
-        totalNodes+=1;
+        totalNodes++;
+        
         // Transposition Table Lookup; node is the lookup key for ttEntry 
         String boardHash = getHash(board);
         TTEntry ttEntry = transpositionTable.get(boardHash);
         double alphaOrig = alpha;
-        totalNodes++;
         //para usar o valor da tabela ela deve ser igual ou mais profunda que a avaliação atual
         if (ttEntry != null && ttEntry.depth >= depth){ 
             
@@ -160,6 +203,6 @@ public class ABPruneTT implements Agente{
     
     @Override
     public String toString(){
-        return "transpositions: " + transpositions + "\ncutoffs: " + cutoffs +  "\ntotal nodes: " + totalNodes;
+        return "transpositions: " + transpositions + "\ncutoffs: " + cutoffs +  "\ntotal nodes: " + totalNodes + "\ntempo de execução: " + tempoExecucao + "s";
     }
 }

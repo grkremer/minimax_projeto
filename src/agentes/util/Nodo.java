@@ -27,6 +27,12 @@ public class Nodo{
 
 
     public void UpdateValorN(){ valorN += 1;}
+    
+    public void Learn(double reward){
+        double learningRate = 1;
+        this.valorQ = this.valorQ + learningRate * (reward - this.valorQ );
+    }
+
     public void UpdateValorQ(double valorQ){  this.valorQ += valorQ; }
     public HashMap<Jogada, Nodo> getFilhos(){ return filhos; }
     public Estado getEstado(){ return estado; }
