@@ -8,15 +8,24 @@ import jogos.util.Jogada;
 import jogos.util.Jogo;
 import logging.LogArvoreMonteCarlo;
 
-public class MonteCarloTree implements Agente{
+/* 
+    Monte-Carlo Tree Search (MCTS) using UCB1 policy
+*/
+public class MCTS implements Agente{
     
     int maxSimulacoes;
     double coeficienteExploracao;
-    Nodo raiz;
+    NodoMonteCarlo raiz;
     int COR_PECA;
     LogArvoreMonteCarlo log;
+    
+    private final String ID = "MCTS";
+    private Jogo lastGamePlayed;
+    protected float tempoExecucao;
+    protected long startTime;
+    protected long endTime;
 
-    public MonteCarloTree(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
+    public MCTS(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
         this.maxSimulacoes = maxSimulacoes;
         this.coeficienteExploracao = coeficienteExploracao;
         this.COR_PECA = COR_PECA;
@@ -24,12 +33,15 @@ public class MonteCarloTree implements Agente{
 
     public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
         
-        log = new LogArvoreMonteCarlo();
-        Estado estadoInicial = new Estado(tabuleiro, COR_PECA, false, 0, COR_PECA, 0);
-        raiz = new Nodo(estadoInicial, null , null, jogo.listaPossiveisJogadas(estadoInicial.getTurnoJogador(), estadoInicial.getTabuleiro()));
-        Jogada j = BuscaArvoreMonteCarlo(jogo);
-        log.AvaliaArvore(raiz);
         
+        Estado estadoInicial = new Estado(tabuleiro, COR_PECA, false, 0, COR_PECA, 0);
+        initializeVariables();
+        raiz = new NodoMonteCarlo(estadoInicial, null , null, jogo.listaPossiveisJogadas(estadoInicial.getTurnoJogador(), estadoInicial.getTabuleiro()));
+        Jogada j = BuscaArvoreMonteCarlo(jogo);
+        closeVariables();
+        lastGamePlayed = jogo;
+
+        System.out.println("nodes: " + String.valueOf(maxSimulacoes) + "\ttime: " + String.valueOf(tempoExecucao) + "s");
         return j;
         
     }
@@ -37,7 +49,7 @@ public class MonteCarloTree implements Agente{
    private Jogada BuscaArvoreMonteCarlo(Jogo jogo) throws InterruptedException{ 
         
         for(int it = 0; Condicional(it); it++){
-            Nodo novoNodo = selecionaNodo(jogo, raiz);
+            NodoMonteCarlo novoNodo = selecionaNodo(jogo, raiz);
             double recompensa = simulaJogo(jogo, novoNodo);
             propagaResultado(novoNodo, recompensa);
 
@@ -46,12 +58,12 @@ public class MonteCarloTree implements Agente{
     }
 
 
-    private Nodo selecionaNodo(Jogo jogo, Nodo raiz) throws InterruptedException{
-        Nodo nodo = raiz;
+    private NodoMonteCarlo selecionaNodo(Jogo jogo, NodoMonteCarlo raiz) throws InterruptedException{
+        NodoMonteCarlo nodo = raiz;
         //enquanto o nodo não for uma folha
         while(!nodo.filhosIsEmpty()){
             
-            Nodo aux = politicaCaminhamento(nodo);
+            NodoMonteCarlo aux = politicaCaminhamento(nodo);
 
             //se a politica retornar um nodo vazio, cria um novo filho pro nodo 
             if(aux.getAction() == null)
@@ -69,25 +81,25 @@ public class MonteCarloTree implements Agente{
 
 
     // calcula UCB1 de todos os nodos filhos
-    private Nodo politicaCaminhamento(Nodo nodo){
+    private NodoMonteCarlo politicaCaminhamento(NodoMonteCarlo nodo){
         
-        Nodo novaAcao = null;
+        NodoMonteCarlo novaAcao = null;
         double maxUCB = -100;
-        Nodo maxNodo = null;
+        NodoMonteCarlo maxNodo = null;
 
         //se ainda for possivel fazer um novo movimento no nodo,
         // avalia o valor de ucb de uma nova acao
         if(!nodo.possiveisMovimentosIsEmpty())
         {
             //da valor UCB para aplicar uma nova acao
-            novaAcao = new Nodo(null, nodo, null, null);
+            novaAcao = new NodoMonteCarlo(null, nodo, null, null);
             novaAcao.UpdateValorN();
             maxUCB = calculaUCB(novaAcao);
             maxNodo = novaAcao; //null
         }
         
 
-        for(Nodo n : (nodo.getFilhos()).values()){
+        for(NodoMonteCarlo n : (nodo.getFilhos()).values()){
             double newUCB  = calculaUCB(n);
             if(maxUCB < newUCB){
                 maxNodo = n;
@@ -98,7 +110,7 @@ public class MonteCarloTree implements Agente{
     }
 
     //expande um nodo
-    private Nodo expandeNodo(Jogo jogo, Nodo nodoPai) throws InterruptedException{ 
+    private NodoMonteCarlo expandeNodo(Jogo jogo, NodoMonteCarlo nodoPai) throws InterruptedException{ 
         
 
         ArrayList<Jogada> movimentos = nodoPai.getPossiveisMovimentos();
@@ -113,7 +125,7 @@ public class MonteCarloTree implements Agente{
         Estado novoEstado = novoEstado(jogo, estadoPai, movimento);
         ArrayList<Jogada> possiveisMovimentos = jogo.listaPossiveisJogadas(novoEstado.getTurnoJogador(), novoEstado.getTabuleiro());
         nodoPai.removePossivelAcao(movimento);
-        Nodo novoNodo = new Nodo(novoEstado, nodoPai, movimento, possiveisMovimentos);
+        NodoMonteCarlo novoNodo = new NodoMonteCarlo(novoEstado, nodoPai, movimento, possiveisMovimentos);
         nodoPai.insereNovoFilho(movimento, novoNodo);
         
         return novoNodo;
@@ -121,7 +133,7 @@ public class MonteCarloTree implements Agente{
     
     //simula partida ate encontrar fim de jogo *nao adiciona nada arvore
     // * talvez não instanciar Estado durante a simulação
-    private double simulaJogo(Jogo jogo, Nodo inicio) throws InterruptedException{
+    private double simulaJogo(Jogo jogo, NodoMonteCarlo inicio) throws InterruptedException{
         Estado estadoSimulado = inicio.getEstado();
         
         //só o proximo movimento com heuristica
@@ -135,7 +147,7 @@ public class MonteCarloTree implements Agente{
         estadoSimulado = novoEstado(jogo, estadoSimulado, movimento); 
 
         int it = 0;
-        while(!estadoSimulado.isFimJogo() && it < 1000)
+        while(!estadoSimulado.isFimJogo() && it < 100)
         {
             it++;
             movimentos = jogo.listaPossiveisJogadas(estadoSimulado.getTurnoJogador(), estadoSimulado.getCopiaTabuleiro());
@@ -151,9 +163,9 @@ public class MonteCarloTree implements Agente{
     }
 
     // atualiza arvore
-    private void propagaResultado(Nodo n, double recompensa)
+    private void propagaResultado(NodoMonteCarlo n, double recompensa)
     {
-        Nodo bn = n;
+        NodoMonteCarlo bn = n;
         double recompensaDescontada = recompensa;
         while(!(bn == null)){
             bn.UpdateValorN();
@@ -164,7 +176,7 @@ public class MonteCarloTree implements Agente{
         }
     }
 
-    private double calculaUCB(Nodo n) {
+    private double calculaUCB(NodoMonteCarlo n) {
         double recompensa = n.getValorQ()/n.getValorN();
         //double recompensa = n.getValorQ();
         double exploracao = coeficienteExploracao * Math.sqrt( (2*Math.log(n.getPai().getValorN()))/n.getValorN() );
@@ -180,8 +192,8 @@ public class MonteCarloTree implements Agente{
     private Jogada escolheMelhorJogada(){
         double bestReward = Double.NEGATIVE_INFINITY;
         Jogada j = null;
-        for(Map.Entry<Jogada,Nodo> n: (raiz.getFilhos()).entrySet()){
-            Nodo aux = n.getValue();
+        for(Map.Entry<Jogada,NodoMonteCarlo> n: (raiz.getFilhos()).entrySet()){
+            NodoMonteCarlo aux = n.getValue();
             double rw = (aux.getValorQ()/aux.getValorN()) - coeficienteExploracao * Math.sqrt( (2*Math.log(aux.getPai().getValorN()))/aux.getValorN() );
             
             if(rw > bestReward){
@@ -228,7 +240,32 @@ public class MonteCarloTree implements Agente{
 
     }
 
-    public Nodo getRaiz(){
+    protected void initializeVariables(){
+        tempoExecucao = 0;
+        startTime = System.currentTimeMillis();  
+    }
+
+    protected void closeVariables(){
+        endTime = System.currentTimeMillis();
+        tempoExecucao = (endTime - startTime)/1000f;
+    }
+
+    @Override
+    public String[] ComputeStatistics(){
+        
+        log = new LogArvoreMonteCarlo();
+        
+        log.AvaliaArvore(raiz);
+        String[] thisArgs = getArgs();
+        return thisArgs;
+    }
+
+    @Override
+    public String[] getArgs(){
+        return new String[]{String.valueOf(COR_PECA), this.ID, lastGamePlayed.getNome(), String.valueOf(tempoExecucao), String.valueOf(log.numeroNodos), String.valueOf(log.mediaBranching), String.valueOf(log.maxBranching), "0", "0"};
+    }
+
+    public NodoMonteCarlo getRaiz(){
         return raiz;
     }
 

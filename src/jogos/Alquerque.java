@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import jogos.util.*;
 
 public class Alquerque extends Jogo {
+
     public Alquerque() {
         setNome("Alquerque");
     }

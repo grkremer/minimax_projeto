@@ -1,34 +1,34 @@
 package agentes;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import agentes.util.Agente;
 import agentes.util.TTEntry;
-import agentes.util.Flag;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
-public class ABPruneTT implements Agente{
-    HashMap<String, TTEntry> transpositionTable;
-    int maxDepth;
-    int COR_PECA;
-    int transpositions = 0;
-    int totalNodes = 0;
-    int cutoffs = 0;
-    float tempoExecucao;
-    long startTime;
-    long endTime;
+import agentes.Trees.NegTTTree;
+import java.util.Arrays;
+/* 
+    Negamax w/ transposition table implementation.
+
+    Negamax OK
+    NegamaxTree OK
+    logNegamax INCOMPLETE
+
+*/
+public class NegTT extends Negamax{
+    private final String ID = "NEGAMAXTT";
     
-    public ABPruneTT (int COR_PECA, int profundidadeMax) {
-        this.COR_PECA = COR_PECA;
-        this.maxDepth = profundidadeMax;
+    protected HashMap<String, TTEntry> transpositionTable;
+    protected int transpositions;
+    public NegTT (int COR_PECA, int depth) {
+        super(COR_PECA, depth);
     }
     
+    @Override
     public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
-        totalNodes = 1; 
-        tempoExecucao = 0;
-        startTime = System.currentTimeMillis();
-        this.transpositionTable = new HashMap<String, TTEntry>();
+        initializeVariables();
+        numberNodes = 1;
+        transpositions=0;
+
         float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
         int opponentPiece = jogo.invertePeca(COR_PECA);
@@ -36,62 +36,26 @@ public class ABPruneTT implements Agente{
         for(Jogada j:jogo.listaPossiveisJogadas(COR_PECA, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            float value = -NegamaxTT(jogo, novoTabuleiro, opponentPiece, maxDepth-1, -1); 
-            //float value = -NegamaxTT(jogo, novoTabuleiro, opponentPiece, maxDepth-1, Integer.MIN_VALUE, Integer.MAX_VALUE, -1); 
+            float value = -negamax(jogo, novoTabuleiro, opponentPiece, maxDepth-1, -1); 
             if(value > max)
             {
                 melhorJogada = j;
                 max = value;
             }
         }
-        endTime = System.currentTimeMillis();
-        tempoExecucao = (endTime - startTime)/1000f;
+        
+        super.closeVariables();
+        lastGamePlayed = jogo;
+        lastBoardEvaluated = jogo.criaCopiaTabuleiro(tabuleiro);
+        System.out.println("nodes: " + String.valueOf(numberNodes) + "\ttranspositions: " + String.valueOf(transpositions));
         return melhorJogada;
         
     }
     
-    public float Negamax(Jogo game, int[][] board, int currentPiece, int depth, int sign) throws InterruptedException{ 
-        totalNodes+=1;
-        
-        if(depth == 0 ||game.verificaFimDeJogo(board)){
-            return game.geraCusto(COR_PECA, board, -100, +100) * sign;
-        }
-        
-        float max = Integer.MIN_VALUE;
-        int opponentPiece = game.invertePeca(currentPiece);
-        for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
-            int[][] newBoard = game.criaCopiaTabuleiro(board);
-            game.fazJogada(j, newBoard, false);
-            max = Math.max(max, -Negamax(game, newBoard, opponentPiece, depth-1, sign*-1) * 0.99f);
-        }
-        return max;
-    }
 
-    public float Negamax(Jogo game, int[][] board, int currentPiece, int depth, float alpha, float beta, int sign) throws InterruptedException{ 
-        totalNodes+=1;
-        
-        if(depth == 0 ||game.verificaFimDeJogo(board)){
-            return game.geraCusto(COR_PECA, board, -100, +100) * sign;
-        }
-        
-        //float max = Integer.MIN_VALUE;
-        int opponentPiece = game.invertePeca(currentPiece);
-        for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
-            int[][] newBoard = game.criaCopiaTabuleiro(board);
-            game.fazJogada(j, newBoard, false);
-            alpha = Math.max(alpha, -Negamax(game, newBoard, opponentPiece, depth-1, -beta, -alpha, sign*-1) * 0.99f);
-            
-            if (alpha >= beta) {
-                cutoffs++;
-                break;
-            }
-        }
-        return alpha;
-    }
-
-    public float NegamaxTT(Jogo game, int[][] board, int currentPiece, int depth, int sign) throws InterruptedException{ 
-        totalNodes++;
-        
+    @Override
+    public float negamax(Jogo game, int[][] board, int currentPiece, int depth, int sign) throws InterruptedException{ 
+        numberNodes++;
         // Transposition Table Lookup; node is the lookup key for ttEntry 
         String boardHash = getHash(board);
         TTEntry ttEntry = transpositionTable.get(boardHash);
@@ -112,7 +76,7 @@ public class ABPruneTT implements Agente{
         for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
             int[][] newBoard = game.criaCopiaTabuleiro(board);
             game.fazJogada(j, newBoard, false);
-            max = Math.max(max, -NegamaxTT(game, newBoard, opponentPiece, depth-1, sign*-1) * 0.99f);
+            max = Math.max(max, -negamax(game, newBoard, opponentPiece, depth-1, sign*-1) * 0.99f);
         }
 
         ttEntry = new TTEntry();
@@ -123,6 +87,7 @@ public class ABPruneTT implements Agente{
         return max;
     }
 
+    /*
     public float NegamaxTT(Jogo game, int[][] board, int currentPiece, int depth, float alpha, float beta, int sign) throws InterruptedException{ 
         totalNodes++;
         
@@ -188,10 +153,9 @@ public class ABPruneTT implements Agente{
 
         return value;
     }
+    */
 
-   public int getProfundidade(){ return maxDepth; }
-    public int getCorPeca(){ return COR_PECA; }
-    private String getHash(int[][] board){
+    protected String getHash(int[][] board){
         String hash = "";
         for(int i =0 ; i < 5; i++){
             for(int j = 0; j < 5; j++){
@@ -200,9 +164,32 @@ public class ABPruneTT implements Agente{
         }
         return hash;
     }
+
+    public String[] ComputeStatistics(){
+        NegTTTree logTree = new NegTTTree(COR_PECA, maxDepth);
+        
+        try{
+            logTree.Mover(this.lastGamePlayed, lastBoardEvaluated);
+        }catch(InterruptedException e){
+
+        }
+
+        String[] logArgs = logTree.getArgs();
+        String[] thisArgs = getArgs();
+        String[] result = Arrays.copyOf(logArgs, logArgs.length + thisArgs.length);
+        System.arraycopy(thisArgs, 0, result, logArgs.length, thisArgs.length);
+        return result;
+    }
     
     @Override
-    public String toString(){
-        return "transpositions: " + transpositions + "\ncutoffs: " + cutoffs +  "\ntotal nodes: " + totalNodes + "\ntempo de execução: " + tempoExecucao + "s";
+    public String[] getArgs(){
+        return new String[]{String.valueOf(COR_PECA), this.ID, lastGamePlayed.getNome(), String.valueOf(executionTime)};
+    }
+
+    @Override
+    protected void initializeVariables(){
+        super.initializeVariables();
+        this.transpositionTable = new HashMap<String, TTEntry>();
+        
     }
 }

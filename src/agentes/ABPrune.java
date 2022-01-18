@@ -1,65 +1,73 @@
 package agentes;
 
+import java.util.Collections;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import agentes.util.Agente;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
 
+import java.util.Arrays;
+import agentes.Trees.ABPruneTree;
 
-public class ABPrune implements Agente{
-    int numeroNodos;
-    int profundidadeMax;
-    int COR_PECA;
-    public final int MAX_PONTOS = 100;
-    public final int MIN_PONTOS = -100;
-    int totalNodes = 0;
+
+
+public class ABPrune extends Minimax{
+    
+    private final String ID = "ABPRUNE";
+    private Jogo lastGamePlayed;
+    private int[][] lastBoardEvaluated;
+    
+    protected int cutoffs;
+
     public ABPrune(int COR_PECA, int profundadeMax){
-        
-        this.profundidadeMax = profundadeMax;
-        this.COR_PECA = COR_PECA;
+        super(COR_PECA, profundadeMax);
     }
 
+    @Override
     public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
-        totalNodes= 0;
-        return Poda(jogo, tabuleiro, COR_PECA, COR_PECA);
-    }
-
-    Jogada Poda(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual) throws InterruptedException{
-        int max = Integer.MIN_VALUE;;
+        super.initializeVariables();
+        super.numberNodes=1;
+        cutoffs=0;
+        
+        float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
         float alpha = Float.NEGATIVE_INFINITY; 
         float beta  = Float.POSITIVE_INFINITY;
-        ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        ArrayList<Jogada> possiveisJogadas = jogo.listaPossiveisJogadas(COR_PECA, tabuleiro);
         
         for(Jogada j:possiveisJogadas){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            int valor = Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidadeMax-1, alpha, beta);
+            float valor = Min(jogo, novoTabuleiro, COR_PECA, jogo.invertePeca(COR_PECA), maxDepth-1, alpha, beta);
             if(valor > max)
             {
                 melhorJogada = j;
                 max = valor;
             }
         }
-        
+        super.closeVariables();
+        lastGamePlayed = jogo;
+        lastBoardEvaluated = jogo.criaCopiaTabuleiro(tabuleiro);
+        System.out.println("nodes: " + String.valueOf(numberNodes) + "\ncutoffs: " + String.valueOf(cutoffs));
+       
         return melhorJogada;
     }
 
-    private int Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
-        totalNodes++;
+    private float Max(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
+        super.numberNodes++;
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            return jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
         }
         
-        int valor = Integer.MIN_VALUE;
+        float valor = Integer.MIN_VALUE;
+        int corPecaAdversario = jogo.invertePeca(corPecaAtual);
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
             
-            valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta));
-            if(valor >= beta){ 
+            valor = Math.max(valor, Min(jogo, novoTabuleiro, corPecaJogador, corPecaAdversario, profundidade-1, alpha, beta));
+            if(valor >= beta){
+                cutoffs++;
                 return valor;
             }
             alpha = Math.max(alpha, valor);
@@ -67,39 +75,54 @@ public class ABPrune implements Agente{
         return valor;
     }
 
-    private int Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
-        totalNodes++;
+    private float Min(Jogo jogo, int[][] tabuleiro, int corPecaJogador, int corPecaAtual, int profundidade, float alpha, float beta) throws InterruptedException{
+        super.numberNodes++;
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
-            return (int)jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
+            return jogo.geraCusto(corPecaJogador, tabuleiro, MIN_PONTOS, MAX_PONTOS);
         }
         
-        int valor = Integer.MAX_VALUE;
+        float valor = Integer.MAX_VALUE;
+        int corPecaAdversario = jogo.invertePeca(corPecaAtual);
         for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
             
-            valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, jogo.invertePeca(corPecaAtual), profundidade-1, alpha, beta));
+            valor = Math.min(valor, Max(jogo, novoTabuleiro, corPecaJogador, corPecaAdversario, profundidade-1, alpha, beta));
             if(valor <= alpha) {
+                cutoffs++;
                 return valor;
             }
             beta = Math.min(beta, valor);
         }
         return valor;
+    }    
+
+
+    public String[] ComputeStatistics(){
+        ABPruneTree logTree = new ABPruneTree(COR_PECA, maxDepth);
+        
+        try{
+            logTree.Mover(lastGamePlayed, lastBoardEvaluated);
+        }catch(InterruptedException e){
+
+        }
+
+        String[] logArgs = logTree.getArgs();
+        String[] thisArgs = getArgs();
+        String[] result = Arrays.copyOf(logArgs, logArgs.length + thisArgs.length);
+        System.arraycopy(thisArgs, 0, result, logArgs.length, thisArgs.length);
+        return result;
     }
 
-    public int getCorPeca(){
-        return COR_PECA;
+    @Override
+    public String[] getArgs(){
+         return new String[]{String.valueOf(COR_PECA), this.ID, lastGamePlayed.getNome(), String.valueOf(executionTime)};
     }
 
-    public int getProfundidade(){
-        return profundidadeMax;
-    }
-    
 
     @Override
     public String toString()
     {
-       
-        return "totalNodes: " + totalNodes;
+        return "";
     }
 }

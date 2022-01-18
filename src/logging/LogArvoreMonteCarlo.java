@@ -2,23 +2,19 @@ package logging;
 
 import java.util.HashMap;
 
-import agentes.util.Nodo;
+import agentes.util.NodoMonteCarlo;
 // número de nodos
 // número de nodos por filho (Média)
 // número máximo de filhos por nodo (Max)
 // tempo de execução
 public class LogArvoreMonteCarlo {
-    int numeroNodos;
-    int nodosInternos;
-    int sumFilhos;
-    float mediaBranching;
-    int maxBranching;
+   public  int numeroNodos;
+    public int nodosInternos;
+    public int sumFilhos;
+    public float mediaBranching;
+    public int maxBranching;
     //ArrayList<Integer> nodosPorNivel;
     HashMap<Integer, Integer> nodosPorNivel;
-
-    float tempoExecucao;
-    long startTime;
-    long endTime;
     public LogArvoreMonteCarlo(){
         //nodosPorNivel = new ArrayList<Integer>();
         nodosPorNivel = new HashMap<Integer,Integer>();
@@ -27,19 +23,16 @@ public class LogArvoreMonteCarlo {
         sumFilhos = 1;
         mediaBranching = 0;
         maxBranching = 0;
-        tempoExecucao = 0;
-        startTime = System.currentTimeMillis();
+        
     };
 
-    public void AvaliaArvore(Nodo raiz)
+    public void AvaliaArvore(NodoMonteCarlo raiz)
     {
-        endTime = System.currentTimeMillis();
         ProcessarArvore(raiz, 0);
         mediaBranching = sumFilhos/nodosInternos;
-        tempoExecucao = (endTime - startTime)/1000f;
     }
 
-    private void ProcessarArvore(Nodo nodo, int profundidade)
+    private void ProcessarArvore(NodoMonteCarlo nodo, int profundidade)
     {
         
         numeroNodos+=1;
@@ -64,7 +57,7 @@ public class LogArvoreMonteCarlo {
         if(!nodosPorNivel.containsKey(profundidade)) nodosPorNivel.put(profundidade,1);
         else nodosPorNivel.put(profundidade, nodosPorNivel.get(profundidade)+1) ;
         //pega os filhos
-        for (Nodo filho : (nodo.getFilhos()).values()) ProcessarArvore(filho, profundidade+1);
+        for (NodoMonteCarlo filho : (nodo.getFilhos()).values()) ProcessarArvore(filho, profundidade+1);
         
     }
 
@@ -78,6 +71,6 @@ public class LogArvoreMonteCarlo {
             int n = nodosPorNivel.get(i);
             filhosPorNivel += "(nvl " + i + ":" +  n + ") ";
         }
-        return "\nMONTE-CARLO\nnumero de nodos: " + numeroNodos + "\nmax filho: " + maxBranching + "\nmedia filhos: " + mediaBranching + "\n" + filhosPorNivel + "\n" + tempoExecucao + "s";
+        return "\nMONTE-CARLO\nnumero de nodos: " + numeroNodos + "\nmax filho: " + maxBranching + "\nmedia filhos: " + mediaBranching + "\n" + filhosPorNivel + "\n";
     }
 }

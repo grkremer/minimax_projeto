@@ -47,6 +47,7 @@ public class NodoMinimax{
 
         return menorRecompensa;
     }
+    
     public float getMaiorRecompensaFilhos(){
         float maiorRecompensa = Integer.MIN_VALUE;
         for (Map.Entry<Jogada, NodoMinimax> pair : filhos.entrySet()) {

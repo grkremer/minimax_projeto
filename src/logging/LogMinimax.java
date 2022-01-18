@@ -9,11 +9,11 @@ import agentes.util.NodoMinimax;
 // número máximo de filhos por nodo (Max)
 // tempo de execução
 public class LogMinimax {
-    int numeroNodos;
-    int nodosInternos;
-    int sumFilhos;
-    float mediaBranching;
-    int maxBranching;
+    public int numeroNodos;
+    public int nodosInternos;
+    public int sumFilhos;
+    public float mediaBranching;
+    public int maxBranching;
     //ArrayList<Integer> nodosPorNivel;
     HashMap<Integer, Integer> nodosPorNivel;
 

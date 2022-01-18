@@ -5,20 +5,20 @@ import jogos.util.Jogada;
 
 import java.util.ArrayList;
 
-public class Nodo{
+public class NodoMonteCarlo{
     private Estado estado;
-    private Nodo pai;
+    private NodoMonteCarlo pai;
     private Jogada action; //ação que levou a este estado
     private int valorN;
     private double valorQ;
     
     ArrayList<Jogada> possiveisMovimentos; //todas as possibilidades de ação a partir desse estado
-    private HashMap<Jogada, Nodo> filhos;
+    private HashMap<Jogada, NodoMonteCarlo> filhos;
     
-    public Nodo(Estado estado, Nodo pai,  Jogada acao, ArrayList<Jogada> possiveisMovimentos){
+    public NodoMonteCarlo(Estado estado, NodoMonteCarlo pai,  Jogada acao, ArrayList<Jogada> possiveisMovimentos){
         valorN = 0;
         valorQ = 0;
-        filhos = new HashMap<Jogada, Nodo>();
+        filhos = new HashMap<Jogada, NodoMonteCarlo>();
         this.pai = pai;
         this.action = acao;
         this.possiveisMovimentos = possiveisMovimentos;
@@ -34,7 +34,7 @@ public class Nodo{
     }
 
     public void UpdateValorQ(double valorQ){  this.valorQ += valorQ; }
-    public HashMap<Jogada, Nodo> getFilhos(){ return filhos; }
+    public HashMap<Jogada, NodoMonteCarlo> getFilhos(){ return filhos; }
     public Estado getEstado(){ return estado; }
     public int[][] getCopiaTabuleiro(){ 
         return estado.getCopiaTabuleiro();
@@ -49,7 +49,7 @@ public class Nodo{
             }
         }
     }
-    public void insereNovoFilho(Jogada acao, Nodo novoFilho){
+    public void insereNovoFilho(Jogada acao, NodoMonteCarlo novoFilho){
         filhos.put(acao, novoFilho);
     }
     
@@ -66,7 +66,7 @@ public class Nodo{
     public double getValorQ() {
         return valorQ;
     }
-    public Nodo getPai() {
+    public NodoMonteCarlo getPai() {
         return pai;
     }
 

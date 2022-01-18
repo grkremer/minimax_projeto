@@ -7,7 +7,6 @@ import jogos.util.*;
 import java.util.Collections;
 
 public class FiveFieldKono extends Jogo {
-    
     public FiveFieldKono() {
         setNome("Five Field Kono");
     }

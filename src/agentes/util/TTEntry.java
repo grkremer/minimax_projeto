@@ -2,6 +2,9 @@ package agentes.util;
 
 
 public class TTEntry {
+    
+    public enum Flag{LOWERBOUND, UPPERBOUND, EXACT};
+    
     public float value; //zobrist (?)
     public Flag flag;
     public int depth;
