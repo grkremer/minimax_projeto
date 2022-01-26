@@ -36,8 +36,9 @@ public class Simulador {
         while(rodadasRestantes > 0){
             jogo.inicializaTabuleiro();;
             int rodada = rodadaInicial;
-        
+            int turnos = 0;
             while(!jogo.verificaFimDeJogo(jogo.getTabuleiro())){
+                turnos++;
                 Agente jogadorAtual;
                 if(agente1.getCorPeca() == rodada)
                 {
@@ -49,12 +50,11 @@ public class Simulador {
                 j = jogadorAtual.Mover(jogo, jogo.getTabuleiro());
                 //String[] teste = (jogadorAtual).ComputeStatistics();
                 
-                //analisador.Mover(jogo, jogo.getTabuleiro());
 
                 jogo.fazJogada(j, jogo.getTabuleiro(), true);
                 rodada = jogo.invertePeca(rodada);
-                //Thread.sleep(1000);
-                
+                if(turnos >= 30) break;
+                //Thread.sleep(500);
             }
 
             if(jogo.verificaVitoria(agente1.getCorPeca(), jogo.getTabuleiro())){
@@ -67,10 +67,10 @@ public class Simulador {
                 System.out.println("EMPATE");
                 empates++;
             }
-            Thread.sleep(1000);
-
+            
             rodadaInicial = jogo.invertePeca(rodadaInicial);
             rodadasRestantes-=1;
+            
         }
         System.out.println("Vitorias Agente1: " + vitoriasA1 + "\nVitorias Agente2: " + vitoriasA2 + "\nEmpate: " + empates);
     

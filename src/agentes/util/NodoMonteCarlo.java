@@ -9,6 +9,7 @@ public class NodoMonteCarlo{
     private Estado estado;
     private NodoMonteCarlo pai;
     private Jogada action; //ação que levou a este estado
+    
     private int valorN;
     private double valorQ;
     
@@ -28,10 +29,12 @@ public class NodoMonteCarlo{
 
     public void UpdateValorN(){ valorN += 1;}
     
-    public void Learn(double reward){
-        double learningRate = 1;
-        this.valorQ = this.valorQ + learningRate * (reward - this.valorQ );
+    public void Learn(double sampledReward){
+        double learningRate = 0.45;
+        double error = sampledReward - this.valorQ;
+        this.valorQ = this.valorQ + learningRate * (error);
     }
+
 
     public void UpdateValorQ(double valorQ){  this.valorQ += valorQ; }
     public HashMap<Jogada, NodoMonteCarlo> getFilhos(){ return filhos; }

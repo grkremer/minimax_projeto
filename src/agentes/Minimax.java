@@ -38,7 +38,7 @@ public class Minimax implements Agente{
         Jogada melhorJogada = null;
         int opponentPiece = jogo.invertePeca(COR_PECA);   
         List<Jogada> actions = jogo.listaPossiveisJogadas(COR_PECA, tabuleiro);
-        Collections.shuffle(actions);
+        //Collections.shuffle(actions);
 
         for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
@@ -66,12 +66,12 @@ public class Minimax implements Agente{
         float valor = Integer.MIN_VALUE;
         int opponentPiece = jogo.invertePeca(corPecaAtual);
         List<Jogada> actions = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
-        Collections.shuffle(actions);
+        //Collections.shuffle(actions);
         
         for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            valor = Math.max(valor, Min(jogo, novoTabuleiro, opponentPiece, profundidade-1) * 0.99f) ;
+            valor = Math.max(valor, Min(jogo, novoTabuleiro, opponentPiece, profundidade-1)) ;
              
         }
         return valor;
@@ -86,12 +86,12 @@ public class Minimax implements Agente{
         float valor = Integer.MAX_VALUE;
         int opponentPiece = jogo.invertePeca(corPecaAtual);
         List<Jogada> actions = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
-        Collections.shuffle(actions);
+        //Collections.shuffle(actions);
         
         for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
-            valor = Math.min(valor, Max(jogo, novoTabuleiro, opponentPiece, profundidade-1) * 0.99f);
+            valor = Math.min(valor, Max(jogo, novoTabuleiro, opponentPiece, profundidade-1));
              
         }
         return valor;

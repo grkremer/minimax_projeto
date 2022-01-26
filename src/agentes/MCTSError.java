@@ -11,7 +11,7 @@ import logging.LogArvoreMonteCarlo;
 /* 
     Monte-Carlo Tree Search (MCTS) using UCB1 policy
 */
-public class MCTS implements Agente{
+public class MCTSError implements Agente{
     
     int maxSimulacoes;
     double coeficienteExploracao;
@@ -25,7 +25,7 @@ public class MCTS implements Agente{
     protected long startTime;
     protected long endTime;
 
-    public MCTS(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
+    public MCTSError(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
         this.maxSimulacoes = maxSimulacoes;
         this.coeficienteExploracao = coeficienteExploracao;
         this.COR_PECA = COR_PECA;
@@ -47,7 +47,7 @@ public class MCTS implements Agente{
     }
 
    private Jogada BuscaArvoreMonteCarlo(Jogo jogo) throws InterruptedException{ 
-        
+        //numbero episodes
         for(int it = 0; Condicional(it); it++){
             NodoMonteCarlo novoNodo = selecionaNodo(jogo, raiz);
             double recompensa = simulaJogo(jogo, novoNodo);
@@ -169,16 +169,16 @@ public class MCTS implements Agente{
         double recompensaDescontada = recompensa;
         while(!(bn == null)){
             bn.UpdateValorN();
-            bn.UpdateValorQ(recompensaDescontada);
-            //bn.Learn(recompensaDescontada);
+            //bn.UpdateValorQ(recompensaDescontada);
+            bn.Learn(recompensaDescontada);
             bn = bn.getPai(); 
             recompensaDescontada *= 0.9;
         }
     }
 
     private double calculaUCB(NodoMonteCarlo n) {
-        double recompensa = n.getValorQ()/n.getValorN();
-        //double recompensa = n.getValorQ();
+        //double recompensa = n.getValorQ()/n.getValorN();
+        double recompensa = n.getValorQ();
         double exploracao = coeficienteExploracao * Math.sqrt( (2*Math.log(n.getPai().getValorN()))/n.getValorN() );
         return recompensa + exploracao;
     }
@@ -211,8 +211,8 @@ public class MCTS implements Agente{
         // ganhador1: 2 turnos 0,984, 0,99| 4 turnos  0,96, 0,980 =  diferença 0,02
         // ganhador2: 50 turnos 0,6, 0,94 | 100 turnos  0,33, 0,93 = diferença 0,3
         
-        float fatorDesconto = (float)Math.pow(0.99, Math.log(s.getTurnos()/2));
-        //float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
+        //float fatorDesconto = (float)Math.pow(0.9, Math.log(s.getTurnos()/2));
+        float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
         
         if(s.getMarcaAgente() == s.getVencedor())
             valorUt = 1;

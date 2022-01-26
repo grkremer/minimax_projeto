@@ -12,6 +12,7 @@ import java.util.Arrays;
     Negamax OK
     NegamaxTree OK
     logNegamax INCOMPLETE
+    it seems like its not working *not exact like minimax
 
 */
 public class NegTT extends Negamax{
@@ -72,15 +73,17 @@ public class NegTT extends Negamax{
         }
         
         float max = Integer.MIN_VALUE;
+        float maxAux = Integer.MIN_VALUE;
         int opponentPiece = game.invertePeca(currentPiece);
         for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
             int[][] newBoard = game.criaCopiaTabuleiro(board);
             game.fazJogada(j, newBoard, false);
-            max = Math.max(max, -negamax(game, newBoard, opponentPiece, depth-1, sign*-1) * 0.99f);
+            maxAux = Math.max(maxAux, -negamax(game, newBoard, opponentPiece, depth-1, sign*-1));
+            max = Math.max(max, maxAux);
         }
 
         ttEntry = new TTEntry();
-        ttEntry.value = max;
+        ttEntry.value = maxAux;
         ttEntry.depth = depth;
         transpositionTable.put(boardHash, ttEntry);
 

@@ -55,17 +55,18 @@ public class NegABPrune extends Negamax{
         }
         
         int opponentPiece = game.invertePeca(currentPiece);
+        float value = Integer.MIN_VALUE;
         for(Jogada j:game.listaPossiveisJogadas(currentPiece, board)){
             int[][] newBoard = game.criaCopiaTabuleiro(board);
             game.fazJogada(j, newBoard, false);
-            alpha = Math.max(alpha, -negamax(game, newBoard, opponentPiece, depth-1, -beta, -alpha, sign*-1) * 0.99f);
-            
+            value  = Math.max(value, -negamax(game, newBoard, opponentPiece, depth-1, -beta, -alpha, sign*-1));
+            alpha  = Math.max(alpha, value);
             if (alpha >= beta) {
                 cutoffs++;
                 break;
             }
         }
-        return alpha;
+        return value;
     }
 
     @Override
