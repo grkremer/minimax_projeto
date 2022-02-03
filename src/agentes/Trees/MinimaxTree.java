@@ -8,6 +8,10 @@ import jogos.util.Jogo;
 import logging.LogMinimax;
 import agentes.Minimax;
 
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Arrays;
 /* 
     The purpose of minimaxxTree is to save the tree in memory
         in order to compute information about it.
@@ -18,6 +22,14 @@ public class MinimaxTree extends Minimax{
     
     private int numberNodes;
 
+
+    private final String ID = "MINIMAX_T";
+    private Jogo lastGamePlayed;
+    private int[][] lastBoardEvaluated;
+
+    protected float executionTime;
+    protected long startTime;
+    protected long endTime;
     public MinimaxTree(int COR_PECA, int maxDepth){
         super(COR_PECA, maxDepth);
     }
@@ -31,7 +43,9 @@ public class MinimaxTree extends Minimax{
         float max = Integer.MIN_VALUE;;
         Jogada melhorJogada = null;
         int opponentPiece = jogo.invertePeca(COR_PECA);
-        for(Jogada j:jogo.listaPossiveisJogadas(COR_PECA, tabuleiro)){
+        List<Jogada> actions = jogo.listaPossiveisJogadas(COR_PECA, tabuleiro);
+        Collections.shuffle(actions);
+        for(Jogada j: actions ){
         
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             jogo.fazJogada(j, novoTabuleiro, false);
@@ -44,9 +58,13 @@ public class MinimaxTree extends Minimax{
                 max = valor;
             }
         }
-        closeVariables();
+        lastGamePlayed = jogo;
+        lastBoardEvaluated = tabuleiro;
+        
         log.AvaliaArvore(root);
-        System.out.println("nodesT: " + String.valueOf(numberNodes));
+        closeVariables();
+        System.out.println("nodesT: " + String.valueOf(numberNodes) + "\ttime:" + String.valueOf(executionTime)+"s");
+        
         return melhorJogada;
         
     }
@@ -60,8 +78,10 @@ public class MinimaxTree extends Minimax{
         float max = Integer.MIN_VALUE;
         int opponentPiece = jogo.invertePeca(corPecaAtual);
         int nextDepth = nodoAtual.getProfundidade()+1;
-
-        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
+        List<Jogada> actions = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        Collections.shuffle(actions);
+        
+        for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             NodoMinimax newNode = new NodoMinimax(novoTabuleiro, j, opponentPiece, nextDepth);
             nodoAtual.insereNovoFilho(j, newNode);
@@ -84,8 +104,9 @@ public class MinimaxTree extends Minimax{
         float min = Integer.MAX_VALUE;
         int opponentPiece = jogo.invertePeca(corPecaAtual);
         int nextDepth = nodoAtual.getProfundidade()+1;
-
-        for(Jogada j:jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro)){
+        List<Jogada> actions = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
+        Collections.shuffle(actions);
+        for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
             NodoMinimax newNode = new NodoMinimax(novoTabuleiro, j, opponentPiece, nextDepth);
             nodoAtual.insereNovoFilho(j, newNode);
@@ -100,15 +121,32 @@ public class MinimaxTree extends Minimax{
         return min;
     }
 
+    public String[] ComputeStatistics(){
+        
+        String[] thisArgs = getArgs(); //nome_agente, cor_peça 
+        String[] arr = new String[]{this.ID, String.valueOf(COR_PECA), String.valueOf(executionTime)};
+        String[] result = Arrays.copyOf(arr, arr.length + thisArgs.length);
+        System.arraycopy(thisArgs, 0, result, arr.length, thisArgs.length);
+        return result;
+    }
+
     @Override
     protected void initializeVariables(){
         super.initializeVariables();
         log = new LogMinimax();
+        executionTime = 0;
+        startTime = System.currentTimeMillis(); 
+    }
+
+
+    protected void closeVariables(){
+        endTime = System.currentTimeMillis();
+        executionTime = (endTime - startTime)/1000f;
     }
 
     @Override
     public String[] getArgs(){
-        return new String[]{String.valueOf(log.numeroNodos), String.valueOf(log.maxBranching), String.valueOf(log.mediaBranching)};
+        return new String[]{ String.valueOf(maxDepth), String.valueOf(log.maxBranching), String.valueOf(log.mediaBranching), String.valueOf(log.numeroNodos)};
     }
     @Override
     public String toString()

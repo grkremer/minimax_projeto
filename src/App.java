@@ -4,6 +4,7 @@ import jogos.util.Jogo;
 import org.junit.runner.manipulation.Alphanumeric;
 
 import agentes.*;
+import agentes.Trees.MinimaxTree;
 import interfaces.*;
 import tests.*;
 public class App {
@@ -40,8 +41,8 @@ public class App {
         //JanelaJogo janela = new JanelaJogo(jogo);
         //jogo.jogar(new ABPruneTT(Jogo.PECA_PRETA, 6), new ABPrune(Jogo.PECA_BRANCA, 6));
         
-        Simulador s = new Simulador(new JogoDaVelha4(), new MCTSError(Jogo.PECA_BRANCA, 10000, 1), new MCTSError(Jogo.PECA_PRETA, 10000, 1));
-        s.Simular(10);
+        Simulador s = new Simulador(new TicTackle5(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new MinimaxTree(Jogo.PECA_PRETA, 5));
+        s.Simular(100);
 
         //jogo.carregaLog("logs/log.txt");
         //janela.replayHistoricoJogadas();

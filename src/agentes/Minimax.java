@@ -38,7 +38,7 @@ public class Minimax implements Agente{
         Jogada melhorJogada = null;
         int opponentPiece = jogo.invertePeca(COR_PECA);   
         List<Jogada> actions = jogo.listaPossiveisJogadas(COR_PECA, tabuleiro);
-        //Collections.shuffle(actions);
+        Collections.shuffle(actions);
 
         for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
@@ -66,7 +66,7 @@ public class Minimax implements Agente{
         float valor = Integer.MIN_VALUE;
         int opponentPiece = jogo.invertePeca(corPecaAtual);
         List<Jogada> actions = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
-        //Collections.shuffle(actions);
+        Collections.shuffle(actions);
         
         for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
@@ -86,7 +86,7 @@ public class Minimax implements Agente{
         float valor = Integer.MAX_VALUE;
         int opponentPiece = jogo.invertePeca(corPecaAtual);
         List<Jogada> actions = jogo.listaPossiveisJogadas(corPecaAtual, tabuleiro);
-        //Collections.shuffle(actions);
+        Collections.shuffle(actions);
         
         for(Jogada j: actions ){
             int[][] novoTabuleiro = jogo.criaCopiaTabuleiro(tabuleiro);
@@ -106,10 +106,10 @@ public class Minimax implements Agente{
 
         }
 
-        String[] logArgs = logTree.getArgs();
-        String[] thisArgs = getArgs();
-        String[] result = Arrays.copyOf(logArgs, logArgs.length + thisArgs.length);
-        System.arraycopy(thisArgs, 0, result, logArgs.length, thisArgs.length);
+        String[] thisArgs = getArgs(); //nome_agente, cor_peça 
+        String[] logArgs = logTree.getArgs(); //maxdepth, bfactor, tnodes
+        String[] result = Arrays.copyOf(thisArgs, thisArgs.length + logArgs.length);
+        System.arraycopy(logArgs, 0, result, thisArgs.length, logArgs.length);
         return result;
     }
 
@@ -134,7 +134,8 @@ public class Minimax implements Agente{
 
     @Override
     public String[] getArgs(){
-        return new String[]{String.valueOf(COR_PECA), this.ID, lastGamePlayed.getNome(), String.valueOf(executionTime)};
+        //return new String[]{String.valueOf(COR_PECA), this.ID, lastGamePlayed.getNome(), String.valueOf(executionTime)};
+        return new String[]{this.ID, String.valueOf(COR_PECA), String.valueOf(executionTime)};
     }
 
     @Override

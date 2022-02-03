@@ -14,6 +14,7 @@ public class LogMinimax {
     public int sumFilhos;
     public float mediaBranching;
     public int maxBranching;
+    public int maxDepth;
     //ArrayList<Integer> nodosPorNivel;
     HashMap<Integer, Integer> nodosPorNivel;
 
@@ -29,6 +30,7 @@ public class LogMinimax {
         mediaBranching = 0;
         maxBranching = 0;
         tempoExecucao = 0;
+        maxDepth = 0;
         startTime = System.currentTimeMillis();
     };
 
@@ -60,6 +62,8 @@ public class LogMinimax {
         else nodosPorNivel.put(profundidade, nodosPorNivel.get(profundidade)+1) ;
         //pega os filhos
         for (NodoMinimax filho : nodo.getFilhos().values()) ProcessarArvore(filho, profundidade+1);
+
+        if(profundidade > maxDepth) maxDepth = profundidade;
         
     }
 
