@@ -72,9 +72,7 @@ public class Jogo {
         if(peca == PECA_BRANCA) {
             return PECA_PRETA;
         }
-        else {
-            return PECA_BRANCA;
-        }
+        return PECA_BRANCA;
     }
     public int pecaEntrePecas(int x1, int y1, int x2, int y2, int[][] tabuleiro) {
         int[] posNovo = posPecaEntrePecas(x1, y1, x2, y2);
@@ -162,6 +160,50 @@ public class Jogo {
             return false;
     }
     
+    public boolean isLegalInsertion(Movimento movement, int[][] board) {
+        int x = movement.getPosicao1()[0];
+        int y = movement.getPosicao1()[1];
+        if (estaNosLimites(x, y) && board[x][y] == SEM_PECA) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    public boolean isLegalDisplacement(Movimento movement, int[][] board) {
+        int x0 = movement.getPosicao1()[0];
+        int y0 = movement.getPosicao1()[1];
+        int xF = movement.getPosicao2()[0];
+        int yF = movement.getPosicao2()[1];
+        if(estaNosLimites(x0, y0) && estaNosLimites(xF, yF)) {
+            if (tabuleiro[xF][yF] == SEM_PECA && tabuleiro[x0][y0] != SEM_PECA) {
+                //Se quer se mover na diagonal
+                if((Math.abs(x0 - xF) == 1 ) && (Math.abs(y0 - yF) == 1)) {
+                    //Se x e y têm a mesma paridade
+                    if(((x0 % 2 == 0) && (y0 % 2 == 0)) || ((x0 % 2 == 1) && (y0 % 2 == 1))) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                //Se quer se mover na vertical/horizontal
+                else if((Math.abs(x0 - xF) <= 1 ) && (Math.abs(y0 - yF) <= 1)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
     public int contaPecas(int corPeca, int[][] tabuleiro) {
         int cont = 0;
         for(int y=0; y < ALTURA_TABULEIRO; y++) {
@@ -172,8 +214,6 @@ public class Jogo {
         return cont;
     }
 
-
-    
     public float normalizaPontuacao(float minimoAntigo, float maximoAntigo, float minimoNovo, float maximoNovo, float valor){
         return ((valor-minimoAntigo)/(maximoAntigo-minimoAntigo) * (maximoNovo-minimoNovo) + minimoNovo);
     }

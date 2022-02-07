@@ -20,14 +20,7 @@ public class JogoDaVelha4 extends Jogo {
     
     @Override
     public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {
-        int x = movimento.getPosicao1()[0];
-        int y = movimento.getPosicao1()[1];
-        if (estaNosLimites(x, y) && tabuleiro[x][y] == SEM_PECA) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return isLegalInsertion(movimento, tabuleiro);
     }
     
     public boolean verificaSimetriaVertical(int tabuleiro [][]){

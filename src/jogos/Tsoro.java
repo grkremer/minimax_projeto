@@ -13,37 +13,10 @@ public class Tsoro extends JogoDaVelha4{
 
     @Override
     public boolean verificaMovimento(Movimento movimento, int[][] tabuleiro) {
-        int xInicial = movimento.getPosicao1()[0];
-        int yInicial = movimento.getPosicao1()[1];
-        int xFinal = movimento.getPosicao2()[0];
-        int yFinal = movimento.getPosicao2()[1];
-        if(estaNosLimites(xInicial, yInicial) && estaNosLimites(xFinal, yFinal)) {
-            if (tabuleiro[xFinal][yFinal] == SEM_PECA && tabuleiro[xInicial][yInicial] != SEM_PECA) {
-                //Se quer se mover na diagonal
-                if((Math.abs(xInicial - xFinal) == 1 ) && (Math.abs(yInicial - yFinal) == 1)) {
-                    //Se x e y têm a mesma paridade
-                    if(((xInicial % 2 == 0) && (yInicial % 2 == 0)) || ((xInicial % 2 == 1) && (yInicial % 2 == 1))) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                //Se quer se mover na vertical/horizontal
-                else if((Math.abs(xInicial - xFinal) <= 1 ) && (Math.abs(yInicial - yFinal) <= 1)) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return false;
-            }
+        if(proximaAcao(movimento.getCorPeca(), tabuleiro) == Movimento.Acao.INSERE) {
+            return isLegalInsertion(movimento, tabuleiro);
         }
-        else {
-            return false;
-        }
+        return isLegalDisplacement(movimento, tabuleiro);
     }
 
     public ArrayList<Jogada> listaPossiveisJogadasInsercao(int corPeca, int[][] tabuleiro) {
@@ -168,7 +141,7 @@ public class Tsoro extends JogoDaVelha4{
     }
     @Override
     public float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
-        float maxAlinhado =  (float)maximoAlinhado(corPeca, tabuleiro);
+        float maxAlinhado =  (float)numeroDeAlinhamentos(corPeca, tabuleiro);
         float maxDistancia = geraMaiorDistanciaMenor(corPeca, tabuleiro);
         float custo;
         if(maxAlinhado >= 4) {
