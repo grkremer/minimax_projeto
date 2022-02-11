@@ -172,7 +172,7 @@ public class MCTS implements Agente{
             bn.UpdateValorQ(recompensaDescontada);
             //bn.Learn(recompensaDescontada);
             bn = bn.getPai(); 
-            recompensaDescontada *= 0.9;
+            recompensaDescontada *= 0.8;
         }
     }
 
@@ -211,8 +211,8 @@ public class MCTS implements Agente{
         // ganhador1: 2 turnos 0,984, 0,99| 4 turnos  0,96, 0,980 =  diferença 0,02
         // ganhador2: 50 turnos 0,6, 0,94 | 100 turnos  0,33, 0,93 = diferença 0,3
         
-        float fatorDesconto = (float)Math.pow(0.99, Math.log(s.getTurnos()/2));
-        //float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
+        float fatorDesconto = (float)Math.pow(0.8, Math.log(s.getTurnos()/2));
+        //float fatorDesconto = (float)Math.pow(0.8, s.getTurnos()/2);
         
         if(s.getMarcaAgente() == s.getVencedor())
             valorUt = 1;
@@ -262,8 +262,12 @@ public class MCTS implements Agente{
 
     @Override
     public String[] getArgs(){
-        return new String[]{String.valueOf(COR_PECA), this.ID, lastGamePlayed.getNome(), String.valueOf(tempoExecucao), String.valueOf(log.numeroNodos), String.valueOf(log.mediaBranching), String.valueOf(log.maxBranching), "0", "0"};
+
+        return new String[]{this.ID, String.valueOf(COR_PECA), String.valueOf(tempoExecucao), String.valueOf(log.maxDepth), String.valueOf(log.mediaBranching), String.valueOf(log.numeroNodos), String.valueOf(log.maxBranching), log.maxBoard };
     }
+
+
+    
 
     public NodoMonteCarlo getRaiz(){
         return raiz;

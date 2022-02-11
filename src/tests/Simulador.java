@@ -71,25 +71,26 @@ public class Simulador {
                 
                 jogo.fazJogada(j, jogo.getTabuleiro(), true);
                 rodada = jogo.invertePeca(rodada);
-                if(turnos >= 30) break;
-                //Thread.sleep(500);
+                if(turnos >= 50) break;
+                //Thread.sleep(1000);
             }
             
             if(jogo.verificaVitoria(agente1.getCorPeca(), jogo.getTabuleiro())){
                 System.out.println("VITORIA jogador 1");
-                (logLst.get(logLst.size()-1)).set(8, "VITORIA");
+                (logLst.get(logLst.size()-1)).set(9, "VITORIA");
                 vitoriasA1++;
             }else if(jogo.verificaVitoria(agente2.getCorPeca(), jogo.getTabuleiro())){
                 System.out.println("VITORIA jogador 2");
-                (logLst.get(logLst.size()-1)).set(8, "VITORIA");
+                (logLst.get(logLst.size()-1)).set(9, "VITORIA");
                 vitoriasA2++;
             }else{
                 System.out.println("EMPATE");
-                (logLst.get(logLst.size()-1)).set(8, "EMPATE");
+                (logLst.get(logLst.size()-1)).set(9, "EMPATE");
                 empates++;
             }
             rodadaInicial = jogo.invertePeca(rodadaInicial);
             rodadasRestantes-=1;
+            
             
         }
         createLog(jogo.getNome(), rodadasRestantes, logLst);
@@ -104,7 +105,7 @@ public class Simulador {
         try{
         FileWriter fw = new FileWriter( arquivo );
         BufferedWriter bw = new BufferedWriter( fw );
-        bw.write("TURNO;NOME_AGENTE;COR_PECA;PLY_TIME;MAX DEPTH; MAX BRANCH; BFACTOR; TOTAL_NODES;RESULTADO;\n");
+        bw.write("TURNO;NOME_AGENTE;COR_PECA;PLY_TIME;MAX DEPTH; BFACTOR; TOTAL_NODES;MAX BRANCH;MAX BOARD;RESULTADO;\n");
 
         for(int i = 0; i < logs.size(); i++){
             String tmp = "";

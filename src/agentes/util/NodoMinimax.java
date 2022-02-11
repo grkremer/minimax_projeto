@@ -101,4 +101,16 @@ public class NodoMinimax{
     public float getRecompensa(){
         return recompensa;
     }
+
+    public String getHashBoard(){
+        int[][] board = getCopiaEstado();
+        String output = "";
+        for(int i =0; i<5; i++){
+            for(int j =0; j <5; j++){
+                output+= board[i][j];
+            }
+            output+='\t';
+        }
+        return output;
+    }
 }

@@ -20,16 +20,15 @@ public class MinimaxTree extends Minimax{
     LogMinimax log;
     NodoMinimax root;
     
-    private int numberNodes;
-
+    
 
     private final String ID = "MINIMAX_T";
-    private Jogo lastGamePlayed;
-    private int[][] lastBoardEvaluated;
-
-    protected float executionTime;
+    
+    
     protected long startTime;
     protected long endTime;
+    protected float executionTime;
+    private int numberNodes;
     public MinimaxTree(int COR_PECA, int maxDepth){
         super(COR_PECA, maxDepth);
     }
@@ -58,9 +57,6 @@ public class MinimaxTree extends Minimax{
                 max = valor;
             }
         }
-        lastGamePlayed = jogo;
-        lastBoardEvaluated = tabuleiro;
-        
         log.AvaliaArvore(root);
         closeVariables();
         System.out.println("nodesT: " + String.valueOf(numberNodes) + "\ttime:" + String.valueOf(executionTime)+"s");
@@ -121,6 +117,7 @@ public class MinimaxTree extends Minimax{
         return min;
     }
 
+    @Override
     public String[] ComputeStatistics(){
         
         String[] thisArgs = getArgs(); //nome_agente, cor_peça 
@@ -146,7 +143,7 @@ public class MinimaxTree extends Minimax{
 
     @Override
     public String[] getArgs(){
-        return new String[]{ String.valueOf(maxDepth), String.valueOf(log.maxBranching), String.valueOf(log.mediaBranching), String.valueOf(log.numeroNodos)};
+        return new String[]{ String.valueOf(maxDepth), String.valueOf(log.mediaBranching), String.valueOf(log.numeroNodos), String.valueOf(log.maxBranching), log.maxBoard};
     }
     @Override
     public String toString()

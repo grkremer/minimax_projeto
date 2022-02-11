@@ -13,6 +13,8 @@ public class LogArvoreMonteCarlo {
     public int sumFilhos;
     public float mediaBranching;
     public int maxBranching;
+    public int maxDepth;
+    public String maxBoard;
     //ArrayList<Integer> nodosPorNivel;
     HashMap<Integer, Integer> nodosPorNivel;
     public LogArvoreMonteCarlo(){
@@ -23,6 +25,8 @@ public class LogArvoreMonteCarlo {
         sumFilhos = 1;
         mediaBranching = 0;
         maxBranching = 0;
+        maxDepth=0;
+        maxBoard = "";
         
     };
 
@@ -59,6 +63,10 @@ public class LogArvoreMonteCarlo {
         //pega os filhos
         for (NodoMonteCarlo filho : (nodo.getFilhos()).values()) ProcessarArvore(filho, profundidade+1);
         
+        if(maxDepth < profundidade) {
+            maxBoard = nodo.getHashBoard();
+            maxDepth=profundidade;
+        }
     }
 
     @Override

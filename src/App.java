@@ -41,8 +41,9 @@ public class App {
         //JanelaJogo janela = new JanelaJogo(jogo);
         //jogo.jogar(new ABPruneTT(Jogo.PECA_PRETA, 6), new ABPrune(Jogo.PECA_BRANCA, 6));
         
-        Simulador s = new Simulador(new TicTackle5(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new MinimaxTree(Jogo.PECA_PRETA, 5));
-        s.Simular(100);
+        //Simulador s = new Simulador(new JogoDaVelha4(), new Random(Jogo.PECA_BRANCA), new Random(Jogo.PECA_PRETA));
+        //Simulador s = new Simulador(new TicTackle5(), new Random(Jogo.PECA_BRANCA), new Random(Jogo.PECA_PRETA));
+        s.Simular(1000);
 
         //jogo.carregaLog("logs/log.txt");
         //janela.replayHistoricoJogadas();

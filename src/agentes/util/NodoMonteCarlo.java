@@ -30,7 +30,7 @@ public class NodoMonteCarlo{
     public void UpdateValorN(){ valorN += 1;}
     
     public void Learn(double sampledReward){
-        double learningRate = 0.45;
+        double learningRate = 0.12;
         double error = sampledReward - this.valorQ;
         this.valorQ = this.valorQ + learningRate * (error);
     }
@@ -71,6 +71,18 @@ public class NodoMonteCarlo{
     }
     public NodoMonteCarlo getPai() {
         return pai;
+    }
+
+    public String getHashBoard(){
+        int[][] board = estado.getCopiaTabuleiro();
+        String output = "";
+        for(int i =0; i<5; i++){
+            for(int j =0; j <5; j++){
+                output+= board[i][j];
+            }
+            output+='\t';
+        }
+        return output;
     }
 
 }

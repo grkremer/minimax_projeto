@@ -17,6 +17,7 @@ public class LogMinimax {
     public int maxDepth;
     //ArrayList<Integer> nodosPorNivel;
     HashMap<Integer, Integer> nodosPorNivel;
+    public String maxBoard;
 
     float tempoExecucao;
     long startTime;
@@ -31,6 +32,7 @@ public class LogMinimax {
         maxBranching = 0;
         tempoExecucao = 0;
         maxDepth = 0;
+        maxBoard = "";
         startTime = System.currentTimeMillis();
     };
 
@@ -63,7 +65,10 @@ public class LogMinimax {
         //pega os filhos
         for (NodoMinimax filho : nodo.getFilhos().values()) ProcessarArvore(filho, profundidade+1);
 
-        if(profundidade > maxDepth) maxDepth = profundidade;
+        if(profundidade > maxDepth) {
+            maxDepth = profundidade;
+            maxBoard = nodo.getHashBoard();
+        }
         
     }
 
