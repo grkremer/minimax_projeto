@@ -38,9 +38,6 @@ public class App {
         // Simulador s2 = new Simulador(new TicTackle5(), new ABPruneTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
         // s2.Simular("JogoDaVelha-teste2", 100);
         
-        //OBSERVAÇÃO: NOS ARQUIVOS DE LOG DE TESTE TEVE EMPATE ANTES DO TURNO 25, COMO?
-        Simulador s1 = new Simulador(new JogoDaVelha4(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 0.25/*1/Math.sqrt(2)*/, 0.9, "STND", "AVG", true));
-        s1.Simular("tst1", 100);
         
         //jogo.carregaLog("logs/log.txt");
         //janela.replayHistoricoJogadas();
