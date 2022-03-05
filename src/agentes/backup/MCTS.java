@@ -1,4 +1,4 @@
-package agentes;
+package agentes.backup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -11,7 +11,7 @@ import logging.LogArvoreMonteCarlo;
 /* 
     Monte-Carlo Tree Search (MCTS) using UCB1 policy
 */
-public class MCTSError implements Agente{
+public class MCTS implements IAgent{
     
     int maxSimulacoes;
     double coeficienteExploracao;
@@ -25,13 +25,13 @@ public class MCTSError implements Agente{
     protected long startTime;
     protected long endTime;
 
-    public MCTSError(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
+    public MCTS(int COR_PECA, int maxSimulacoes, double coeficienteExploracao){
         this.maxSimulacoes = maxSimulacoes;
         this.coeficienteExploracao = coeficienteExploracao;
         this.COR_PECA = COR_PECA;
     }
 
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         
         
         Estado estadoInicial = new Estado(tabuleiro, COR_PECA, false, 0, COR_PECA, 0);
@@ -47,7 +47,7 @@ public class MCTSError implements Agente{
     }
 
    private Jogada BuscaArvoreMonteCarlo(Jogo jogo) throws InterruptedException{ 
-        //numbero episodes
+        
         for(int it = 0; Condicional(it); it++){
             NodoMonteCarlo novoNodo = selecionaNodo(jogo, raiz);
             double recompensa = simulaJogo(jogo, novoNodo);
@@ -169,16 +169,16 @@ public class MCTSError implements Agente{
         double recompensaDescontada = recompensa;
         while(!(bn == null)){
             bn.UpdateValorN();
-            //bn.UpdateValorQ(recompensaDescontada);
-            bn.Learn(recompensaDescontada);
+            bn.UpdateValorQ(recompensaDescontada);
+            //bn.Learn(recompensaDescontada);
             bn = bn.getPai(); 
             recompensaDescontada *= 0.8;
         }
     }
 
     private double calculaUCB(NodoMonteCarlo n) {
-        //double recompensa = n.getValorQ()/n.getValorN();
-        double recompensa = n.getValorQ();
+        double recompensa = n.getValorQ()/n.getValorN();
+        //double recompensa = n.getValorQ();
         double exploracao = coeficienteExploracao * Math.sqrt( (2*Math.log(n.getPai().getValorN()))/n.getValorN() );
         return recompensa + exploracao;
     }
@@ -212,7 +212,7 @@ public class MCTSError implements Agente{
         // ganhador2: 50 turnos 0,6, 0,94 | 100 turnos  0,33, 0,93 = diferença 0,3
         
         float fatorDesconto = (float)Math.pow(0.8, Math.log(s.getTurnos()/2));
-        //float fatorDesconto = (float)Math.pow(0.99, s.getTurnos()/2);
+        //float fatorDesconto = (float)Math.pow(0.8, s.getTurnos()/2);
         
         if(s.getMarcaAgente() == s.getVencedor())
             valorUt = 1;
@@ -266,6 +266,9 @@ public class MCTSError implements Agente{
         return new String[]{this.ID, String.valueOf(COR_PECA), String.valueOf(tempoExecucao), String.valueOf(log.maxDepth), String.valueOf(log.mediaBranching), String.valueOf(log.numeroNodos), String.valueOf(log.maxBranching), log.maxBoard };
     }
 
+
+    
+
     public NodoMonteCarlo getRaiz(){
         return raiz;
     }
@@ -275,7 +278,7 @@ public class MCTSError implements Agente{
     }
     @Override
     public String toString(){
-        return log.toString();
+        return "";//log.toString();
     }
 
 }

@@ -2,7 +2,8 @@ package logging;
 
 import java.util.HashMap;
 
-import agentes.util.NodoMonteCarlo;
+import agentes.backup.NodoMonteCarlo;
+import agentes.util.NodeMCTS;
 // número de nodos
 // número de nodos por filho (Média)
 // número máximo de filhos por nodo (Max)
@@ -65,6 +66,43 @@ public class LogArvoreMonteCarlo {
         
         if(maxDepth < profundidade) {
             maxBoard = nodo.getHashBoard();
+            maxDepth=profundidade;
+        }
+    }
+
+    public void AvaliaArvore(NodeMCTS raiz)
+    {
+        ProcessarArvore(raiz, 0);
+        mediaBranching = sumFilhos/nodosInternos;
+    }
+
+    private void ProcessarArvore(NodeMCTS nodo, int profundidade)
+    {
+        numeroNodos+=1;
+        
+        if(nodo == null) return;
+        
+        Integer numeroFilhos = nodo.getChildren().size() ;
+        
+        if(numeroFilhos>0){ //se não for nodo folha quer dizer que foi expandido
+            nodosInternos++;
+            sumFilhos += numeroFilhos + nodo.getAvailableActions().size();
+        }
+
+        //atualiza maxBranching
+        if(maxBranching < numeroFilhos + nodo.getAvailableActions().size()) {
+            maxBoard = nodo.getHashBoard();
+            maxBranching = numeroFilhos + nodo.getAvailableActions().size();
+        }
+
+        //atualiza nodos por nível
+        //if(nodosPorNivel.size() < profundidade) nodosPorNivel.add(numeroFilhos);
+        if(!nodosPorNivel.containsKey(profundidade)) nodosPorNivel.put(profundidade,1);
+        else nodosPorNivel.put(profundidade, nodosPorNivel.get(profundidade)+1) ;
+        //pega os filhos
+        for (NodeMCTS filho : (nodo.getChildren()).values()) ProcessarArvore(filho, profundidade+1);
+        
+        if(maxDepth < profundidade) {
             maxDepth=profundidade;
         }
     }

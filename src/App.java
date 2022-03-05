@@ -4,49 +4,44 @@ import jogos.util.Jogo;
 import org.junit.runner.manipulation.Alphanumeric;
 
 import agentes.*;
+import agentes.Trees.ABPruneTree;
 import agentes.Trees.MinimaxTree;
 import interfaces.*;
 import tests.*;
 public class App {
-    /* 
-        OBSERVAÇÃO: o MINIMAX ta com shuffle
-        OBSERVAÇÃO2: usar desconto 0.99f aumenta muito o tempo de execução do NegABPrune
-        TODO: acompanhar as partidas, ABPRUNE ta estranho talvez seja a função custo no ticktackle não ta conseguindo finalizar a partida
-        
-        TODO2: acho que o NegTT tem coisa errada
-
-        obs: parece que o NegABPrune ta mais fraco que o ABPrune
-        Minimax 3 | NegABPrune 7 | 10 simul -> 10 empates
-        NegABPrune 3 | NegABPrune 7 | 10 simul -> 10 empates
-        Negamax 3 | NegABPrune 7 | 10 simul -> 10 empates
-
-        ABPrune 3 | NegABPrune 7 | 10 simul -> 10 empates
-    
-        ABPrune 7 | NegABPrune 3 | 10 simul -> 5 vit ABPrune 5 empates *quando ABPrune com maior profundidade é usado, ele sempre ganha quando começa
-        ABPrune 7 | Minimax 3 | 10 simul -> -> 5 vit ABPrune 5 empates
-
-        * antes eu tava retornando o valor do alpha, agora corrigi e acredito que tenha obtido o resultado correto
-        ABPrune 3 | NegABPrune 7 | 10 simul -> 5 vit NegABPrune 5 empates
-
-        * agora corrigir o NegTT
-        NegTT 7 | NegABPrune 3 | 10 simul -> 10 empates
-        NegTT 7 | ABPrune 3 | 10 simul -> 5 empates 5 vitorórias PRO ABPRUNE! 
-        *coloquei agora na hora de retornar o valor na tabela de transposição *sign e retornou 10 empates (jogou um pouco melhor)
-        *IDEIA: talvez adicionar no hash o valor do sign
-
-    */
     public static void main(String[] args) throws Exception {
-        
-        //Jogo jogo = new Tsoro();  // new Rastros(obj player 1, obj player 2);
+        //Jogo jogo = new TicTackle5();  // new Rastros(obj player 1, obj player 2);
         //JanelaJogo janela = new JanelaJogo(jogo);
-        //jogo.jogar(new ABPrune(Jogo.PECA_PRETA, 6), new Humano(Jogo.PECA_BRANCA, janela));
+        //jogo.jogar(new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 10000, 1/Math.sqrt(2), 0.6, "STND", "AVG", true));
         
-        //Simulador s = new Simulador(new JogoDaVelha4(), new Random(Jogo.PECA_BRANCA), new Random(Jogo.PECA_PRETA));
-        //Simulador s = new Simulador(new TicTackle5(), new Random(Jogo.PECA_BRANCA), new Random(Jogo.PECA_PRETA));
-        s.Simular(1000);
-        //Simulador s = new Simulador(new TicTackle5(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new MinimaxTree(Jogo.PECA_PRETA, 5));
-        //s.Simular(100);
 
+        // *****  MUDANÇAS PARA FAZER ******
+        // botar o shuffle no ABPRUNETree
+        // colocar simetria opcional por parâmetro
+        // tentar otimizar Jogo da velha 4 e Tick tackle
+        
+        // ****** RODAR TESTES *******
+        
+        // TESTE 1
+        // Simulador s1 = new Simulador(new JogoDaVelha4(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
+        // s1.Simular("JogoDaVelha-teste1", 100);
+
+        // TESTE 2
+        // Simulador s2 = new Simulador(new JogoDaVelha4(), new ABPruneTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
+        // s2.Simular("JogoDaVelha-teste2", 100);
+        
+        // TESTE 3
+        // Simulador s1 = new Simulador(new TicTackle5(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
+        // s1.Simular("JogoDaVelha-teste1", 100);
+
+        // TESTE 4
+        // Simulador s2 = new Simulador(new TicTackle5(), new ABPruneTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
+        // s2.Simular("JogoDaVelha-teste2", 100);
+        
+        //OBSERVAÇÃO: NOS ARQUIVOS DE LOG DE TESTE TEVE EMPATE ANTES DO TURNO 25, COMO?
+        Simulador s1 = new Simulador(new JogoDaVelha4(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 0.25/*1/Math.sqrt(2)*/, 0.9, "STND", "AVG", true));
+        s1.Simular("tst1", 100);
+        
         //jogo.carregaLog("logs/log.txt");
         //janela.replayHistoricoJogadas();
     }

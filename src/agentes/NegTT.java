@@ -25,7 +25,7 @@ public class NegTT extends Negamax{
     }
     
     @Override
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         initializeVariables();
         numberNodes = 1;
         transpositions=0;
@@ -172,7 +172,7 @@ public class NegTT extends Negamax{
         NegTTTree logTree = new NegTTTree(COR_PECA, maxDepth);
         
         try{
-            logTree.Mover(this.lastGamePlayed, lastBoardEvaluated);
+            logTree.Move(this.lastGamePlayed, lastBoardEvaluated);
         }catch(InterruptedException e){
 
         }

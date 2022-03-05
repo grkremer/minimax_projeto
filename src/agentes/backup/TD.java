@@ -2,16 +2,16 @@ package agentes.backup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import agentes.util.Agente;
+import agentes.util.IAgent;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
-public class TD implements Agente{
+public class TD implements IAgent{
     private HashMap<String, Double> stateValue;
     private HashMap<Pair<Jogada,String>,String> stateAction; //(state,action)-> state
     private int agentMark;
     private Jogo game;
 
-    public Jogada Mover(Jogo game, int[][] board){ //move
+    public Jogada Move(Jogo game, int[][] board){ //move
         return null;
     }
 

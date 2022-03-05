@@ -20,7 +20,7 @@ public class NegABPrune extends Negamax{
     }
     
     @Override
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         super.initializeVariables();
         super.numberNodes=1;
         cutoffs=0;
@@ -74,7 +74,7 @@ public class NegABPrune extends Negamax{
         NegABPruneTree logTree = new NegABPruneTree(COR_PECA, maxDepth);
         
         try{
-            logTree.Mover(lastGamePlayed, lastBoardEvaluated);
+            logTree.Move(lastGamePlayed, lastBoardEvaluated);
         }catch(InterruptedException e){
 
         }

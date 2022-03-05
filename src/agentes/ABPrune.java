@@ -24,7 +24,7 @@ public class ABPrune extends Minimax{
     }
 
     @Override
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         super.initializeVariables();
         super.numberNodes=1;
         cutoffs=0;
@@ -102,7 +102,7 @@ public class ABPrune extends Minimax{
         ABPruneTree logTree = new ABPruneTree(COR_PECA, maxDepth);
         
         try{
-            logTree.Mover(lastGamePlayed, lastBoardEvaluated);
+            logTree.Move(lastGamePlayed, lastBoardEvaluated, null);
         }catch(InterruptedException e){
 
         }
@@ -124,5 +124,10 @@ public class ABPrune extends Minimax{
     public String toString()
     {
         return "";
+    }
+
+    @Override
+    public String getID(){
+        return ID;
     }
 }

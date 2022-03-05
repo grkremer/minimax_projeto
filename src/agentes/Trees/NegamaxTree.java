@@ -18,7 +18,7 @@ public class NegamaxTree extends Negamax{
         super(COR_PECA, profundidadeMax);
     }
     
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         initializeVariables();
         root = new NodoMinimax(tabuleiro, COR_PECA, 0);
         numberNodes=1;

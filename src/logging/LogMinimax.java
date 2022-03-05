@@ -56,7 +56,10 @@ public class LogMinimax {
         }
 
         //atualiza maxBranching
-        if(maxBranching < numeroFilhos) maxBranching = numeroFilhos;
+        if(maxBranching < numeroFilhos) {
+            maxBranching = numeroFilhos;
+            maxBoard = nodo.getHashBoard();
+        }
 
         //atualiza nodos por nível
         //if(nodosPorNivel.size() < profundidade) nodosPorNivel.add(numeroFilhos);
@@ -67,7 +70,6 @@ public class LogMinimax {
 
         if(profundidade > maxDepth) {
             maxDepth = profundidade;
-            maxBoard = nodo.getHashBoard();
         }
         
     }

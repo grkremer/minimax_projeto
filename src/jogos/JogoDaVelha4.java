@@ -120,26 +120,35 @@ public class JogoDaVelha4 extends Jogo {
 
         //testa 4 alinhamentos
         for(int i = 0; i < 4; i++){
+            
+            lineSequence = 0;
+            columnSequence = 0;
+            
             //diagonal princial
-            if ( (tabuleiro[i][i] == corPeca) && (tabuleiro[i + 1][i + 1] == corPeca)) { dpSequence++; }
+            if ( (tabuleiro[i][i] == corPeca)) { dpSequence++; }
+            else dpSequence = 0;
             //diagonal secundária
-            if ( (tabuleiro[i][4 - i] == corPeca) && tabuleiro[i + 1][4 - (i + 1)] == corPeca) { dsSequence++; }
+            if ( (tabuleiro[i][4 - i] == corPeca)) { dsSequence++; }
+            else dsSequence = 0;
 
+            if(dpSequence >= 4 || dsSequence >= 4) return true;
+            
             for (int j = 0; j < 4; j++)
             {
                 //em linha
-                if ((tabuleiro[j][i]== corPeca) && (tabuleiro[j+1][i] == corPeca)) { lineSequence++; }
+                if ((tabuleiro[j][i]== corPeca)) { lineSequence++; }
+                else lineSequence = 0;
                 //em coluna
-                if ( (tabuleiro[i][j] == corPeca) && (tabuleiro[i][j+1] == corPeca)) { columnSequence++; }
-                
-            }
+                if ( (tabuleiro[i][j] == corPeca)) { columnSequence++; }
+                else columnSequence = 0;
 
-            if(lineSequence > 2 || columnSequence > 2) return true;
-            lineSequence = 0;
-            columnSequence = 0;
+                if(lineSequence >= 4 || columnSequence >= 4) return true;
+            
+            }
+            
         }
-        if(dpSequence > 2 || dsSequence > 2) return true;
-        else return false;
+        
+        return false;
 
     }
 
@@ -255,47 +264,60 @@ public class JogoDaVelha4 extends Jogo {
         return maximo;
     }
 */
+    // * Search for three pieces in sequence
     public boolean tentaAcharTripla(int corPeca, int[][] tabuleiro) {
 
-        for(int y=0; y < ALTURA_TABULEIRO; y++) //horizontal
-            if(tabuleiro[0][y] == SEM_PECA && tabuleiro[4][y] == SEM_PECA)
-                if (tabuleiro[1][y] == corPeca && tabuleiro[2][y] == corPeca && tabuleiro[3][y] == corPeca)
+        for(int i=0; i < ALTURA_TABULEIRO; i++) 
+        {
+            if(tabuleiro[0][i] == SEM_PECA && tabuleiro[4][i] == SEM_PECA) //horizontal
+                if (tabuleiro[1][i] == corPeca && tabuleiro[2][i] == corPeca && tabuleiro[3][i] == corPeca)
                     return true;
-
-        for(int x=0; x < ALTURA_TABULEIRO; x++) //vertical
-            if(tabuleiro[x][0] == SEM_PECA && tabuleiro[x][4] == SEM_PECA)
-                if (tabuleiro[x][1] == corPeca && tabuleiro[x][2] == corPeca && tabuleiro[x][3] == corPeca)
+            
+            if(tabuleiro[i][0] == SEM_PECA && tabuleiro[i][4] == SEM_PECA) //vertical
+                if (tabuleiro[i][1] == corPeca && tabuleiro[i][2] == corPeca && tabuleiro[i][3] == corPeca)
                     return true;
-
+        }
+        
         if (tabuleiro[0][0] == SEM_PECA && tabuleiro[1][1]== corPeca && tabuleiro [2][2] == corPeca && tabuleiro[3][3] == corPeca && tabuleiro [4][4] == SEM_PECA)
             return true;
 
         if (tabuleiro[0][4] == SEM_PECA && tabuleiro[1][3]== corPeca && tabuleiro [2][2] == corPeca && tabuleiro[3][1] == corPeca && tabuleiro [4][0] == SEM_PECA)
             return true;
+
         return false;
     }
+
+    // * Search for two pieces in sequence
     public int contaDuplas(int corPeca, int[][] tabuleiro) {
         int contagem = 0;
-        for(int y=0; y < ALTURA_TABULEIRO; y++) //horizontal
-            if(tabuleiro[0][y] == SEM_PECA && tabuleiro[3][y] == SEM_PECA)
-                if (tabuleiro[1][y] == corPeca && tabuleiro[2][y] == corPeca)
+        for(int i=0; i < ALTURA_TABULEIRO; i++) {
+            
+            if(tabuleiro[0][i] == SEM_PECA && tabuleiro[3][i] == SEM_PECA){ //horizontal 1
+                if (tabuleiro[1][i] == corPeca && tabuleiro[2][i] == corPeca) {
                     contagem ++;
-        for(int y=0; y < ALTURA_TABULEIRO; y++) //horizontal
-            if(tabuleiro[1][y] == SEM_PECA && tabuleiro[4][y] == SEM_PECA)
-                if (tabuleiro[2][y] == corPeca && tabuleiro[3][y] == corPeca)
+                }
+            }
+            
+            if(tabuleiro[1][i] == SEM_PECA && tabuleiro[4][i] == SEM_PECA){ //horizontal 2
+                if (tabuleiro[2][i] == corPeca && tabuleiro[3][i] == corPeca){
                     contagem ++;
-        //Horizontal
+                }
+            }
 
-        for(int x=0; x < ALTURA_TABULEIRO; x++) //vertical
-            if(tabuleiro[x][0] == SEM_PECA && tabuleiro[x][3] == SEM_PECA)
-                if (tabuleiro[x][1] == corPeca && tabuleiro[x][2] == corPeca)
+            if(tabuleiro[i][0] == SEM_PECA && tabuleiro[i][3] == SEM_PECA){ //vertical 1
+                if (tabuleiro[i][1] == corPeca && tabuleiro[i][2] == corPeca){
                     contagem ++;
-        for(int x=0; x < ALTURA_TABULEIRO; x++) //vertical
-            if(tabuleiro[x][1] == SEM_PECA && tabuleiro[x][4] == SEM_PECA)
-                if (tabuleiro[x][2] == corPeca && tabuleiro[x][3] == corPeca)
-                    contagem ++;
-        //Vertical
+                }
+            }
 
+            if(tabuleiro[i][1] == SEM_PECA && tabuleiro[i][4] == SEM_PECA){ //vertical 2
+                if (tabuleiro[i][2] == corPeca && tabuleiro[i][3] == corPeca){
+                    contagem ++;
+                }
+            }
+        }
+        
+        
         if (tabuleiro[0][0] == SEM_PECA && tabuleiro[1][1] == corPeca && tabuleiro [2][2] == corPeca && tabuleiro[3][3] == SEM_PECA)
             contagem ++;
         if (tabuleiro[1][1] == SEM_PECA && tabuleiro [2][2] == corPeca && tabuleiro[3][3] == corPeca && tabuleiro [4][4] == SEM_PECA)
@@ -340,75 +362,6 @@ public class JogoDaVelha4 extends Jogo {
         return verificaVitoria(PECA_BRANCA, tabuleiro) || verificaVitoria(PECA_PRETA, tabuleiro) || contaPecas(SEM_PECA, tabuleiro) == 0;
     }
     
-    public int numeroDeAlinhamentos(int corPeca, int[][] tabuleiro) {
-        int contagem = 0;
-        boolean encontrouPecaLinha;
-        
-        for(int y=0; y < ALTURA_TABULEIRO; y++) {
-            encontrouPecaLinha = false;
-            for(int x=0; x < LARGURA_TABULEIRO; x++) {
-                if(tabuleiro[x][y] == corPeca) {
-                    if(encontrouPecaLinha)  contagem++;
-                    else encontrouPecaLinha = true;
-                }
-            }
-        }
-        for(int x=0; x < LARGURA_TABULEIRO; x++) {
-            encontrouPecaLinha = false;
-            for(int y=0; y < ALTURA_TABULEIRO; y++) {
-                if(tabuleiro[x][y] == corPeca) {
-                    if(encontrouPecaLinha)  contagem++;
-                    else encontrouPecaLinha = true;
-                }
-            }
-        }
-        encontrouPecaLinha = false;
-        for(int x=0; x < LARGURA_TABULEIRO; x++) {
-            if(tabuleiro[x][x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
-                else encontrouPecaLinha = true;
-            }
-        }
-        encontrouPecaLinha = false;
-        for(int x=1; x < LARGURA_TABULEIRO; x++) {
-            if(tabuleiro[x][x-1] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
-                else encontrouPecaLinha = true;
-            }
-        }
-
-        encontrouPecaLinha = false;
-        for(int x=0; x < LARGURA_TABULEIRO-1; x++) {
-            if(tabuleiro[x][x+1] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
-                else encontrouPecaLinha = true;
-            }
-        }
-
-        encontrouPecaLinha = false;
-        for(int x=LARGURA_TABULEIRO-1; x >= 0; x--) {
-            if(tabuleiro[x][(LARGURA_TABULEIRO-1)-x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
-                else encontrouPecaLinha = true;
-            }
-        }
-        encontrouPecaLinha = false;
-        for(int x=LARGURA_TABULEIRO-1; x >= 1; x--) {
-            if(tabuleiro[x-1][LARGURA_TABULEIRO-1-x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
-                else encontrouPecaLinha = true;
-            }
-        }
-        encontrouPecaLinha = false;
-        for(int x=LARGURA_TABULEIRO-2; x >= 0; x--) {
-            if(tabuleiro[x+1][LARGURA_TABULEIRO-1-x] == corPeca) {
-                if(encontrouPecaLinha)  contagem++;
-                else encontrouPecaLinha = true;
-            }
-        }
-        return contagem;
-    }
-
     public int numeroDeAlinhamentosComVazios(int corPeca, int[][] tabuleiro) {
         int pontos = 0;
         boolean encontrouPecaLinha;
@@ -446,6 +399,7 @@ public class JogoDaVelha4 extends Jogo {
             nCorPeca = 0;
             nOutraCor = 0;
             nConsecutivos = 0;
+            
             for(int y=0; y < ALTURA_TABULEIRO; y++) {
                 if(tabuleiro[x][y] == corPeca) {
                     nCorPeca++;
@@ -599,7 +553,7 @@ public class JogoDaVelha4 extends Jogo {
 
         return pontos;
     }
-
+    
     public float geraCustoPeca(int corPeca, int[][] tabuleiro, int minPontos, int maxPontos) {
         float pontosTripla = (float)minPontos;
         if(tentaAcharTripla(corPeca, tabuleiro)) {

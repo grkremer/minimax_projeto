@@ -1,6 +1,7 @@
-package agentes.util;
+package agentes.backup;
 import java.util.HashMap;
 
+import agentes.util.Estado;
 import jogos.util.Jogada;
 
 import java.util.ArrayList;

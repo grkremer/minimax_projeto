@@ -8,16 +8,26 @@ import jogos.util.Jogada;
 import jogos.util.Jogo;
 import logging.LogMinimax;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class ABPruneTree extends ABPrune{
     NodoMinimax root;
     LogMinimax log;
+    
+    private final String ID = "MINIMAX_T";
+    private long startTime;
+    private long endTime;
+    private float runningTime;
+    private int numberNodes;
     
     public ABPruneTree(int COR_PECA, int profundadeMax){
         super(COR_PECA, profundadeMax);
     }
 
     @Override
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         initializeVariables();
         super.numberNodes=1;
         super.cutoffs=0;
@@ -46,9 +56,9 @@ public class ABPruneTree extends ABPrune{
             
         }
         
-        super.closeVariables();
+        closeVariables();
         log.AvaliaArvore(root);
-        System.out.println("nodesTree: " + String.valueOf(numberNodes) + "\ncutoffsTree: " + String.valueOf(cutoffs));
+        System.out.println("nodesTree: " + String.valueOf(numberNodes) + "\ttime" + String.valueOf(runningTime)  + "\ncutoffsTree: " + String.valueOf(cutoffs));
         return melhorJogada;
         
     }
@@ -120,9 +130,28 @@ public class ABPruneTree extends ABPrune{
     }    
 
     @Override
+    public String[] ComputeStatistics(){
+        
+        String[] thisArgs = getArgs(); //nome_agente, cor_peça 
+        String[] arr = new String[]{this.ID, String.valueOf(COR_PECA), String.valueOf(runningTime)};
+        String[] result = Arrays.copyOf(arr, arr.length + thisArgs.length);
+        System.arraycopy(thisArgs, 0, result, arr.length, thisArgs.length);
+        return result;
+    }
+    
+    @Override
     protected void initializeVariables(){
         super.initializeVariables();
         log = new LogMinimax();
+        runningTime = 0;
+        startTime = System.currentTimeMillis(); 
+    
+    }
+
+    @Override
+    protected void closeVariables(){
+        endTime = System.currentTimeMillis();
+        runningTime = (endTime - startTime)/1000f;
     }
 
     @Override

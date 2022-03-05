@@ -3,11 +3,11 @@ package agentes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
-import agentes.util.Agente;
+import agentes.util.IAgent;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
 
-public class Random implements Agente{
+public class Random implements IAgent{
     
     protected int COR_PECA;
     private int branch;
@@ -27,7 +27,7 @@ public class Random implements Agente{
     }
     
     @Override
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException
     {
         List<Jogada> actions = jogo.listaPossiveisJogadas(COR_PECA, tabuleiro);
         branch = actions.size();

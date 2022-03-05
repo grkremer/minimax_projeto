@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import agentes.util.Agente;
+import agentes.util.IAgent;
 
 
 public class Jogo {
@@ -233,23 +233,26 @@ public class Jogo {
         }
     }
     
-    public void jogar(Agente jogador1, Agente jogador2) throws InterruptedException{
+    public void jogar(IAgent jogador1, IAgent jogador2) throws InterruptedException{
         setHistoricoJogadas(new ArrayList<Jogada>());
         inicializaTabuleiro();
         
         int rodada = PECA_BRANCA;
+        String[] executionTime = new String[]{"3"};
         while(!verificaFimDeJogo(getTabuleiro())) {
             
             Jogada j = null;
             if(jogador1.getCorPeca() == rodada)
             {
                 System.out.println("\n*****************************\nVez do jogador1");
-                j = jogador1.Mover(this, getTabuleiro());
+                j = jogador1.Move(this, getTabuleiro(), null);
+                String[] args = jogador1.ComputeStatistics();
+                executionTime[0] = args[2];
                 System.out.println(jogador1);
                 
             }else{
                 System.out.println("\n*****************************\nVez do jogador2");
-                j = jogador2.Mover(this, getTabuleiro());
+                j = jogador2.Move(this, getTabuleiro(), executionTime);
                 System.out.println(jogador2);
             }
             fazJogada(j, getTabuleiro(), true);

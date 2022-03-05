@@ -1,13 +1,13 @@
 package agentes;
 
 import java.util.Collections;
-import agentes.util.Agente;
+import agentes.util.IAgent;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
 import agentes.Trees.MinimaxTree;
 import java.util.Arrays;
 import java.util.List;
-public class Minimax implements Agente{
+public class Minimax implements IAgent{
     
     private final String ID = "MINIMAX";
     private Jogo lastGamePlayed;
@@ -30,7 +30,7 @@ public class Minimax implements Agente{
         this.COR_PECA = COR_PECA;
     }
 
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         initializeVariables();
         numberNodes = 1;
         
@@ -101,7 +101,7 @@ public class Minimax implements Agente{
         Minimax logTree = new MinimaxTree(COR_PECA, maxDepth);
         
         try{
-            logTree.Mover(this.lastGamePlayed, lastBoardEvaluated);
+            logTree.Move(this.lastGamePlayed, lastBoardEvaluated, null);
         }catch(InterruptedException e){
 
         }
@@ -122,6 +122,12 @@ public class Minimax implements Agente{
         endTime = System.currentTimeMillis();
         executionTime = (endTime - startTime)/1000f;
     }
+
+
+    @Override
+    public String getID(){
+        return ID;
+    } 
 
     @Override
     public int getCorPeca(){

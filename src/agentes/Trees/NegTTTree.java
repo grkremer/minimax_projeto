@@ -20,7 +20,7 @@ public class NegTTTree extends NegTT{
     }
     
     @Override
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         initializeVariables();
         numberNodes = 1;
         transpositions=0;

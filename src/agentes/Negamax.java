@@ -1,6 +1,6 @@
 package agentes;
 
-import agentes.util.Agente;
+import agentes.util.IAgent;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
 import agentes.Trees.NegamaxTree;
@@ -13,7 +13,7 @@ import java.util.Arrays;
     logNegamax INCOMPLETE
 
 */
-public class Negamax implements Agente{
+public class Negamax implements IAgent{
     private final String ID = "NEGAMAX";
     protected Jogo lastGamePlayed;
     protected int[][] lastBoardEvaluated;
@@ -31,7 +31,7 @@ public class Negamax implements Agente{
         this.maxDepth = profundidadeMax;
     }
     
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         initializeVariables();
         numberNodes=1;
 
@@ -91,7 +91,7 @@ public class Negamax implements Agente{
         NegamaxTree logTree = new NegamaxTree(COR_PECA, maxDepth);
         
         try{
-            logTree.Mover(this.lastGamePlayed, lastBoardEvaluated);
+            logTree.Move(this.lastGamePlayed, lastBoardEvaluated, null);
         }catch(InterruptedException e){
 
         }

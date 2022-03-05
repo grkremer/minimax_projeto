@@ -1,10 +1,10 @@
 package agentes;
 import interfaces.JanelaJogo;
 
-import agentes.util.Agente;
+import agentes.util.IAgent;
 import jogos.util.*;
 
-public class Humano implements Agente{
+public class Humano implements IAgent{
     private JanelaJogo janelaJogo;
     private int corPeca = 0;
 
@@ -27,7 +27,7 @@ public class Humano implements Agente{
         getJanelaJogo().setCorPecaHumano(corPeca);
     }
 
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException {
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException {
         getJanelaJogo().setHumanoJogando(true);
         while(getJanelaJogo().isHumanoJogando()) {
             Thread.sleep(1);

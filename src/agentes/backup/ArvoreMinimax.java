@@ -2,11 +2,11 @@ package agentes.backup;
 
 import java.util.Collections;
 
-import agentes.util.Agente;
+import agentes.util.IAgent;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
 import logging.LogArvoreJogo;
-public class ArvoreMinimax implements Agente{
+public class ArvoreMinimax implements IAgent{
     int profundidade;
     int COR_PECA;
     Boolean podaLigada;
@@ -25,7 +25,7 @@ public class ArvoreMinimax implements Agente{
         this.COR_PECA = COR_PECA;
     }
     
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         if(podaLigada){ return MoverComPoda(jogo, tabuleiro, COR_PECA, COR_PECA); }
         else return MoverSemPoda(jogo, tabuleiro, COR_PECA, COR_PECA);
     }

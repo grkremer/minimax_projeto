@@ -33,7 +33,7 @@ public class MinimaxTree extends Minimax{
         super(COR_PECA, maxDepth);
     }
 
-    public Jogada Mover(Jogo jogo, int[][] tabuleiro) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
         initializeVariables();
         numberNodes = 1;
         root = new NodoMinimax(tabuleiro, COR_PECA, 0);
