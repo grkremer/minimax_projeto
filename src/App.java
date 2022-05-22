@@ -20,11 +20,18 @@ public class App {
         // colocar simetria opcional por parâmetro
         // tentar otimizar Jogo da velha 4 e Tick tackle
         
+        
+        Simulador s = new Simulador(new JogoDaVelha4(), new MCTS(Jogo.PECA_BRANCA, 1000, 1, true, true), new MCTS(Jogo.PECA_PRETA, 2000, 1, false, false));
+        s.Simular("teste-mMCTS", 100);
+        
+        //JogoDaVelha4 jogo = new JogoDaVelha4();
+        //System.out.println(jogo.maximoAlinhado(-1, new int[][]{ {1,0,0,0,0}, {0,1,0,0,0}, {0,0,1,0,0}, {0,0,0,1,0}, {-1,-1,-1,-1,0}} ));
+        
         // ****** RODAR TESTES *******
         
         // TESTE 1
-        // Simulador s1 = new Simulador(new JogoDaVelha4(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
-        // s1.Simular("JogoDaVelha-teste1", 100);
+        //Simulador s1 = new Simulador(new JogoDaVelha4(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
+        //s1.Simular("JogoDaVelha-teste1", 100);
 
         // TESTE 2
         // Simulador s2 = new Simulador(new JogoDaVelha4(), new ABPruneTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));

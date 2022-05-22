@@ -40,12 +40,13 @@ public class Simulador {
         int vitoriasA1 = 0;
         int vitoriasA2 = 0;
         int empates = 0;
-        //JanelaJogo janela = new JanelaJogo(jogo);
+        JanelaJogo janela = new JanelaJogo(jogo);
         
         
         List<List<String>> logLst = new ArrayList<List<String>>();
         String[] executionTime = new String[]{"10"};
           
+        /* 
         try{
             createFile(fileName, jogo.getNome());
         }catch(FileAlreadyExistsException var){
@@ -58,6 +59,7 @@ public class Simulador {
             System.out.println("Check if the isnt a folder with the exact game name, if doesent exist, create one. ");
             return;
         }
+        */
 
         while(rodadasRestantes > 0){
             jogo.inicializaTabuleiro();;
@@ -117,8 +119,8 @@ public class Simulador {
             }
             
         }
-        writeLog(fileName, jogo.getNome(), logLst);
-        closeLog(fileName, jogo.getNome(), vitoriasA1, vitoriasA2, empates, agente1.getID(), agente2.getID());
+        //writeLog(fileName, jogo.getNome(), logLst);
+        //closeLog(fileName, jogo.getNome(), vitoriasA1, vitoriasA2, empates, agente1.getID(), agente2.getID());
         System.out.println("Vitorias Agente1: " + vitoriasA1 + "\nVitorias Agente2: " + vitoriasA2 + "\nEmpate: " + empates);
     
     }

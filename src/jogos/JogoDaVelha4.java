@@ -1,7 +1,6 @@
 package jogos;
 import java.util.ArrayList;
 
-import agentes.backup.ArvoreDeJogadas;
 import jogos.util.*;
 
 public class JogoDaVelha4 extends Jogo {
@@ -119,7 +118,7 @@ public class JogoDaVelha4 extends Jogo {
         int dsSequence = 0; //diagonal secundaria
 
         //testa 4 alinhamentos
-        for(int i = 0; i < 4; i++){
+        for(int i = 0; i < 5; i++){
             
             lineSequence = 0;
             columnSequence = 0;
@@ -133,7 +132,7 @@ public class JogoDaVelha4 extends Jogo {
 
             if(dpSequence >= 4 || dsSequence >= 4) return true;
             
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 5; j++)
             {
                 //em linha
                 if ((tabuleiro[j][i]== corPeca)) { lineSequence++; }

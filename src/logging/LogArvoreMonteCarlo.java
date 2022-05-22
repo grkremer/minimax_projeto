@@ -100,7 +100,7 @@ public class LogArvoreMonteCarlo {
         if(!nodosPorNivel.containsKey(profundidade)) nodosPorNivel.put(profundidade,1);
         else nodosPorNivel.put(profundidade, nodosPorNivel.get(profundidade)+1) ;
         //pega os filhos
-        for (NodeMCTS filho : (nodo.getChildren()).values()) ProcessarArvore(filho, profundidade+1);
+        for (NodeMCTS filho : (nodo.getChildren())) ProcessarArvore(filho, profundidade+1);
         
         if(maxDepth < profundidade) {
             maxDepth=profundidade;

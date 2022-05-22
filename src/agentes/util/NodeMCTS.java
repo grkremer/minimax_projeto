@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 public class NodeMCTS implements INode {
     private NodeMCTS parent;
-    private HashMap<Jogada, NodeMCTS> children;
+    private ArrayList<NodeMCTS> children;
     private int[][] state;
     private Jogada action;
     private int playerColor;
@@ -27,7 +27,7 @@ public class NodeMCTS implements INode {
         this.ply = ply;
         this.parent = parent;
         this.availableActions = new ArrayList<Jogada>();
-        this.children = new HashMap<Jogada, NodeMCTS>();
+        this.children = new ArrayList<NodeMCTS>();
         this.nValue = 0;
         this.qValue = 0;
     }
@@ -47,7 +47,7 @@ public class NodeMCTS implements INode {
         return output;
     }
 
-    public void addChild(Jogada action, NodeMCTS newChild){ children.put(action, newChild);}
+    public void addChild(Jogada action, NodeMCTS newChild){ children.add(newChild);}
     
     public void incrementNValue(){nValue+=1;}
 
@@ -58,7 +58,7 @@ public class NodeMCTS implements INode {
 
     public int[][] getState(){ return state; }
 
-    public HashMap<Jogada, NodeMCTS> getChildren(){ return children; }
+    public ArrayList<NodeMCTS> getChildren(){ return children; }
 
     public int getPly(){ return ply; }
 
@@ -76,5 +76,19 @@ public class NodeMCTS implements INode {
     public void setAvailableActions(ArrayList<Jogada> avActions){ availableActions = avActions; }
 
     public void setQValue(double qValue){ this.qValue = qValue;}
+
+    public void removeParent(){ this.parent = null; }
+
+    @Override
+    public String toString(){
+        String out = "";
+        for(int i = 0; i < 5; i++){
+            for(int j = 0; j < 5; j++){
+                out += Integer.toString(state[i][j]) + "";
+            }
+            out += "|";
+        }
+        return out;
+    }
     
 }
