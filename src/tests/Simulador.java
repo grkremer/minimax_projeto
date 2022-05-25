@@ -79,6 +79,9 @@ public class Simulador {
                 j = jogadorAtual.Move(jogo, jogo.getTabuleiro(), executionTime);
                 
                 
+
+                
+                /* 
                 String[] stArgs = (jogadorAtual).ComputeStatistics();
                 executionTime[0] = stArgs[2];
                 
@@ -88,7 +91,8 @@ public class Simulador {
                 Collections.addAll(plyLst, stArgs);
                 plyLst.add(" ");
                 logLst.add(plyLst);
-                
+                */
+
                 jogo.fazJogada(j, jogo.getTabuleiro(), true);
                 rodada = jogo.invertePeca(rodada);
                 if(turnos >= 50) break;
@@ -99,15 +103,15 @@ public class Simulador {
             
             if(jogo.verificaVitoria(agente1.getCorPeca(), jogo.getTabuleiro())){
                 System.out.println("VITORIA jogador 1");
-                (logLst.get(logLst.size()-1)).set(10, "VITORIA");
+                //(logLst.get(logLst.size()-1)).set(10, "VITORIA");
                 vitoriasA1++;
             }else if(jogo.verificaVitoria(agente2.getCorPeca(), jogo.getTabuleiro())){
                 System.out.println("VITORIA jogador 2");
-                (logLst.get(logLst.size()-1)).set(10, "VITORIA");
+                //(logLst.get(logLst.size()-1)).set(10, "VITORIA");
                 vitoriasA2++;
             }else{
                 System.out.println("EMPATE");
-                (logLst.get(logLst.size()-1)).set(10, "EMPATE");
+                //(logLst.get(logLst.size()-1)).set(10, "EMPATE");
                 empates++;
             }
             rodadaInicial = jogo.invertePeca(rodadaInicial);

@@ -49,7 +49,7 @@ public class NegTTTree extends NegTT{
         
         super.closeVariables();
         log.AvaliaArvore(root);
-        System.out.println("nodesTT: " + String.valueOf(numberNodes) + "\ttranspositionsTT: " + String.valueOf(transpositions));
+        //System.out.println("nodesTT: " + String.valueOf(numberNodes) + "\ttranspositionsTT: " + String.valueOf(transpositions));
         
         return melhorJogada;
         
@@ -60,7 +60,7 @@ public class NegTTTree extends NegTT{
         
         numberNodes++;
         
-        String boardHash = super.getHash(board);
+        String boardHash = super.getHash(board, sign);
         TTEntry ttEntry = transpositionTable.get(boardHash);
         
         //para usar o valor da tabela ela deve ser igual ou mais profunda que a avaliação atual

@@ -52,7 +52,27 @@ public class NodeMCTS implements INode {
     public void incrementNValue(){nValue+=1;}
 
     public void updateQValue(double newQvalue){ qValue = newQvalue;}
+
+    public void updateNValue(int newNvalue){ nValue = newNvalue;}
     
+    public Boolean isEqual(NodeMCTS node){
+        //Check if matrixes are equivalend: Java stinks
+        Boolean eq = true;
+        for(int i = 0; i < 5; i++){
+            for(int j = 0; j < 5; j++){
+                if(node.getState()[i][j]!=state[i][j]){
+                    eq=false;
+                    break;
+                }
+            }
+        }
+
+        if( eq && node.getPlayerColor() == this.getPlayerColor()) {
+            return true;
+        }else{
+            return false;
+        }
+    }
     // GETTERS
     public Jogada getAction(){return action; }
 

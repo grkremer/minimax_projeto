@@ -19,16 +19,19 @@ public class MCTS implements IAgent{
     private final String ID = "MCTS";
     private final double DISCOUNT_COEF_STND = 0.99;
 
-    private int episodes;
-    private double explorationCoeficient; //(0...1)
-    private double discountCoef; // (0...1)
-    private Boolean timeBased; // INSTEAD NUMBER OF EPISODES, GENERATE THE TREE USING TIME.
-    private double timeLimit;
-    private Boolean treeReuse;
-
-    private NodeMCTS root;
-    private int agentColor;
+    /* USEFUL PARAMETERS */
+    protected int episodes;
+    protected double explorationCoeficient; //(0...1)
+    protected double discountCoef; // (0...1)
+    protected Boolean timeBased; // INSTEAD NUMBER OF EPISODES, GENERATE THE TREE USING TIME.
+    protected double timeLimit;
+    protected int agentColor;
+    
     private LogArvoreMonteCarlo log;
+    
+    /* SPECIFIC PARAMETERS */
+    private Boolean treeReuse;
+    private NodeMCTS root;
     
     protected float runningTime;
     protected long startTime;
@@ -45,6 +48,7 @@ public class MCTS implements IAgent{
         
     }
 
+    @Override
     public Jogada Move(Jogo enviroment, int[][] board, String[] args) throws InterruptedException{ //tem que adicionar a ply
         runningTime = 0;
         startTime   = System.currentTimeMillis();  
@@ -154,7 +158,7 @@ public class MCTS implements IAgent{
         return newNode;
     }
 
-    private double rollout(Jogo env, NodeMCTS node) throws InterruptedException{
+    public double rollout(Jogo env, NodeMCTS node) throws InterruptedException{
         ArrayList<Jogada> actionsLst = node.getAvailableActions();
         int[][] state = env.criaCopiaTabuleiro(node.getState());
         if(actionsLst.isEmpty()){
@@ -184,7 +188,7 @@ public class MCTS implements IAgent{
         
     }
 
-    private void backpropagate(NodeMCTS node, double reward){
+    public void backpropagate(NodeMCTS node, double reward){
         NodeMCTS current  = node;
         double discReward = reward;
         while(!(current == null)){

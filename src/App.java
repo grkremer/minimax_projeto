@@ -21,7 +21,9 @@ public class App {
         // tentar otimizar Jogo da velha 4 e Tick tackle
         
         
-        Simulador s = new Simulador(new JogoDaVelha4(), new MCTS(Jogo.PECA_BRANCA, 1000, 1, true, true), new MCTS(Jogo.PECA_PRETA, 2000, 1, false, false));
+        Simulador s = new Simulador(new TicTackle5(), new ParallelMCTS(Jogo.PECA_BRANCA, 2000, 1, 3), new MCTS(Jogo.PECA_PRETA, 2000, 1, false, false));
+        //Simulador s = new Simulador(new JogoDaVelha4(), new NegTT(Jogo.PECA_BRANCA, 5), new MinimaxTree(Jogo.PECA_PRETA, 5));
+        
         s.Simular("teste-mMCTS", 100);
         
         //JogoDaVelha4 jogo = new JogoDaVelha4();

@@ -14,4 +14,5 @@ public class TTEntry {
         this.flag = flag;
         this.depth = depth;
     }
+    
 }
