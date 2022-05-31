@@ -68,7 +68,7 @@ public class NegTT extends Negamax{
         }
 
         if(depth == 0 || game.verificaFimDeJogo(board)){
-            return game.geraCusto(COR_PECA, board, -100, +100); //* sign;
+            return game.geraCusto(COR_PECA, board, -100, +100) * sign;
         }
         
         float max    = Integer.MIN_VALUE;

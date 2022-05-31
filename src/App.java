@@ -21,10 +21,10 @@ public class App {
         // tentar otimizar Jogo da velha 4 e Tick tackle
         
         
-        Simulador s = new Simulador(new TicTackle5(), new ParallelMCTS(Jogo.PECA_BRANCA, 2000, 1, 3), new MCTS(Jogo.PECA_PRETA, 2000, 1, false, false));
-        //Simulador s = new Simulador(new JogoDaVelha4(), new NegTT(Jogo.PECA_BRANCA, 5), new MinimaxTree(Jogo.PECA_PRETA, 5));
+        //Simulador s = new Simulador(new TicTackle5(), new ParallelMCTS(Jogo.PECA_BRANCA, 500, 1, 3), new MCTS(Jogo.PECA_PRETA, 1500, 1, false, false));
+        Simulador s = new Simulador(new Alquerque(), new ParallelMCTS(Jogo.PECA_BRANCA, 10000, 1, 4), new IterativeDeepening(Jogo.PECA_PRETA, 9));
         
-        s.Simular("teste-mMCTS", 100);
+        s.Simular("teste-mMCTS", 30);
         
         //JogoDaVelha4 jogo = new JogoDaVelha4();
         //System.out.println(jogo.maximoAlinhado(-1, new int[][]{ {1,0,0,0,0}, {0,1,0,0,0}, {0,0,1,0,0}, {0,0,0,1,0}, {-1,-1,-1,-1,0}} ));
