@@ -22,7 +22,8 @@ public class App {
         
         
         //Simulador s = new Simulador(new TicTackle5(), new ParallelMCTS(Jogo.PECA_BRANCA, 500, 1, 3), new MCTS(Jogo.PECA_PRETA, 1500, 1, false, false));
-        Simulador s = new Simulador(new Alquerque(), new ParallelMCTS(Jogo.PECA_BRANCA, 10000, 1, 4), new IterativeDeepening(Jogo.PECA_PRETA, 9));
+        Simulador s = new Simulador(new Alquerque(), new Minimax(Jogo.PECA_BRANCA, 4), new IterativeDeepening(Jogo.PECA_PRETA, 4));
+        //Simulador s = new Simulador(new Alquerque(), new MCTS(Jogo.PECA_BRANCA, 5000, 1, false, false), new MCTS(Jogo.PECA_PRETA, 5000, 1, false, false));
         
         s.Simular("teste-mMCTS", 30);
         

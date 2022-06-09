@@ -14,6 +14,7 @@ public class NodeMCTS implements INode {
     
     private ArrayList<Jogada> availableActions;
     private int nValue;
+    private ArrayList<Double> totalQValues;
     private double qValue;
     
 
@@ -30,6 +31,7 @@ public class NodeMCTS implements INode {
         this.children = new ArrayList<NodeMCTS>();
         this.nValue = 0;
         this.qValue = 0;
+        totalQValues = new ArrayList<Double>();
     }
 
     public void removeAvailableAction(Jogada j){
@@ -51,9 +53,14 @@ public class NodeMCTS implements INode {
     
     public void incrementNValue(){nValue+=1;}
 
-    public void updateQValue(double newQvalue){ qValue = newQvalue;}
+    public void updateQValue(double newQvalue){ 
+        totalQValues.add(newQvalue);
+        qValue = newQvalue;
+    }
 
-    public void updateNValue(int newNvalue){ nValue = newNvalue;}
+    public void updateNValue(int newNvalue){ 
+        nValue = newNvalue;
+    }
     
     public Boolean isEqual(NodeMCTS node){
         //Check if matrixes are equivalend: Java stinks
@@ -91,6 +98,8 @@ public class NodeMCTS implements INode {
     public int getNValue(){ return nValue; }
     
     public double getQValue(){ return qValue; }
+
+    public ArrayList<Double> getTotalQValue(){ return totalQValues;}
 
     // SETTERS
     public void setAvailableActions(ArrayList<Jogada> avActions){ availableActions = avActions; }

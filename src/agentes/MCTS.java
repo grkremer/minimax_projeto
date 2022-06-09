@@ -122,8 +122,13 @@ public class MCTS implements IAgent{
         double maxUCB1    = -100;
         
         for (NodeMCTS n: node.getChildren()){
-            double UCBValue = UCB1(node.getNValue(), n.getNValue(), n.getQValue(), node.getPlayerColor());
-        
+            
+            double UCBValue = 0;
+            if(agentColor == Jogo.PECA_BRANCA)
+                UCBValue = UCBTuned(node.getNValue(), n.getNValue(), n.getTotalQValue(), node.getPlayerColor());
+            else
+                UCBValue = UCB1(node.getNValue(), n.getNValue(), n.getQValue(), node.getPlayerColor());
+            
             if(UCBValue > maxUCB1){
                 maxUCB1  = UCBValue;
                 nextNode = n;
@@ -208,6 +213,30 @@ public class MCTS implements IAgent{
             exploitation *= -1;
         }
         return exploitation + (explorationCoeficient * exploration);
+    }
+
+    private double UCBTuned(int nValueParent, int nValue, ArrayList<Double> totalQValues, int parentColor){
+        
+        double sumAvgPowRewards = 0;
+        double sumAvgRewards = 0;
+        for(Double nv : totalQValues){
+            sumAvgPowRewards += (Math.pow(nv, 2));
+            sumAvgRewards += nv;
+        }
+
+        double avgPowRewards = sumAvgPowRewards/nValue;
+        double powAvgRewardsPow = Math.pow(sumAvgRewards/nValue, 2);
+        double diffAvgs = avgPowRewards - powAvgRewardsPow;
+
+        double exploitation = sumAvgPowRewards/nValue;
+        if(parentColor != agentColor){
+            exploitation *= -1;
+        }
+        
+        double UCBVariance = diffAvgs + Math.sqrt((2*Math.log(nValueParent))/nValue);
+        double exploration  =  Math.log(nValueParent)/nValue * Math.min(1/4, UCBVariance);
+        
+        return exploitation  + (explorationCoeficient * exploration);
     }
 
     private double rewardValue(Jogo env, int[][] state, int playerColor){
