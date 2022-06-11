@@ -1,4 +1,4 @@
-package agentes;
+package agentes.Minimax;
 
 import java.util.Collections;
 import agentes.util.IAgent;
@@ -30,7 +30,7 @@ public class Minimax implements IAgent{
         this.COR_PECA = COR_PECA;
     }
 
-    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args){
         initializeVariables();
         numberNodes = 1;
         
@@ -57,7 +57,7 @@ public class Minimax implements IAgent{
         return melhorJogada;
     }
 
-    private float Max(Jogo jogo, int[][] tabuleiro, int corPecaAtual, int profundidade) throws InterruptedException{
+    private float Max(Jogo jogo, int[][] tabuleiro, int corPecaAtual, int profundidade){
         numberNodes++;
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
             return jogo.geraCusto(COR_PECA, tabuleiro, MIN_PONTOS, MAX_PONTOS); //* fatorDesconto;
@@ -77,7 +77,7 @@ public class Minimax implements IAgent{
         return valor;
     }
 
-    private float Min(Jogo jogo, int[][] tabuleiro, int corPecaAtual, int profundidade) throws InterruptedException{
+    private float Min(Jogo jogo, int[][] tabuleiro, int corPecaAtual, int profundidade){
         numberNodes++;
         if(profundidade == 0 ||jogo.verificaFimDeJogo(tabuleiro)){
             return jogo.geraCusto(COR_PECA, tabuleiro, MIN_PONTOS, MAX_PONTOS); //* fatorDesconto;
@@ -98,19 +98,7 @@ public class Minimax implements IAgent{
     }
 
     public String[] ComputeStatistics(){
-        Minimax logTree = new MinimaxTree(COR_PECA, maxDepth);
-        
-        try{
-            logTree.Move(this.lastGamePlayed, lastBoardEvaluated, null);
-        }catch(InterruptedException e){
-
-        }
-
-        String[] thisArgs = getArgs(); //nome_agente, cor_peça 
-        String[] logArgs = logTree.getArgs(); //maxdepth, bfactor, tnodes
-        String[] result = Arrays.copyOf(thisArgs, thisArgs.length + logArgs.length);
-        System.arraycopy(logArgs, 0, result, thisArgs.length, logArgs.length);
-        return result;
+       return null;
     }
 
     protected void initializeVariables(){

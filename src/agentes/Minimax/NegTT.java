@@ -1,4 +1,4 @@
-package agentes;
+package agentes.Minimax;
 
 import java.util.HashMap;
 import agentes.util.TTEntry;
@@ -25,7 +25,7 @@ public class NegTT extends Negamax{
     }
     
     @Override
-    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args){
         initializeVariables();
         numberNodes = 1;
         transpositions=0;
@@ -55,7 +55,7 @@ public class NegTT extends Negamax{
     
 
     @Override
-    public float negamax(Jogo game, int[][] board, int currentPiece, int depth, int sign) throws InterruptedException{ 
+    public float negamax(Jogo game, int[][] board, int currentPiece, int depth, int sign){ 
         numberNodes++;
         // Transposition Table Lookup; node is the lookup key for ttEntry 
         String boardHash = getHash(board, sign);
@@ -101,22 +101,6 @@ public class NegTT extends Negamax{
     
     @Override
     public String[] ComputeStatistics(){
-        
-        /* 
-        NegTTTree logTree = new NegTTTree(COR_PECA, maxDepth);
-        
-        try{
-            logTree.Move(this.lastGamePlayed, lastBoardEvaluated, null);
-        }catch(InterruptedException e){
-
-        }
-
-        String[] logArgs = logTree.getArgs();
-        String[] thisArgs = getArgs();
-        String[] result = Arrays.copyOf(logArgs, logArgs.length + thisArgs.length);
-        System.arraycopy(thisArgs, 0, result, logArgs.length, thisArgs.length);
-        return result;
-        */
         return null;
     }
     

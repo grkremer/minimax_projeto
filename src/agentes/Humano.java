@@ -27,10 +27,15 @@ public class Humano implements IAgent{
         getJanelaJogo().setCorPecaHumano(corPeca);
     }
 
-    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException {
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args){
         getJanelaJogo().setHumanoJogando(true);
         while(getJanelaJogo().isHumanoJogando()) {
-            Thread.sleep(1);
+            try{
+                Thread.sleep(1);
+            }
+            catch(InterruptedException e){
+                System.out.println("Thread Interrupted");
+            }
         }
         return getJanelaJogo().getJogadaDoHumano();
     }

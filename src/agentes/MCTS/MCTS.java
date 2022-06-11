@@ -1,4 +1,4 @@
-package agentes;
+package agentes.MCTS;
 
 /* COMMUM DATA STRCTURES */
 import java.util.ArrayList;
@@ -8,12 +8,13 @@ import java.util.Map;
 import javax.lang.model.util.ElementScanner14;
 
 /* GAME DATA STRCURES */
+import agentes.MCTS.policy.*;
 import agentes.util.IAgent;
 import agentes.util.INode;
-import agentes.util.NodeMCTS;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
 import logging.LogArvoreMonteCarlo;
+;
 
 public class MCTS implements IAgent{
     private final String ID = "MCTS";
@@ -27,29 +28,32 @@ public class MCTS implements IAgent{
     protected double timeLimit;
     protected int agentColor;
     
-    private LogArvoreMonteCarlo log;
-    
     /* SPECIFIC PARAMETERS */
     private Boolean treeReuse;
     private NodeMCTS root;
+    private Policy policy;
     
+
     protected float runningTime;
     protected long startTime;
     protected long endTime;
     protected int nodeCounter;
 
-    public MCTS(int agentColor, int episodes, double expCoeficient, Boolean timeBased, Boolean treeReuse){
+    public MCTS(int policy, int agentColor, int episodes, double expCoeficient, Boolean timeBased, Boolean treeReuse){
         this.agentColor = agentColor;
         this.episodes   = episodes;
         this.discountCoef = DISCOUNT_COEF_STND;
         this.timeBased    = timeBased;
         this.treeReuse    = treeReuse;
         this.explorationCoeficient = expCoeficient;
-        
+        if(policy == 0)
+            this.policy = new UCB(agentColor, expCoeficient);
+        else
+            this.policy = new UCBTuned(agentColor, expCoeficient);
     }
 
     @Override
-    public Jogada Move(Jogo enviroment, int[][] board, String[] args) throws InterruptedException{ //tem que adicionar a ply
+    public Jogada Move(Jogo enviroment, int[][] board, String[] args){ //tem que adicionar a ply
         runningTime = 0;
         startTime   = System.currentTimeMillis();  
         nodeCounter = 0;
@@ -93,10 +97,10 @@ public class MCTS implements IAgent{
         runningTime = (endTime - startTime)/1000f;
         System.out.println("nodesNEW: " + String.valueOf(nodeCounter) + "\ttime: " + String.valueOf(runningTime) + "s");
         
-        return maxChild();//bestAction;
+        return maxChild(root);
     }
 
-    public Jogada maxChild(){
+    public Jogada maxChild(NodeMCTS root){
         Jogada bestAction = null;
         double maxValue   = Integer.MIN_VALUE;
 
@@ -117,20 +121,15 @@ public class MCTS implements IAgent{
             return node;
         }
         
-        
         NodeMCTS nextNode = null;
-        double maxUCB1    = -100;
+        double maxPolicyValue    = -100;
         
         for (NodeMCTS n: node.getChildren()){
             
-            double UCBValue = 0;
-            if(agentColor == Jogo.PECA_BRANCA)
-                UCBValue = UCBTuned(node.getNValue(), n.getNValue(), n.getTotalQValue(), node.getPlayerColor());
-            else
-                UCBValue = UCB1(node.getNValue(), n.getNValue(), n.getQValue(), node.getPlayerColor());
+            double policyValue = policy.select(node.getNValue(), n.getNValue(), n.getTotalQValue(), node.getPlayerColor());
             
-            if(UCBValue > maxUCB1){
-                maxUCB1  = UCBValue;
+            if(policyValue > maxPolicyValue){
+                maxPolicyValue  = policyValue;
                 nextNode = n;
             }
         }
@@ -144,7 +143,7 @@ public class MCTS implements IAgent{
         
     }
 
-    public NodeMCTS expand(Jogo env, NodeMCTS node) throws InterruptedException{
+    public NodeMCTS expand(Jogo env, NodeMCTS node){
         ArrayList<Jogada> avActions = node.getAvailableActions();
         if(avActions.isEmpty()) return node;
         Collections.shuffle(avActions);
@@ -163,7 +162,7 @@ public class MCTS implements IAgent{
         return newNode;
     }
 
-    public double rollout(Jogo env, NodeMCTS node) throws InterruptedException{
+    public double rollout(Jogo env, NodeMCTS node){
         ArrayList<Jogada> actionsLst = node.getAvailableActions();
         int[][] state = env.criaCopiaTabuleiro(node.getState());
         if(actionsLst.isEmpty()){
@@ -205,41 +204,8 @@ public class MCTS implements IAgent{
         }
     }
 
-    private double UCB1(int nValueParent, int nValue, double qValue, int parentColor){
-        double exploitation = qValue/nValue;;
-        double exploration  = Math.sqrt( (2*Math.log(nValueParent))/nValue );
-        
-        if(parentColor != agentColor){
-            exploitation *= -1;
-        }
-        return exploitation + (explorationCoeficient * exploration);
-    }
-
-    private double UCBTuned(int nValueParent, int nValue, ArrayList<Double> totalQValues, int parentColor){
-        
-        double sumAvgPowRewards = 0;
-        double sumAvgRewards = 0;
-        for(Double nv : totalQValues){
-            sumAvgPowRewards += (Math.pow(nv, 2));
-            sumAvgRewards += nv;
-        }
-
-        double avgPowRewards = sumAvgPowRewards/nValue;
-        double powAvgRewardsPow = Math.pow(sumAvgRewards/nValue, 2);
-        double diffAvgs = avgPowRewards - powAvgRewardsPow;
-
-        double exploitation = sumAvgPowRewards/nValue;
-        if(parentColor != agentColor){
-            exploitation *= -1;
-        }
-        
-        double UCBVariance = diffAvgs + Math.sqrt((2*Math.log(nValueParent))/nValue);
-        double exploration  =  Math.log(nValueParent)/nValue * Math.min(1/4, UCBVariance);
-        
-        return exploitation  + (explorationCoeficient * exploration);
-    }
-
-    private double rewardValue(Jogo env, int[][] state, int playerColor){
+    
+    public double rewardValue(Jogo env, int[][] state, int playerColor){
         if(env.verificaVitoria(playerColor, state)){
             return 1;
         }else if(env.verificaVitoria(env.invertePeca(playerColor), state)){
@@ -253,6 +219,8 @@ public class MCTS implements IAgent{
         return Math.pow(discountCoef, plys);
     }
 
+
+    /* Used for tree reuse */
     private NodeMCTS findRoot(Jogo env, int[][] state){
         ArrayList<NodeMCTS> nodes = new ArrayList<NodeMCTS>();
         nodes.add(root);
@@ -289,23 +257,8 @@ public class MCTS implements IAgent{
     public int getCorPeca(){ return agentColor;}
     
     @Override
-    public String[] ComputeStatistics(){
-        
-        log = new LogArvoreMonteCarlo();
-        
-        log.AvaliaArvore(root);
-        String[] thisArgs = getArgs();
-        return thisArgs;
-    }
-
-    @Override
-    public String[] getArgs(){
-
-        return new String[]{this.ID, String.valueOf(agentColor), String.valueOf(runningTime), String.valueOf(log.maxDepth), String.valueOf(log.mediaBranching), String.valueOf(log.numeroNodos), String.valueOf(log.maxBranching), log.maxBoard };
-    }
-
-    @Override
     public String getID(){
         return ID;
     }
+
 }

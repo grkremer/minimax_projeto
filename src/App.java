@@ -4,6 +4,9 @@ import jogos.util.Jogo;
 import org.junit.runner.manipulation.Alphanumeric;
 
 import agentes.*;
+import agentes.MCTS.EnsembleMCTS;
+import agentes.MCTS.ParallelLeafMCTS;
+import agentes.MCTS.MCTS;
 import agentes.Trees.ABPruneTree;
 import agentes.Trees.MinimaxTree;
 import interfaces.*;
@@ -14,42 +17,9 @@ public class App {
         //JanelaJogo janela = new JanelaJogo(jogo);
         //jogo.jogar(new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 10000, 1/Math.sqrt(2), 0.6, "STND", "AVG", true));
         
-
-        // *****  MUDANÇAS PARA FAZER ******
-        // botar o shuffle no ABPRUNETree
-        // colocar simetria opcional por parâmetro
-        // tentar otimizar Jogo da velha 4 e Tick tackle
-        
-        
-        //Simulador s = new Simulador(new TicTackle5(), new ParallelMCTS(Jogo.PECA_BRANCA, 500, 1, 3), new MCTS(Jogo.PECA_PRETA, 1500, 1, false, false));
-        Simulador s = new Simulador(new Alquerque(), new Minimax(Jogo.PECA_BRANCA, 4), new IterativeDeepening(Jogo.PECA_PRETA, 4));
-        //Simulador s = new Simulador(new Alquerque(), new MCTS(Jogo.PECA_BRANCA, 5000, 1, false, false), new MCTS(Jogo.PECA_PRETA, 5000, 1, false, false));
-        
+        Simulador s = new Simulador(new Alquerque(), new MCTS(0, Jogo.PECA_BRANCA, 5000, 1, false, false), new MCTS(1, Jogo.PECA_PRETA, 5000, 1, false, false));
         s.Simular("teste-mMCTS", 30);
         
-        //JogoDaVelha4 jogo = new JogoDaVelha4();
-        //System.out.println(jogo.maximoAlinhado(-1, new int[][]{ {1,0,0,0,0}, {0,1,0,0,0}, {0,0,1,0,0}, {0,0,0,1,0}, {-1,-1,-1,-1,0}} ));
         
-        // ****** RODAR TESTES *******
-        
-        // TESTE 1
-        //Simulador s1 = new Simulador(new JogoDaVelha4(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
-        //s1.Simular("JogoDaVelha-teste1", 100);
-
-        // TESTE 2
-        // Simulador s2 = new Simulador(new JogoDaVelha4(), new ABPruneTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
-        // s2.Simular("JogoDaVelha-teste2", 100);
-        
-        // TESTE 3
-        // Simulador s1 = new Simulador(new TicTackle5(), new MinimaxTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
-        // s1.Simular("JogoDaVelha-teste1", 100);
-
-        // TESTE 4
-        // Simulador s2 = new Simulador(new TicTackle5(), new ABPruneTree(Jogo.PECA_BRANCA, 5), new newMCTS(Jogo.PECA_PRETA, 20000, 1/Math.sqrt(2), 0.9, "STND", "AVG", true));
-        // s2.Simular("JogoDaVelha-teste2", 100);
-        
-        
-        //jogo.carregaLog("logs/log.txt");
-        //janela.replayHistoricoJogadas();
     }
 }

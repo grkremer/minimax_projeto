@@ -1,7 +1,9 @@
-package agentes.util;
+package agentes.MCTS;
 import jogos.util.Jogada;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import agentes.util.INode;
 public class NodeMCTS implements INode {
     private NodeMCTS parent;
     private ArrayList<NodeMCTS> children;

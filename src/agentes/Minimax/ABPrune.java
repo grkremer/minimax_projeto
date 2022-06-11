@@ -1,4 +1,4 @@
-package agentes;
+package agentes.Minimax;
 
 import java.util.Collections;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import jogos.util.Jogada;
 import jogos.util.Jogo;
 
 import java.util.Arrays;
+
 import agentes.Trees.ABPruneTree;
 
 

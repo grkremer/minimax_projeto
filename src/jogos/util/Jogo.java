@@ -139,11 +139,17 @@ public class Jogo {
                 break;
         }
     }
-    public void fazJogada(Jogada jogada, int[][] tabuleiro, boolean usaDelay) throws InterruptedException {
+    public void fazJogada(Jogada jogada, int[][] tabuleiro, boolean usaDelay){
         for(Movimento movimento : jogada.getMovimentos()) {
             fazMovimento(movimento, tabuleiro);
-            if(usaDelay)
-                Thread.sleep(getDelayJogada());
+            if(usaDelay){
+                try{
+                    Thread.sleep(getDelayJogada());
+                }
+                catch(InterruptedException e){
+                    System.out.println("Interrupted");
+                }
+            }
         }
     } 
     public boolean verificaJogada(Jogada jogada, int[][] tabuleiro) {

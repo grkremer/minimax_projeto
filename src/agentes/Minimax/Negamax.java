@@ -1,4 +1,4 @@
-package agentes;
+package agentes.Minimax;
 
 import agentes.util.IAgent;
 import jogos.util.Jogada;
@@ -31,7 +31,7 @@ public class Negamax implements IAgent{
         this.maxDepth = profundidadeMax;
     }
     
-    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args){
         initializeVariables();
         numberNodes=1;
 
@@ -58,7 +58,7 @@ public class Negamax implements IAgent{
         
     }
     
-    public float negamax(Jogo game, int[][] board, int currentPiece, int depth, int sign) throws InterruptedException{ 
+    public float negamax(Jogo game, int[][] board, int currentPiece, int depth, int sign){ 
         numberNodes++;
         if(depth == 0 ||game.verificaFimDeJogo(board)){
             return game.geraCusto(COR_PECA, board, -100, +100) * sign;
@@ -86,28 +86,6 @@ public class Negamax implements IAgent{
 
     public int getProfundidade(){ return maxDepth; }
     public int getCorPeca(){ return COR_PECA; }
-
-    public String[] ComputeStatistics(){
-        NegamaxTree logTree = new NegamaxTree(COR_PECA, maxDepth);
-        
-        try{
-            logTree.Move(this.lastGamePlayed, lastBoardEvaluated, null);
-        }catch(InterruptedException e){
-
-        }
-
-        String[] logArgs = logTree.getArgs();
-        String[] thisArgs = getArgs();
-        String[] result = Arrays.copyOf(logArgs, logArgs.length + thisArgs.length);
-        System.arraycopy(thisArgs, 0, result, logArgs.length, thisArgs.length);
-        return result;
-    }
-
-    //"Jogador;Tecnica;Jogo;Turno;Tempo Execução;Nodos Explorados;Profundidade;Branching Factor;Max child;Podas;Transposições;";
-    @Override
-    public String[] getArgs(){
-        return new String[]{String.valueOf(COR_PECA), this.ID, lastGamePlayed.getNome(), String.valueOf(executionTime)+"s"};
-    }
     
     @Override
     public String toString(){

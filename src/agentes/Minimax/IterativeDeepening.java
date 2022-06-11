@@ -1,4 +1,4 @@
-package agentes;
+package agentes.Minimax;
 
 import java.util.Collections;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class IterativeDeepening implements IAgent{
     }
 
     @Override
-    public Jogada Move(Jogo environment, int[][] state, String[] args) throws InterruptedException{
+    public Jogada Move(Jogo environment, int[][] state, String[] args){
         
         cutoffs=0;
         
@@ -73,7 +73,7 @@ public class IterativeDeepening implements IAgent{
 
 
 
-    private float Max(Jogo environment, int[][] state, int currentPlayer, int depth, float alpha, float beta) throws InterruptedException{
+    private float Max(Jogo environment, int[][] state, int currentPlayer, int depth, float alpha, float beta){
         
         nodes++;
         
@@ -120,7 +120,7 @@ public class IterativeDeepening implements IAgent{
         return value;
     }
 
-    private float Min(Jogo environment, int[][] state, int currentPlayer, int depth, float alpha, float beta) throws InterruptedException{
+    private float Min(Jogo environment, int[][] state, int currentPlayer, int depth, float alpha, float beta){
         
         nodes++;
         if(depth == 0 ||environment.verificaFimDeJogo(state)){
@@ -182,18 +182,7 @@ public class IterativeDeepening implements IAgent{
     public int getCorPeca(){
         return this.player;
     }
-
-    @Override
-    public String[] ComputeStatistics(){
-        return new String[]{};
-    }
-
-    @Override
-    public String[] getArgs(){
-        return new String[]{};
-    }
-
-
+    
     @Override
     public String toString()
     {

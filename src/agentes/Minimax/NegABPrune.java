@@ -1,6 +1,5 @@
-package agentes;
+package agentes.Minimax;
 
-import agentes.Trees.NegABPruneTree;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
 import java.util.Arrays;
@@ -20,7 +19,7 @@ public class NegABPrune extends Negamax{
     }
     
     @Override
-    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args) throws InterruptedException{
+    public Jogada Move(Jogo jogo, int[][] tabuleiro, String[] args){
         super.initializeVariables();
         super.numberNodes=1;
         cutoffs=0;
@@ -48,7 +47,7 @@ public class NegABPrune extends Negamax{
         
     }
     
-    public float negamax(Jogo game, int[][] board, int currentPiece, int depth, float alpha, float beta, int sign) throws InterruptedException{ 
+    public float negamax(Jogo game, int[][] board, int currentPiece, int depth, float alpha, float beta, int sign){ 
         super.numberNodes++;
         if(depth == 0 ||game.verificaFimDeJogo(board)){
             return game.geraCusto(COR_PECA, board, -100, +100) * sign;
@@ -71,19 +70,7 @@ public class NegABPrune extends Negamax{
 
     @Override
     public String[] ComputeStatistics(){
-        NegABPruneTree logTree = new NegABPruneTree(COR_PECA, maxDepth);
-        
-        try{
-            logTree.Move(lastGamePlayed, lastBoardEvaluated);
-        }catch(InterruptedException e){
-
-        }
-
-        String[] logArgs = logTree.getArgs();
-        String[] thisArgs = getArgs();
-        String[] result = Arrays.copyOf(logArgs, logArgs.length + thisArgs.length);
-        System.arraycopy(thisArgs, 0, result, logArgs.length, thisArgs.length);
-        return result;
+        return null;
     }
 
     @Override
