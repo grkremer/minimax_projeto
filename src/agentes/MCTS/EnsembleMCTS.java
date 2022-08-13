@@ -2,20 +2,10 @@ package agentes.MCTS;
 
 /* COMMUM DATA STRCTURES */
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.lang.model.util.ElementScanner14;
 
 /* GAME DATA STRCURES */
-import agentes.util.IAgent;
-import agentes.util.INode;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
-import logging.LogArvoreMonteCarlo;
 
 
 public class EnsembleMCTS extends MCTS {

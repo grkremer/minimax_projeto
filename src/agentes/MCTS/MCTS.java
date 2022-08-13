@@ -3,18 +3,13 @@ package agentes.MCTS;
 /* COMMUM DATA STRCTURES */
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
-
-import javax.lang.model.util.ElementScanner14;
 
 /* GAME DATA STRCURES */
 import agentes.MCTS.policy.*;
 import agentes.util.IAgent;
-import agentes.util.INode;
 import jogos.util.Jogada;
 import jogos.util.Jogo;
-import logging.LogArvoreMonteCarlo;
-;
+
 
 public class MCTS implements IAgent{
     private final String ID = "MCTS";
@@ -48,8 +43,20 @@ public class MCTS implements IAgent{
         this.explorationCoeficient = expCoeficient;
         if(policy == 0)
             this.policy = new UCB(agentColor, expCoeficient);
-        else
+        else if(policy == 1)
             this.policy = new UCBTuned(agentColor, expCoeficient);
+        else
+            this.policy = new UCB_RAVE(agentColor, expCoeficient);
+    }
+
+    public MCTS(Policy policy, int agentColor, int episodes, double expCoeficient, Boolean timeBased, Boolean treeReuse){
+        this.agentColor = agentColor;
+        this.episodes   = episodes;
+        this.discountCoef = DISCOUNT_COEF_STND;
+        this.timeBased    = timeBased;
+        this.treeReuse    = treeReuse;
+        this.explorationCoeficient = expCoeficient;
+        this.policy = policy;
     }
 
     @Override
@@ -126,7 +133,7 @@ public class MCTS implements IAgent{
         
         for (NodeMCTS n: node.getChildren()){
             
-            double policyValue = policy.select(node.getNValue(), n.getNValue(), n.getTotalQValue(), node.getPlayerColor());
+            double policyValue = policy.select(node);
             
             if(policyValue > maxPolicyValue){
                 maxPolicyValue  = policyValue;
@@ -188,7 +195,7 @@ public class MCTS implements IAgent{
             playerColor = env.invertePeca(playerColor);
         }
 
-        return rewardValue(env, state, agentColor); //* discountFactor(plys);
+        return rewardValue(env, state, agentColor) * discountFactor(plys);
         
     }
 

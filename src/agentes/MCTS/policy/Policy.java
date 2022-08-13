@@ -1,7 +1,8 @@
 package agentes.MCTS.policy;
-import java.util.ArrayList;
+import agentes.MCTS.NodeMCTS;
+
 public class Policy {
-    public double select(int nValueParent, int nValue, ArrayList<Double> totalQValues, int parentColor){
+    public double select(NodeMCTS node){
         return 0;
     }
 }

@@ -10,6 +10,7 @@ public class UCBTuned extends Policy{
         this.explorationCoeficient = explorationCoeficient;
     }
 
+    //TODO
     @Override
     public double select(int nValueParent, int nValue, ArrayList<Double> totalQValues, int parentColor){
         double parentLog;

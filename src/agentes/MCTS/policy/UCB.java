@@ -1,5 +1,5 @@
 package agentes.MCTS.policy;
-import java.util.ArrayList;
+import agentes.MCTS.NodeMCTS;
 
 public class UCB extends Policy{
     int agentColor;
@@ -11,15 +11,15 @@ public class UCB extends Policy{
     }
 
     @Override
-    public double select(int nValueParent, int nValue, ArrayList<Double> totalQValues, int parentColor)
+    public double select(NodeMCTS node)
     {
-        double qValue = totalQValues.stream()
+        double qValue = node.getTotalQValues().stream()
                         .mapToDouble(a -> a)
                         .sum();
-        double exploitation = qValue/nValue;;
-        double exploration  = Math.sqrt( (2*Math.log(nValueParent))/nValue );
+        double exploitation = qValue/node.getNValue();
+        double exploration  = Math.sqrt( (2*Math.log(node.getParent().getNValue()))/node.getNValue() );
         
-        if(parentColor != agentColor){
+        if(node.getParent().getPlayerColor() != agentColor){
             exploitation *= -1;
         }
         return exploitation + (explorationCoeficient * exploration);
